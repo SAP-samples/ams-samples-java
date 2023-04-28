@@ -2,7 +2,7 @@
 // SPDX-License-Identifier: Apache-2.0
 
 POLICY readAllOwnItems {
-    GRANT read ON * WHERE author.createdBy = $user.user_uuid;
+    GRANT read ON * WHERE author.createdBy = $user.user_uuid AND $user.user_uuid IS NOT RESTRICTED;
 }
 
 POLICY readAllOwnItems_new {

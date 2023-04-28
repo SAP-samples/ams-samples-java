@@ -4,6 +4,4 @@ SCHEMA {
         updatedBy: String
     },
     Country: String
- 
-    
 }
