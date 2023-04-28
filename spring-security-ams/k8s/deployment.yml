@@ -1,0 +1,130 @@
+---
+###  SERVICE INSTANCE CONFIGURATION  ###
+# Identity instance
+apiVersion: services.cloud.sap.com/v1
+kind: ServiceInstance
+metadata:
+  name: auth
+spec:
+  serviceOfferingName: identity
+  servicePlanName: application
+  parameters:
+    authorization:
+      product_label: "IAS-AMS Spring example app (Kyma)"
+
+---
+apiVersion: services.cloud.sap.com/v1
+kind: ServiceBinding
+metadata:
+  name: identity
+spec:
+  serviceInstanceName: auth
+  credentialsRotationPolicy:
+    enabled: true
+    rotationFrequency: 672h # rotate every 28 days
+    rotatedBindingTTL: 336h # keep old binding for another 14 days
+  parameters:
+    credential-type: "X509_GENERATED"
+---
+###  APPLICATION CONFIGURATION  ###
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: ams-sample-app
+  name: ams-sample-app
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: ams-sample-app
+  strategy: {}
+  template:
+    metadata:
+      labels:
+        app: ams-sample-app
+    spec:
+      imagePullSecrets:
+        - name: <YOUR IMAGE PULL SECRET>
+      containers:
+        - image: <YOUR IMAGE REPOSITORY>
+          imagePullPolicy: Always
+          name: backend
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: auth-secret
+              mountPath: "/bindings/identity"
+              readOnly: true
+          env:
+            - name: SERVICE_BINDING_ROOT
+              value: "/bindings"
+        - image: cloud-security-integration.int.repositories.cloud.sap/ams-k8s-poc:e2e-test
+          imagePullPolicy: Always
+          name: adc-sidecar
+          ports:
+            - name: sidecar
+              containerPort: 8181
+              protocol: TCP
+          volumeMounts:
+            - name: auth-secret
+              mountPath: "etc/secrets/sapcp/identity/auth"
+              readOnly: true
+        - image: <YOUR APPROUTER IMAGE REPOSITORY>
+          imagePullPolicy: Always
+          name: approuter
+          ports:
+            - name: http
+              containerPort: 5000
+          volumeMounts:
+            - name: auth-secret
+              mountPath: "/etc/secrets/sapcp/identity/auth"
+              readOnly: true
+          env:
+            - name: destinations
+              value: |-
+                [{
+                    "name": "ams-spring-app-destination",
+                    "url": "http://localhost:8080",
+                    "forwardAuthToken": true
+                }]
+      volumes:
+        - name: auth-secret
+          secret:
+            secretName: "identity"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  labels:
+    app: ams-sample-app
+  name: ams-sample-app
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 5000
+  selector:
+    app: ams-sample-app # refer to pods with label = app: ams-sample-app
+
+---
+apiVersion: gateway.kyma-project.io/v1beta1
+kind: APIRule
+metadata:
+  name: ams-sample-app-api
+  labels:
+    app: ams-sample-app
+spec:
+  gateway: kyma-gateway.kyma-system.svc.cluster.local
+  host: ams-sample-app-api
+  rules:
+    - accessStrategies:
+        - config: {}
+          handler: allow
+      methods: ["GET", "POST"]
+      path: /.*
+  service:
+    name: ams-sample-app
+    port: 80

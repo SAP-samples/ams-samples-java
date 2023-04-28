@@ -1,0 +1,41 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta charset="UTF-8">
+
+    <script id="sap-ui-bootstrap"
+            src="https://sapui5.hana.ondemand.com/resources/sap-ui-core.js"
+            data-sap-ui-libs="sap.m"
+            data-sap-ui-theme="sap_fiori_3"
+            data-sap-ui-appCacheBuster="./"
+    >
+    </script>
+
+    <style>
+        .logoffPage .sapMMessagePageInner {
+            position: relative;
+        }
+    </style>
+
+    <script>
+        sap.ui.getCore().attachInit(function() {
+            new sap.m.MessagePage({
+                title: "Log Off",
+                description: "You are logged off.",
+                icon: "sap-icon://log",
+                customText: [
+                    new sap.m.Link({
+                        text: "Back to Log On",
+                        href: "/index.html"
+                    })
+                ]
+            }).addStyleClass("logoffPage").placeAt("content");
+        });
+    </script>
+</head>
+
+<body class="sapUiBody" id="content">
+</body>
+</html>

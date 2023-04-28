@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+SPDX-FileCopyrightText: 2020
+
+SPDX-License-Identifier: Apache-2.0
+-->
+<web-app xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+		 xmlns="http://java.sun.com/xml/ns/javaee"
+		 xsi:schemaLocation="http://java.sun.com/xml/ns/javaee http://java.sun.com/xml/ns/javaee/web-app_2_5.xsd"
+		 version="2.5">
+	<filter-mapping>
+		<filter-name>iasTokenValidator</filter-name>
+		<url-pattern>/app/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>x5tValidator</filter-name>
+		<url-pattern>/app/callback/*</url-pattern>
+	</filter-mapping>
+	<filter-mapping>
+		<filter-name>ams-audit-logging</filter-name>
+		<url-pattern>/app/*</url-pattern>
+	</filter-mapping>
+</web-app>

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>BasicController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-security-ams</a> &gt; <a href="index.source.html" class="el_package">com.sap.cloud.security.samples</a> &gt; <span class="el_source">BasicController.java</span></div><h1>BasicController.java</h1><pre class="source lang-java linenums">/*
+ * SPDX-FileCopyrightText: 2020
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+package com.sap.cloud.security.samples;
+
+import com.sap.cloud.security.ams.api.Principal;
+import com.sap.cloud.security.ams.dcl.client.pdp.Attributes;
+import com.sap.cloud.security.ams.dcl.client.pdp.PolicyDecisionPoint;
+import com.sap.cloud.security.config.cf.CFConstants;
+import com.sap.cloud.security.json.DefaultJsonObject;
+import com.sap.cloud.security.json.JsonObject;
+import com.sap.cloud.security.token.Token;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.access.AccessDeniedException;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ResponseStatus;
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.HttpServerErrorException;
+
+import java.util.*;
+
+import static com.sap.cloud.security.token.TokenClaims.*;
+import static org.springframework.http.HttpStatus.OK;
+import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
+
+@RestController
+<span class="fc" id="L30">public class BasicController {</span>
+
+    @Autowired
+    PolicyDecisionPoint policyDecisionPoint;
+
+    @GetMapping(value = &quot;/health&quot;)
+    public String healthCheck() {
+<span class="pc bpc" id="L37" title="1 of 2 branches missed.">        if (policyDecisionPoint.isReachable()) {</span>
+<span class="fc" id="L38">            return &quot;{\&quot;status\&quot;:\&quot;UP\&quot;}&quot;;</span>
+        }
+<span class="nc" id="L40">        throw new HttpServerErrorException(SERVICE_UNAVAILABLE, &quot;Policy engine is not reachable.&quot;);</span>
+    }
+
+    @GetMapping(value = &quot;/authenticate&quot;)
+    public String secured(@AuthenticationPrincipal Token token) {
+<span class="pc bpc" id="L45" title="1 of 2 branches missed.">        String name = token.hasClaim(USER_NAME) ? token.getClaimAsString(USER_NAME) : token.getClaimAsString(EMAIL);</span>
+<span class="fc" id="L46">        return &quot;Congratulation, &quot; + name + &quot; - You are an authenticated user.&lt;br&gt;&quot; + &quot;&lt;br&gt;user_uuid: &quot;</span>
+<span class="fc" id="L47">                + token.getClaimAsString(SAP_GLOBAL_USER_ID) + &quot;&lt;br&gt;zone_uuid: &quot;</span>
+<span class="fc" id="L48">                + token.getClaimAsString(SAP_GLOBAL_ZONE_ID);</span>
+    }
+
+    @GetMapping(value = &quot;/read&quot;)
+    public String authorizedRead() {
+<span class="fc" id="L53">        Principal principal = Principal.create();</span>
+<span class="fc" id="L54">        Attributes attributes = principal.getAttributes().setAction(&quot;read&quot;);</span>
+<span class="fc" id="L55">        boolean isReadAllowed = policyDecisionPoint.allow(attributes);</span>
+
+<span class="fc bfc" id="L57" title="All 2 branches covered.">        if (isReadAllowed) {</span>
+<span class="fc" id="L58">            return &quot;Read-protected method called!&quot;;</span>
+        }
+<span class="fc" id="L60">        throw new AccessDeniedException(&quot;Principal (&quot; + principal + &quot;') has no permission.&quot;);</span>
+    }
+
+    // required for the UI
+    @GetMapping(value = &quot;/uiurl&quot;)
+    public String getAmsUiUrl() {
+<span class="nc" id="L66">        String vcapServices = System.getenv(CFConstants.VCAP_SERVICES);</span>
+<span class="nc" id="L67">        JsonObject serviceJsonObject = new DefaultJsonObject(vcapServices).getJsonObjects(&quot;authorization&quot;).get(0);</span>
+<span class="nc" id="L68">        Map&lt;String, String&gt; credentialsMap = serviceJsonObject.getJsonObject(CFConstants.CREDENTIALS).getKeyValueMap();</span>
+<span class="nc" id="L69">        return credentialsMap.get(&quot;ui_url&quot;);</span>
+    }
+
+    @GetMapping(value = &quot;/authorized&quot;)
+    public String authorizedView() {
+<span class="fc" id="L74">        return &quot;Endpoint access allowed for action 'view'&quot;;</span>
+    }
+
+    @GetMapping(value = &quot;/technical-communication&quot;)
+    public String authorizedSystemUser() {
+<span class="fc" id="L79">        Attributes attributes = Principal.create().getAttributes().setAction(&quot;read&quot;).setResource(&quot;system&quot;);</span>
+<span class="fc bfc" id="L80" title="All 2 branches covered.">        if (policyDecisionPoint.allow(attributes)) {</span>
+<span class="fc" id="L81">            return &quot;Technical user accessed 'system' resources!&quot;;</span>
+        }
+<span class="fc" id="L83">        throw new AccessDeniedException(&quot;Technical user isn't allowed to access 'system' resources&quot;); // 403</span>
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

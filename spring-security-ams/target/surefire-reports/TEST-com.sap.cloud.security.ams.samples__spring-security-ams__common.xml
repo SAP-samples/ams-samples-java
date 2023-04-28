@@ -1,0 +1,5 @@
+<testsuites name="com.sap.cloud.security.ams.samples__spring-security-ams__common" tests="1" errors="0" failures="0" skipped="0">
+<testsuite name="com.sap.cloud.security.ams.samples__spring-security-ams__common.botuser" tests="1" errors="0" failures="0" skipped="0" id="0">
+<testcase name="defaultBotUserTest" time="0.002" className="com.sap.cloud.security.ams.samples__spring-security-ams__common.botuser"></testcase>
+</testsuite>
+</testsuites>

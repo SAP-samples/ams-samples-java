@@ -1,0 +1,5 @@
+com/sap/cloud/security/samples/SecurityConfiguration.class
+com/sap/cloud/security/samples/BasicController.class
+com/sap/cloud/security/samples/Application.class
+com/sap/cloud/security/samples/CertificateAttributesProcessor.class
+com/sap/cloud/security/samples/SalesOrderController.class

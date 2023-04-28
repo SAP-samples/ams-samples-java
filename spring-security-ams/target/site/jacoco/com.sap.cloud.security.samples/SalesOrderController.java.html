@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?><!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd"><html xmlns="http://www.w3.org/1999/xhtml" lang="en"><head><meta http-equiv="Content-Type" content="text/html;charset=UTF-8"/><link rel="stylesheet" href="../jacoco-resources/report.css" type="text/css"/><link rel="shortcut icon" href="../jacoco-resources/report.gif" type="image/gif"/><title>SalesOrderController.java</title><link rel="stylesheet" href="../jacoco-resources/prettify.css" type="text/css"/><script type="text/javascript" src="../jacoco-resources/prettify.js"></script></head><body onload="window['PR_TAB_WIDTH']=4;prettyPrint()"><div class="breadcrumb" id="breadcrumb"><span class="info"><a href="../jacoco-sessions.html" class="el_session">Sessions</a></span><a href="../index.html" class="el_report">spring-security-ams</a> &gt; <a href="index.source.html" class="el_package">com.sap.cloud.security.samples</a> &gt; <span class="el_source">SalesOrderController.java</span></div><h1>SalesOrderController.java</h1><pre class="source lang-java linenums">/*
+ * SPDX-FileCopyrightText: 2020
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+package com.sap.cloud.security.samples;
+
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.*;
+
+@RestController
+@RequestMapping(&quot;/salesOrders&quot;)
+<span class="fc" id="L13">public class SalesOrderController {</span>
+
+    /**
+     * An endpoint showing how to use Spring method security. Only if the request principal has the given privilege
+     * he/she is allowed to access the method. Otherwise a 403 error will be returned.
+     */
+    @PreAuthorize(&quot;forResourceAction('salesOrders', 'read')&quot;)
+    @GetMapping
+    public String readSelectedSalesOrder() {
+<span class="fc" id="L22">        return &quot;Read-protected salesOrders resource accessed!&quot;;</span>
+    }
+
+    @PreAuthorize(&quot;forAction('read', 'CountryCode:string=' + #countryCode)&quot;)
+    @GetMapping(value = &quot;/readByCountry/{countryCode}&quot;)
+    public String readResourcesInCountry(@PathVariable String countryCode) {
+<span class="fc" id="L28">        return &quot;Read-protected resource with countryCode = &quot; + countryCode + &quot; accessed!&quot;;</span>
+    }
+
+    @PreAuthorize(&quot;forResourceAction('salesOrders', 'read', 'CountryCode:string=' + #countryCode, 'salesOrder.type:number=' + #type)&quot;)
+    @GetMapping(value = &quot;/readByCountryAndType/{countryCode}/{type}&quot;)
+    public String readSelectedSalesOrder(@PathVariable String countryCode, @PathVariable String type) {
+<span class="fc" id="L34">        return &quot;Read-protected SalesOrder with attributes countryCode = &quot; + countryCode + &quot; and type &quot; + type</span>
+                + &quot; accessed!&quot;;
+    }
+}
+</pre><div class="footer"><span class="right">Created with <a href="http://www.jacoco.org/jacoco">JaCoCo</a> 0.8.8.202204050719</span></div></body></html>

@@ -1,0 +1,13 @@
+# SPDX-FileCopyrightText: 2020 
+#
+# SPDX-License-Identifier: Apache-2.0
+---
+sap.security.services:
+  identity:
+    clientid: 6d4ec19d-31ea-432a-ae23-672536986cde
+    domains: accounts400.ondemand.com
+
+logging.level:
+  com.sap.cloud.security: DEBUG
+  org.springframework.boot.web.embedded.tomcat.TomcatWebServer: DEBUG
+
