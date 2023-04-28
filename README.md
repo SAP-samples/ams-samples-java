@@ -20,17 +20,17 @@ More detailed description can be found [here](https://github.wdf.sap.corp/pages/
 
 ## Overview Samples
 
-| Feature                         | Version | [Java](java-security-ams) | [Spring](spring-security-ams) | [Node.js](nodejs-ams) |
-|---------------------------------|---------|---------------------------|-------------------------------|-----------------------|
-| unit testing                    |         | x                         | x                             | x                     |
-| local setup / testing           |         | x                         | x                             | x                     |
-| multi-tenancy                   | 0.8.0   | x                         |                               |                       |
-| value help (odata)              | 0.9.0   | x                         |                               |                       |
-| privileged mode for techn. comm | 0.9.0   |                           | x                             |                       |
-| kyma/kubernetes deployment      | 0.9.0   |                           | x                             |                       |
+| Feature                         | Version | [Java](java-security-ams) | [Spring](spring-security-ams) | 
+|---------------------------------|---------|---------------------------|-------------------------------|
+| unit testing                    |         | x                         | x                             | 
+| local setup / testing           |         | x                         | x                             | 
+| multi-tenancy                   | 0.8.0   | x                         |                               |                      
+| value help (odata)              | 0.9.0   | x                         |                               |                      
+| privileged mode for techn. comm | 0.9.0   |                           | x                             |                      
+| kyma/kubernetes deployment      | 0.9.0   |                           | x                             |              
 
 # Download and Installation
-You need to clone this [Github repository](https://github.wdf.sap.corp/CPSecurity/cloud-authorization-samples) that includes the samples. The used libraries are available in [Jfrog Artifactory on GCP](https://int.repositories.cloud.sap/artifactory/build-releases/com/sap/cloud/security/ams/client/).
+You need to clone this [Github repository](https://github.wdf.sap.corp/CPSecurity/ams-samples-java) that includes the samples. The used libraries are available in [Jfrog Artifactory on GCP](https://int.repositories.cloud.sap/artifactory/build-releases/com/sap/cloud/security/ams/client/).
 
 # Prerequisites
 1. You need a new Cloud Foundry Subaccount (CANARY) that fulfills this criteria:
