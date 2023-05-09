@@ -1,3 +1,7 @@
+# NOTE
+#
+# Values in this file are modified by the deploy.sh wizard script.
+
 # some data to make the urls unique
 # change to another value, e.g. your User ID
 ID: 00-00-00
@@ -6,7 +10,6 @@ ID: 00-00-00
 LANDSCAPE_APPS_DOMAIN: cfapps.sap.hana.ondemand.com
 
 # Required only for the multitenant app java-security-ams sample setup. Set the MT to true to enable multi-tenancy
-MT: 
 PROVIDER_TENANT_NAME: ""
 PROVIDER_TENANT_ID: ""
 SUBSCRIBER_TENANT_NAME: ""

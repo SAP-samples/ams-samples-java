@@ -1,5 +1,0 @@
-<testsuites name="com.sap.cloud.security.ams.samples__spring-security-ams__sales" tests="1" errors="0" failures="0" skipped="0">
-<testsuite name="com.sap.cloud.security.ams.samples__spring-security-ams__sales.sales_test" tests="1" errors="0" failures="0" skipped="0" id="0">
-<testcase name="readSalesOrders_TypeTest" time="0.002" className="com.sap.cloud.security.ams.samples__spring-security-ams__sales.sales_test"></testcase>
-</testsuite>
-</testsuites>
