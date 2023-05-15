@@ -3,7 +3,7 @@
 ## Description
 
 All samples deployed on Cloud Foundry use the [SAP application router](https://www.npmjs.com/package/@sap/approuter) as
-OAuth 2.0 client and Business Application Gateway and forwards (reverse proxy) the requests to the backend sample
+OAuth 2.0 client and Business Application Gateway which forwards (reverse proxy) the requests to the backend sample
 application (Spring/Java) running on Cloud Foundry. The application uses a Token Validation Client Library to validate
 the token before serving a resource to the client: it checks for all incoming requests whether the user is
 authenticated. The Authorization Client Library is used to make sure that the subject has the requested permissions
