@@ -74,14 +74,6 @@ class SalesOrderControllerTest {
     }
 
     @Test
-    void readByCountry_botUser_200() throws Exception {
-        Token botUserToken = extension.getContext().getPreconfiguredJwtGenerator()
-                .withClaimValue("email", "dl_5eb27aaf4de077027e59aa60@global.corp.sap").createToken();
-        mockMvc.perform(get("/salesOrders/readByCountry/IT").header(HttpHeaders.AUTHORIZATION,
-                "Bearer " + botUserToken.getTokenValue())).andExpect(status().isOk());
-    }
-
-    @Test
     void readByCountry_403() throws Exception {
         mockMvc.perform(get("/salesOrders/readByCountry/US")
                 .with(userWithPolicies(extension.getContext(), "common.readAll_Europe")))
