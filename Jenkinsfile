@@ -1,4 +1,11 @@
 #!/usr/bin/env groovy
+@Library(['piper-lib', 'cas-central-jenkins-library']) _
+
+def repoOrg             = 'CPSecurity'
+def repoName            = 'ams-samples-java'
+def repoFullName            = repoOrg + '/' + repoName
+
+
 
 def isBranchIndexingCause() {
     return currentBuild.getBuildCauses().toString().contains('BranchIndexingCause')
@@ -19,18 +26,15 @@ properties([
 
 try {
     node('ams-agent') {
-        def isTriggeredFromDependencyBuilder = isTriggeredFromDependencyBuilder()
-
-        if (isTriggeredFromDependencyBuilder) {
+             
+        if (isTriggeredByUpstreamProject upstreamProject: 'CPSecurity/cas-ams-dependency-builder/master') {
             stage('Setup') {
                 prepareScm()
             }
             
             def projectVersion = getMavenVersion()
-            
-            stage('Update version') {
-                updateVersionAndPushChanges(projectVersion)
-            }
+            updateVersionAndPushChangesArtifactory treeish: treeish, artifactVersion: projectVersion, repoFullName: repoFullName
+
         } else {
             stage('Setup') {
                 prepareScm()
