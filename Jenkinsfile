@@ -54,8 +54,10 @@ try {
     globalPipelineEnvironment.addError(this, err)
     throw err
 } finally{
-    // At this point as the build is successful, we can clean the workspace
-    cleanWorkspace()
+    node('ams-agent'){
+        // At this point as the build is successful, we can clean the workspace
+        cleanWorkspace()
+    }
 }
 
 def getMavenVersion() {
