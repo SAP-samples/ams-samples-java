@@ -44,6 +44,9 @@ try {
                     unitTests()
                 }
             }
+            stage('visualize tests') {
+                junit 'java-security-ams/target/surefire-reports/TEST-com.sap.cloud.security.ams.samples__java-security-ams__ams.xml'
+            }
             stage('Integration Test') {
                 integrationTests()
             }
