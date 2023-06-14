@@ -61,44 +61,6 @@ def getMavenVersion() {
     return mavenVersion
 }
 
-def updateVersionAndPushChanges(projectVersion) {
-    withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'GitHub_UP_SCPSECCASBOT', usernameVariable: 'username', passwordVariable: 'password']]) {
-        withCredentials([[$class: 'UsernamePasswordMultiBinding', credentialsId: 'ARTIFACTORY_UP_BTPSECAMSBOT', usernameVariable: 'ARTIFACTORY_USER', passwordVariable: 'ARTIFACTORY_PASSWORD']]) {
-            sh """
-                git remote -v
-                git remote remove origin
-                git remote add origin https://${username}:${password}@github.wdf.sap.corp/CPSecurity/cloud-authorization-samples.git
-                git fetch
-                git checkout release-pipeline
-                git branch --set-upstream-to=origin/release-pipeline
-                git reset --hard origin/${env.BRANCH_NAME}
-                git push origin HEAD:release-pipeline --force
-                git status
-                git pull --rebase
-                bash ./scripts/updateProject.sh ${projectVersion} ${ARTIFACTORY_USER} ${ARTIFACTORY_PASSWORD}
-                git push
-            """
-        }
-    }
-}
-
-def isTriggeredFromDependencyBuilder() {
-    def causes = currentBuild.rawBuild.getCauses()
-    def bIsTriggered = false
-    
-    for(cause in causes) {
-        if (cause.class.toString().contains("UpstreamCause")) {
-            def upstreamProject = cause.upstreamProject
-            println "This job was caused by job: " + upstreamProject
-            if (upstreamProject == "CPSecurity/cas-ams-dependency-builder/master") {
-                bIsTriggered = true
-            }
-        }
-    }
-
-    return bIsTriggered
-}
-
 // ===============================================
 // Misc Utils
 // ===============================================
