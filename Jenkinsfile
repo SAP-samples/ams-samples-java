@@ -44,10 +44,7 @@ try {
                     unitTests()
                 }
             }
-            stage('visualize tests') {
-                junit 'java-security-ams/target/surefire-reports/*.xml'
-                junit 'spring-security-ams/target/surefire-reports/*.xml'
-            }
+
             stage('Integration Test') {
                 integrationTests()
             }
@@ -56,6 +53,9 @@ try {
 } catch (Throwable err) { // catch all exceptions
     globalPipelineEnvironment.addError(this, err)
     throw err
+} finally{
+    // At this point as the build is successful, we can clean the workspace
+    cleanWorkspace()
 }
 
 def getMavenVersion() {
@@ -78,11 +78,15 @@ def unitTests() {
         'Java': {
             dir('java-security-ams') {
                 sh 'mvn -q clean test'
+                // get results for the jenkins junit plugin
+                junit 'target/surefire-reports/*.xml'
             }
         },
         'Spring': {
             dir('spring-security-ams') {
                 sh 'mvn -q clean test'
+                // get results for the jenkins junit plugin
+                junit 'target/surefire-reports/*.xml'
             }
         }
     )
