@@ -20,7 +20,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <properties>
         <java.version>1.8</java.version>
-        <sap.cloud.security.ams.version>0.13.0</sap.cloud.security.ams.version>
+        <sap.cloud.security.ams.version>0.14.0</sap.cloud.security.ams.version>
         <sap.cloud.security.version>2.13.5</sap.cloud.security.version>
         <apache.httpclient.version>4.5.13</apache.httpclient.version>
         <junit.jupiter.version>5.7.2</junit.jupiter.version>
@@ -123,6 +123,7 @@ SPDX-License-Identifier: Apache-2.0
                         </goals>
                         <configuration>
                             <verbose>true</verbose>
+                            <failOn>deprecation</failOn>
                         </configuration>
                     </execution>
                 </executions>

@@ -17,7 +17,7 @@ SPDX-License-Identifier: Apache-2.0
         <maven.compiler.source>1.8</maven.compiler.source>
         <maven.compiler.target>1.8</maven.compiler.target>
         <sap.cloud.security.version>2.13.5</sap.cloud.security.version>
-        <sap.cloud.security.ams.version>0.13.0</sap.cloud.security.ams.version>
+        <sap.cloud.security.ams.version>0.14.0</sap.cloud.security.ams.version>
         <slf4j.api.version>2.0.6</slf4j.api.version>
         <apache.httpclient.version>4.5.14</apache.httpclient.version>
         <javax.servlet.api.version>4.0.1</javax.servlet.api.version>
@@ -188,6 +188,7 @@ SPDX-License-Identifier: Apache-2.0
                         </goals>
                         <configuration>
                             <verbose>true</verbose>
+                            <failOn>deprecation</failOn>
                         </configuration>
                     </execution>
                 </executions>
