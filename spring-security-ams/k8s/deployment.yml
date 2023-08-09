@@ -60,7 +60,7 @@ spec:
           env:
             - name: SERVICE_BINDING_ROOT
               value: "/bindings"
-        - image: cloud-security-integration.int.repositories.cloud.sap/ams-k8s-poc:e2e-test
+        - image: cloud-security-integration.common.repositories.cloud.sap/ams-k8s-sidecar:0.53.1-sap-0.3.3
           imagePullPolicy: Always
           name: adc-sidecar
           ports:
