@@ -69,7 +69,7 @@ spec:
               protocol: TCP
           volumeMounts:
             - name: auth-secret
-              mountPath: "etc/secrets/sapcp/identity/auth"
+              mountPath: "etc/secrets/sapbtp/identity/auth"
               readOnly: true
         - image: <YOUR APPROUTER IMAGE REPOSITORY>
           imagePullPolicy: Always
