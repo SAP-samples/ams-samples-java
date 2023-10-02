@@ -1,4 +1,16 @@
 ---
+### PVC for DCL files
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dcl-files-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
+---
 ###  SERVICE INSTANCE CONFIGURATION  ###
 # Identity instance
 apiVersion: services.cloud.sap.com/v1
@@ -46,8 +58,18 @@ spec:
     spec:
       imagePullSecrets:
         - name: <YOUR IMAGE PULL SECRET>
+      initContainers:
+        - name: copy-dcl-files
+          image: cloud-security-integration.common.repositories.cloud.sap/spring-ams-k8s:0.0.1
+          command: [ 'sh', '-c', 'cp -R /dcl-data/* /dcl-files/' ]
+          volumeMounts:
+            - name: dcl-files
+              mountPath: "/dcl-files"
+            - name: auth-secret
+              mountPath: "/bindings/identity"
+              readOnly: true
       containers:
-        - image: <YOUR IMAGE REPOSITORY>
+        - image: cloud-security-integration.common.repositories.cloud.sap/spring-ams-k8s:0.0.1
           imagePullPolicy: Always
           name: backend
           ports:
@@ -57,10 +79,12 @@ spec:
             - name: auth-secret
               mountPath: "/bindings/identity"
               readOnly: true
+            - name: dcl-files
+              mountPath: "/dcl-files"
           env:
             - name: SERVICE_BINDING_ROOT
               value: "/bindings"
-        - image: cloud-security-integration.common.repositories.cloud.sap/ams-k8s-sidecar:0.53.1-sap-0.3.3
+        - image: cloud-security-integration.common.repositories.cloud.sap/ams-k8s-sidecar:0.53.1-sap-0.3.3-1
           imagePullPolicy: Always
           name: adc-sidecar
           ports:
@@ -79,7 +103,7 @@ spec:
               containerPort: 5000
           volumeMounts:
             - name: auth-secret
-              mountPath: "/etc/secrets/sapcp/identity/auth"
+              mountPath: "etc/secrets/sapbtp/identity/auth"
               readOnly: true
           env:
             - name: destinations
@@ -90,9 +114,12 @@ spec:
                     "forwardAuthToken": true
                 }]
       volumes:
+        - name: dcl-files
+          persistentVolumeClaim:
+            claimName: dcl-files-pvc
         - name: auth-secret
           secret:
-            secretName: "identity"
+            secretName: identity
 ---
 apiVersion: v1
 kind: Service
