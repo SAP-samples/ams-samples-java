@@ -15,9 +15,9 @@ Follow the deployment steps for [Kyma/Kubernetes](#deployment-on-kymakubernetes)
 # Deployment on Kyma/Kubernetes
 The compiled base DCLs have to be uploaded to the AMS server, this part is handled by the [ams-dcl-uploader](https://github.wdf.sap.corp/CPSecurity/ams-dcl-uploader).
 The `ams-dcl-uploader` expects to locate the DCL files in a [PVC](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) at path ``/dcl-files``.
-The relevant `PVC` is defined in the deployment.yml file, which can be found  [here](https://github.wdf.sap.corp/CPSecurity/ams-samples-java/blob/main/spring-security-ams/k8s/deployment.yml#L2-L12)
+The relevant `PVC` is defined in the deployment.yml file, which can be found  [here](https://github.wdf.sap.corp/CPSecurity/ams-samples-java/blob/main/spring-security-ams/k8s/deployment.yml#L2-L12).
 
-The application developers have complete autonomy over how the files are provided to the PVC. In this example, the process is performed by including DCL files in the application's docker image then using an `initContainer` to transfer them via the shell command `cp`. 
+The application developers have complete autonomy over how the files are provided to the `PVC`. In this example, the process is performed by including DCL files in the application's docker image then using an `initContainer` to transfer them via the shell command `cp`. 
 You can see this defined in these lines of the [deployment.yml](https://github.wdf.sap.corp/CPSecurity/ams-samples-java/blob/main/spring-security-ams/k8s/deployment.yml#L61-L70).
 
 Follow these necessary steps to setup the AMS sample application:
@@ -25,7 +25,6 @@ Follow these necessary steps to setup the AMS sample application:
 - Configure the deployment.yml configuration with the corresponding Docker images
 - Deploy the application
 - Access the application
-- Assign policies
 
 
 ## Build docker images and push them to repository
