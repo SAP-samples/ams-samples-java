@@ -28,7 +28,7 @@ spec:
 apiVersion: services.cloud.sap.com/v1
 kind: ServiceBinding
 metadata:
-  name: identity
+  name: identity-service-binding
 spec:
   serviceInstanceName: auth
   credentialsRotationPolicy:
@@ -119,7 +119,36 @@ spec:
             claimName: dcl-files-pvc
         - name: auth-secret
           secret:
-            secretName: identity
+            secretName: identity-service-binding
+---
+### DCL Upload Job
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dcl-upload-job
+spec:
+  ttlSecondsAfterFinished: 150
+  template:
+    spec:
+      imagePullSecrets:
+        - name: sap-repo-registry
+      containers:
+        - name: upload-container
+          image: cloud-security-integration.common.repositories.cloud.sap/dcl-uploader-poc:0.0.1
+          volumeMounts:
+            - name: dcl-files
+              mountPath: /dcl-files
+            - name: auth-secret
+              mountPath: /bindings/identity
+              readOnly: true
+      volumes:
+        - name: dcl-files
+          persistentVolumeClaim:
+            claimName: dcl-files-pvc
+        - name: auth-secret
+          secret:
+            secretName: identity-service-binding
+      restartPolicy: OnFailure
 ---
 apiVersion: v1
 kind: Service
@@ -132,7 +161,7 @@ spec:
     - name: http
       port: 80
       protocol: TCP
-      targetPort: 5000
+      targetPort: 8080
   selector:
     app: ams-sample-app # refer to pods with label = app: ams-sample-app
 
