@@ -61,7 +61,7 @@ kubectl apply -f ./k8s/deployment.yml -n <YOUR NAMESPACE>
 ## Access the application
 After successful deployment, access the spring sample application via approuter.
 
-The url of the exposed service can be found in <br>Kyma Console - ``<Your Namenspace>`` - Discovery and Network - API Rules - ```<spring-security-ams-api>```.
+The url of the exposed service can be found in <br>Kyma Console - ``<Your Namenspace>`` - Discovery and Network - API Rules - ```ams-sample-app-api```.
 
 ![](/docs/images/KymaConsole_APIRule.png)
 
@@ -71,12 +71,12 @@ First, we need to enter the service url as callback within our ias application a
 
 For that login as admin to your ias tenant (you can find the identity service``url`` in the ``identity`` secrets), select your application and configure manually these urls as redirect urls within the OpenID Connect Configuration:
 
-- ```<spring-security-ams-api>```/login/callback?authType=ias
-- ```<spring-security-ams-api>```/login/callback
+- ```<ams-sample-app-api>```/login/callback?authType=ias
+- ```<ams-sample-app-api>```/login/callback
 
 Now we can call the url to access the application
-- ```<spring-security-ams-api>```/health <br>should return "ok" (Status Code `200`). If not check the application logs, whether the AMS Service is unavailable (search for `/v1/data/dcr._default_/ping`).
-- ```<spring-security-ams-api>```<br>  
+- ```<ams-sample-app-api>```/health <br>should return "ok" (Status Code `200`). If not check the application logs, whether the AMS Service is unavailable (search for `/v1/data/dcr._default_/ping`).
+- ```<ams-sample-app-api>```<br>  
 
 It redirects you to a login screen for authentication.
 If the login fails, it will return an error status code `401`. 
