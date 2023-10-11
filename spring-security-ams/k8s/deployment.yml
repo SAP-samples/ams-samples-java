@@ -60,7 +60,7 @@ spec:
         - name: <YOUR IMAGE PULL SECRET>
       initContainers:
         - name: copy-dcl-files
-          image: cloud-security-integration.common.repositories.cloud.sap/spring-ams-k8s:0.0.1
+          image: <YOUR APP IMAGE REPOSITORY>
           command: [ 'sh', '-c', 'cp -R /dcl-data/* /dcl-files/' ]
           volumeMounts:
             - name: dcl-files
@@ -69,7 +69,7 @@ spec:
               mountPath: "/bindings/identity"
               readOnly: true
       containers:
-        - image: cloud-security-integration.common.repositories.cloud.sap/spring-ams-k8s:0.0.1
+        - image: <YOUR APP IMAGE REPOSITORY>
           imagePullPolicy: Always
           name: backend
           ports:
