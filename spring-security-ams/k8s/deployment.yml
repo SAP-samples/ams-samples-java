@@ -134,7 +134,11 @@ spec:
         - name: sap-repo-registry
       containers:
         - name: upload-container
-          image: cloud-security-integration.common.repositories.cloud.sap/dcl-uploader-poc:0.0.1
+          imagePullPolicy: Always
+          image: cloud-security-integration.common.repositories.cloud.sap/dcl-uploader:0.0.1
+          env:
+            - name: AMS_LOG_LEVEL
+              value: debug
           volumeMounts:
             - name: dcl-files
               mountPath: /dcl-files
