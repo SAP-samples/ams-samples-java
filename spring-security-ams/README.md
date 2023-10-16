@@ -1,31 +1,28 @@
 # Description
-This sample is a Spring Boot application that utilizes the `spring-ams` and `spring-security` client libraries to authenticate JWT tokens issued by the `identity` service and to authorize resource access managed by AMS(Authorization Management Service).
+This sample is a Spring Boot application that utilizes the [spring-ams](https://github.wdf.sap.corp/CPSecurity/cloud-authorization-client-library-java/tree/master/spring-ams) and [spring-security](https://github.com/SAP/cloud-security-services-integration-library/tree/main/spring-security) client libraries to authenticate JWT tokens issued by the [SAP Identity service](https://help.sap.com/docs/identity-authentication) and to authorize resource access managed by [AMS (Authorization Management Service)](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/).
 The application uses the [SAP application router](https://www.npmjs.com/package/@sap/approuter) as OAuth 2.0 client and forwards the requests as reverse proxy to a Spring Boot backend application.
-The Spring Boot backend application checks for all incoming requests whether the user is authenticated and whether the user has the requested permissions assigned with the **Authorization Management Service (AMS)**.
+The Spring Boot backend application checks for all incoming requests whether the user is authenticated and whether the user has the requested permissions assigned with AMS.
 
-To setup the IAS tenant follow this [guide](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/Overview/HowTo_AMSConfig).
+# Steps
+1. Setup the IAS tenant follow this [guide](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/Overview/HowTo_AMSConfig)
 
-To enable authorization checks, application needs to declare authorization model in a form of [DCL files](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/DCLLanguage/Declare) and provide these files to the AMS service.
-
+2. Enable authorization checks, application needs to declare authorization model in a form of [DCL files](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/DCLLanguage/Declare) and provide these files to the AMS service. 
 For a deeper understanding of how the AMS client library operates, refer to https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/ClientLibs/EnforceJava
 
+3. Follow the deployment steps for [Kyma/Kubernetes](#deployment-on-kymakubernetes) or [Cloud Foundry](#deployment-on-cloud-foundry)
 
-Follow the deployment steps for [Kyma/Kubernetes](#deployment-on-kymakubernetes) or [Cloud Foundry](#deployment-on-cloud-foundry).
 
 # Deployment on Kyma/Kubernetes
 The compiled base DCLs have to be uploaded to the AMS server, this part is handled by the [ams-dcl-uploader](https://github.wdf.sap.corp/CPSecurity/ams-dcl-uploader).
 The `ams-dcl-uploader` expects to locate the DCL files in a [PVC](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) at path ``/dcl-files``.
-The relevant `PVC` is defined in the deployment.yml file, which can be found  [here](https://github.wdf.sap.corp/CPSecurity/ams-samples-java/blob/main/spring-security-ams/k8s/deployment.yml#L2-L12).
+The relevant `PVC` is defined in the [deployment.yml](https://github.wdf.sap.corp/CPSecurity/ams-samples-java/blob/main/spring-security-ams/k8s/deployment.yml#L2-L12).
 
 The application developers have complete autonomy over how the files are provided to the `PVC`. In this example, the process is performed by including DCL files in the application's docker image then using an `initContainer` to transfer them via the shell command `cp`. 
 You can see this defined in these lines of the [deployment.yml](https://github.wdf.sap.corp/CPSecurity/ams-samples-java/blob/main/spring-security-ams/k8s/deployment.yml#L61-L70).
 
-Follow these necessary steps to setup the AMS sample application:
-- Build the Docker images of the spring back-end and approuter images and push them to the appropriate repository
-- Configure the deployment.yml configuration with the corresponding Docker images
-- Deploy the application
-- Access the application
+In addition, a sidecar process is necessary to compute authorizations from the policies. For this, a pre-built image is added in [deployment.yml](https://github.wdf.sap.corp/CPSecurity/ams-samples-java/blob/main/spring-security-ams/k8s/deployment.yml#L63)
 
+Follow the following steps below to setup the AMS sample application:
 
 ## Build docker images and push them to repository
 The images must be accessible externally.
@@ -46,11 +43,12 @@ docker push <repositoryName>/<imageName>
 ```
 
 ## Configure the deployment.yml
-In `deployment.yml` replace the image repository placeholders `<YOUR IMAGE REPOSITORY>` and `<YOUR APPROUTER IMAGE REPOSITORY` with the one created in the previous step.
-
-                                                                                                   
-For access to the Authorization decision controller side-car image (ams-k8s-sidecar) you will need to have a user for https://common.repositories.cloud.sap and [create an image pull secret](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line) with `--docker-server=cloud-security-integration.common.repositories.cloud.sap` parameter.
-Then replace the image pull secret placeholder `<YOUR IMAGE PULL SECRET>` with your just created secret name in the deployment.yml                                                                                                  
+1. In [deployment.yml](https://github.wdf.sap.corp/CPSecurity/ams-samples-java/blob/main/spring-security-ams/k8s/deployment.yml#L63) replace the image repository placeholders `<YOUR IMAGE REPOSITORY>` and `<YOUR APPROUTER IMAGE REPOSITORY` with the URLs of the repository(ies) used in the previous step.
+ 
+2. [Create an image pull secret](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line) with `--docker-server=cloud-security-integration.common.repositories.cloud.sap` parameter for https://common.repositories.cloud.sap. This requires a user account for https://common.repositories.cloud.sap
+The secret is required to access the `ams-k8s-sidecar` (Authorization decision controller side-car image ) and `ams-dcl-uploader` images.
+    
+3. Replace `<YOUR IMAGE PULL SECRET>` in [deployment.yml](https://github.wdf.sap.corp/CPSecurity/ams-samples-java/blob/main/spring-security-ams/k8s/deployment.yml#L48) with the name of the secret created in the previous step.                                                                                  
 
 ## Deploy the application
 Deploy the applications using [kubectl cli](https://kubernetes.io/docs/reference/kubectl/)
@@ -58,22 +56,21 @@ Deploy the applications using [kubectl cli](https://kubernetes.io/docs/reference
 kubectl apply -f ./k8s/deployment.yml -n <YOUR NAMESPACE>
 ``` 
 
-## Access the application
-After successful deployment, access the spring sample application via approuter.
-
-The url of the exposed service can be found in <br>Kyma Console - ``<Your Namenspace>`` - Discovery and Network - API Rules - ```ams-sample-app-api```.
-
-![](/docs/images/KymaConsole_APIRule.png)
-
-First, we need to enter the service url as callback within our ias application as depicted in the screenshot below.
+## Identity service configuration
+Before we can log in, we need to add the service URL as redirect URI within our IAS application as depicted in the screenshot below.
 
 ![](/docs/images/IAS_OpenIDConnectConfiguration.png)
 
-For that login as admin to your ias tenant (you can find the identity service``url`` in the ``identity`` secrets), select your application and configure manually these urls as redirect urls within the OpenID Connect Configuration:
+The URL of the exposed service can be found in <br>Kyma Console - ``<Your Namenspace>`` - Discovery and Network - API Rules - ```ams-sample-app-api```.
+
+![](/docs/images/KymaConsole_APIRule.png)
+
+To do so, login as admin to your IAS tenant (you can find the identity service ``url`` in the ``identity`` secrets), select your application and manually configure these urls as redirect urls within the OpenID Connect Configuration:
 
 - ```<ams-sample-app-api>```/login/callback?authType=ias
 - ```<ams-sample-app-api>```/login/callback
 
+## Access the application
 Now we can call the url to access the application
 - ```<ams-sample-app-api>```/health <br>should return "ok" (Status Code `200`). If not check the application logs, whether the AMS Service is unavailable (search for `/v1/data/dcr._default_/ping`).
 - ```<ams-sample-app-api>```<br>  
@@ -83,7 +80,7 @@ If the login fails, it will return an error status code `401`.
 Upon successful login, the index page presents a variety of links for convenient access to different endpoints.
 
 #### Assign policies
-To assign policies to a user go to the `identity` service admin console. Follow this [guide](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/Policies/Manage#assign-policies) for more details.
+To assign policies to a user, go to the `identity` service admin console. Follow this [guide](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/Policies/Manage#assign-policies) for more details.
 
 After a delay of maximum 60 seconds, repeat the forbidden test request. A re-login is not required.
 
@@ -94,8 +91,7 @@ Finally, delete your application and your service instances using the following 
 ```
 
 # Deployment on Cloud Foundry
-
-On Cloud Foundry your application gets deployed together with [AMS buildpack](https://github.com/SAP/cloud-authorization-buildpack), so that the policy decision runtime is available as a *sidecar*. 
+On Cloud Foundry, your application gets deployed together with [AMS buildpack](https://github.com/SAP/cloud-authorization-buildpack), which uploads the DCL policies to the AMS server and provides a policy decision runtime as a *sidecar* process.
 In the manifest you may need to adapt the ``appName`` and `directories` to your `AMS_DCL_ROOT`. The `directories` serves the `.dcl` files and the data which contains the assignments of users to policies.
 
 ## Create the OAuth2 identity service instance (with AMS enabled)
