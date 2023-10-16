@@ -1,4 +1,16 @@
 ---
+### PVC for DCL files
+apiVersion: v1
+kind: PersistentVolumeClaim
+metadata:
+  name: dcl-files-pvc
+spec:
+  accessModes:
+    - ReadWriteOnce
+  resources:
+    requests:
+      storage: 50Mi
+---
 ###  SERVICE INSTANCE CONFIGURATION  ###
 # Identity instance
 apiVersion: services.cloud.sap.com/v1
@@ -16,7 +28,7 @@ spec:
 apiVersion: services.cloud.sap.com/v1
 kind: ServiceBinding
 metadata:
-  name: identity
+  name: identity-service-binding
 spec:
   serviceInstanceName: auth
   credentialsRotationPolicy:
@@ -46,6 +58,16 @@ spec:
     spec:
       imagePullSecrets:
         - name: <YOUR IMAGE PULL SECRET>
+      initContainers:
+        - name: copy-dcl-files
+          image: <YOUR IMAGE REPOSITORY>
+          command: [ 'sh', '-c', 'cp -R /dcl-data/* /dcl-files/' ]
+          volumeMounts:
+            - name: dcl-files
+              mountPath: "/dcl-files"
+            - name: auth-secret
+              mountPath: "/bindings/identity"
+              readOnly: true
       containers:
         - image: <YOUR IMAGE REPOSITORY>
           imagePullPolicy: Always
@@ -57,10 +79,12 @@ spec:
             - name: auth-secret
               mountPath: "/bindings/identity"
               readOnly: true
+            - name: dcl-files
+              mountPath: "/dcl-files"
           env:
             - name: SERVICE_BINDING_ROOT
               value: "/bindings"
-        - image: cloud-security-integration.common.repositories.cloud.sap/ams-k8s-sidecar:0.53.1-sap-0.3.3
+        - image: cloud-security-integration.common.repositories.cloud.sap/ams-k8s-sidecar:0.53.1-sap-0.3.3-1
           imagePullPolicy: Always
           name: adc-sidecar
           ports:
@@ -79,7 +103,7 @@ spec:
               containerPort: 5000
           volumeMounts:
             - name: auth-secret
-              mountPath: "/etc/secrets/sapcp/identity/auth"
+              mountPath: "etc/secrets/sapbtp/identity/auth"
               readOnly: true
           env:
             - name: destinations
@@ -90,9 +114,45 @@ spec:
                     "forwardAuthToken": true
                 }]
       volumes:
+        - name: dcl-files
+          persistentVolumeClaim:
+            claimName: dcl-files-pvc
         - name: auth-secret
           secret:
-            secretName: "identity"
+            secretName: identity-service-binding
+---
+### DCL Upload Job
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: dcl-upload-job
+spec:
+  ttlSecondsAfterFinished: 150
+  template:
+    spec:
+      imagePullSecrets:
+        - name: sap-repo-registry
+      containers:
+        - name: upload-container
+          imagePullPolicy: Always
+          image: cloud-security-integration.common.repositories.cloud.sap/dcl-uploader:0.0.1
+          env:
+            - name: AMS_LOG_LEVEL
+              value: debug
+          volumeMounts:
+            - name: dcl-files
+              mountPath: /dcl-files
+            - name: auth-secret
+              mountPath: /bindings/identity
+              readOnly: true
+      volumes:
+        - name: dcl-files
+          persistentVolumeClaim:
+            claimName: dcl-files-pvc
+        - name: auth-secret
+          secret:
+            secretName: identity-service-binding
+      restartPolicy: OnFailure
 ---
 apiVersion: v1
 kind: Service
@@ -105,7 +165,7 @@ spec:
     - name: http
       port: 80
       protocol: TCP
-      targetPort: 5000
+      targetPort: 8080
   selector:
     app: ams-sample-app # refer to pods with label = app: ams-sample-app
 
