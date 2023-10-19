@@ -1,0 +1,53 @@
+# SPDX-FileCopyrightText: 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+
+---
+# Configuration:
+# configured for EU10. For other landscapes, please adopt LANDSCAPE_APPS_DOMAIN in ../vars.yml
+# If the route is occupied, you might need to change ID in ../vars.yml
+applications:
+- name: jakarta-ams
+  instances: 1
+  memory: 896M
+  health-check-type: http
+  health-check-http-endpoint: /health
+  routes:
+    - route: jakarta-ams-((ID)).((LANDSCAPE_APPS_DOMAIN))
+    - route: jakarta-ams-((ID)).cert.((LANDSCAPE_APPS_DOMAIN))
+  host: 
+  path: target//jakarta-security-ams.war
+  services:
+    - name: jakarta-ams-ias
+      parameters: { "credential-type": "X509_GENERATED" }
+    - jakarta-ams-sms
+  buildpacks:
+    - https://github.com/SAP/cloud-authorization-buildpack/releases/latest/download/opa_buildpack.zip
+    - https://github.com/cloudfoundry/java-buildpack/releases/download/v4.62.0/java-buildpack-v4.62.0.zip
+  env:
+    JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 17.0.+ } }'
+    JBP_CONFIG_TOMCAT: '{ tomcat: { version: 10.0.+ } }'
+    AMS_DCL_ROOT: "/WEB-INF/classes/"
+
+##----------------------------------------------------------
+## Application Router
+##----------------------------------------------------------
+#- name: jakarta-ams-approuter
+#  path: approuter
+#  buildpacks:
+#    - nodejs_buildpack
+#  memory: 128M
+#  routes:
+#    - route: ((PROVIDER_TENANT_ID))--((PROVIDER_TENANT_NAME))-ar-((ID)).((LANDSCAPE_APPS_DOMAIN))
+#    - route: ((SUBSCRIBER_TENANT_ID))--((SUBSCRIBER_TENANT_NAME))-ar-((ID)).((LANDSCAPE_APPS_DOMAIN))
+#  services:
+#    - name: jakarta-ams-ias
+#      parameters: { "credential-type": "X509_GENERATED" }
+#  env:
+#    TENANT_HOST_PATTERN: ^(.*)-ar-((ID)).((LANDSCAPE_APPS_DOMAIN))
+#    destinations: >
+#      [
+#        {"name":"ams-jakarta-app-destination",
+#         "url":"https://jakarta-ams-((ID)).((LANDSCAPE_APPS_DOMAIN))",
+#         "forwardAuthToken": true}
+#      ]
