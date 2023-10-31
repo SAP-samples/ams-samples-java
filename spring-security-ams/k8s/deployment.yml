@@ -37,6 +37,7 @@ spec:
     rotatedBindingTTL: 336h # keep old binding for another 14 days
   parameters:
     credential-type: "X509_GENERATED"
+    app-identifier: "ams-sample-app"
 ---
 ###  APPLICATION CONFIGURATION  ###
 apiVersion: apps/v1
