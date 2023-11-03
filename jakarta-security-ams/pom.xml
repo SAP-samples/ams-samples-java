@@ -16,9 +16,9 @@ SPDX-License-Identifier: Apache-2.0
         <maven.surefire.plugin.version>3.0.0</maven.surefire.plugin.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <sap.cloud.security.version>3.1.3</sap.cloud.security.version>
-        <sap.cloud.security.ams.version>1.0.0-SNAPSHOT</sap.cloud.security.ams.version>
-        <slf4j.api.version>2.0.7</slf4j.api.version>
+        <sap.cloud.security.version>3.2.1</sap.cloud.security.version>
+        <sap.cloud.security.ams.version>1.0.0</sap.cloud.security.ams.version>
+        <slf4j.api.version>2.0.9</slf4j.api.version>
         <apache.httpclient.version>4.5.14</apache.httpclient.version>
         <jakarta.servlet.api.version>6.0.0</jakarta.servlet.api.version>
         <maven.formatter.plugin.version>2.22.0</maven.formatter.plugin.version>
@@ -27,7 +27,7 @@ SPDX-License-Identifier: Apache-2.0
         <junit.version>5.9.2</junit.version>
         <assertj.version>3.24.2</assertj.version>
         <!-- audit log service -->
-        <sap.xs.auditlog.version>2.0.17</sap.xs.auditlog.version>
+        <sap.xs.auditlog.version>2.0.16</sap.xs.auditlog.version>
         <sap.xs.env.version>1.8.5</sap.xs.env.version>
         <sap.cf.logging.version>3.7.0</sap.cf.logging.version>
     </properties>
