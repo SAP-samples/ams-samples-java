@@ -4,11 +4,11 @@ import com.sap.cloud.security.ams.api.AttributesProcessor;
 import com.sap.cloud.security.ams.api.Principal;
 import com.sap.cloud.security.x509.Certificate;
 import com.sap.cloud.security.x509.X509Certificate;
+import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.security.authentication.InsufficientAuthenticationException;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;

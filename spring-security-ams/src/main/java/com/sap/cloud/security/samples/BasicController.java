@@ -8,7 +8,7 @@ package com.sap.cloud.security.samples;
 import com.sap.cloud.security.ams.api.Principal;
 import com.sap.cloud.security.ams.dcl.client.pdp.Attributes;
 import com.sap.cloud.security.ams.dcl.client.pdp.PolicyDecisionPoint;
-import com.sap.cloud.security.config.cf.CFConstants;
+import com.sap.cloud.security.config.ServiceConstants;
 import com.sap.cloud.security.json.DefaultJsonObject;
 import com.sap.cloud.security.json.JsonObject;
 import com.sap.cloud.security.token.Token;
@@ -16,14 +16,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.access.AccessDeniedException;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.ResponseStatus;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.HttpServerErrorException;
 
-import java.util.*;
+import java.util.Map;
 
 import static com.sap.cloud.security.token.TokenClaims.*;
-import static org.springframework.http.HttpStatus.OK;
 import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
 
 @RestController
@@ -44,8 +42,8 @@ public class BasicController {
     public String secured(@AuthenticationPrincipal Token token) {
         String name = token.hasClaim(USER_NAME) ? token.getClaimAsString(USER_NAME) : token.getClaimAsString(EMAIL);
         return "Congratulation, " + name + " - You are an authenticated user.<br>" + "<br>user_uuid: "
-                + token.getClaimAsString(SAP_GLOBAL_USER_ID) + "<br>zone_uuid: "
-                + token.getClaimAsString(SAP_GLOBAL_ZONE_ID);
+                + token.getClaimAsString(SAP_GLOBAL_USER_ID) + "<br>app_tid: "
+                + token.getClaimAsString(SAP_GLOBAL_APP_TID);
     }
 
     @GetMapping(value = "/read")
@@ -63,9 +61,9 @@ public class BasicController {
     // required for the UI
     @GetMapping(value = "/uiurl")
     public String getAmsUiUrl() {
-        String vcapServices = System.getenv(CFConstants.VCAP_SERVICES);
+        String vcapServices = System.getenv(ServiceConstants.VCAP_SERVICES);
         JsonObject serviceJsonObject = new DefaultJsonObject(vcapServices).getJsonObjects("authorization").get(0);
-        Map<String, String> credentialsMap = serviceJsonObject.getJsonObject(CFConstants.CREDENTIALS).getKeyValueMap();
+        Map<String, String> credentialsMap = serviceJsonObject.getJsonObject("credentials").getKeyValueMap();
         return credentialsMap.get("ui_url");
     }
 
