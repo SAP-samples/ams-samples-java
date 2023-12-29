@@ -1,0 +1,24 @@
+{
+  "authorization": {
+    "enabled": true,
+    "value_help_url": "https://jakarta-ams-((ID)).cert.((LANDSCAPE_APPS_DOMAIN))/app/callback/value-help"
+  },
+  "oauth2-configuration": {
+    "post-logout-redirect-uris": [
+      "https://ar-((ID)).((LANDSCAPE_APPS_DOMAIN))/logout.html",
+      "http://localhost:5000/logout.html"
+    ],
+    "redirect-uris": [
+      "https://*.((LANDSCAPE_APPS_DOMAIN))/login/callback",
+      "https://*.((LANDSCAPE_APPS_DOMAIN))/login/callback?authType=ias",
+      "https://*.((LANDSCAPE_APPS_DOMAIN))/login/oauth2/code/*",
+      "https://*.internal.((LANDSCAPE_APPS_DOMAIN))/node/signin-oidc/*",
+      "https://ar-((ID)).((LANDSCAPE_APPS_DOMAIN))/login/callback?authType=ias",
+      "https://ar-((ID)).((LANDSCAPE_APPS_DOMAIN))/login/callback",
+      "http://localhost:5000/login/callback?authType=ias",
+      "http://localhost:5000/login/callback"
+    ]
+  },
+  "display-name": "jakarta-ams-ias-((ID))",
+  "multi-tenant": "((MT))"
+}

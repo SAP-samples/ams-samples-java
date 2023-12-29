@@ -176,7 +176,7 @@ After successful deployment, we access our spring sample via approuter.
 It redirects you to a login-screen to authenticate yourself. <br>It will respond with error status code ``401`` in case of failing logon. <br>After a successful logon the index page provides a list of links to access the different endpoints conveniently.
 
 #### Assign permissions
-The approuter also contains a direct link to the AMS Admin UI to assign the missing permissions. <br>Please follow the [Guide](https://github.wdf.sap.corp/pages/CPSecurity/AMS/Overview/HowTo_AMSConfig/#create-an-admin-user-for-your-ams-tenant) on how to setup the IAS tenant.  
+The approuter also contains a direct link to the AMS Admin UI to assign the missing permissions. <br>Please follow the [Guide](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/Overview/HowTo_AMSConfig) on how to setup the IAS tenant.  
 
 After a delay of maximum 60 seconds, repeat the forbidden test request. A re-login is not required.
 
