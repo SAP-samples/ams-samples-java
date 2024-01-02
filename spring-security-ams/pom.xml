@@ -9,22 +9,22 @@ SPDX-License-Identifier: Apache-2.0
     <parent>
         <groupId>org.springframework.boot</groupId>
         <artifactId>spring-boot-starter-parent</artifactId>
-        <version>2.7.8</version>
+        <version>3.2.1</version>
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.sap.cloud.security.ams.samples</groupId>
     <artifactId>spring-security-ams</artifactId>
-    <version>0.14.0</version>
+    <version>1.0.7</version>
     <packaging>jar</packaging>
     <description>Demo project for a Spring Boot</description>
 
     <properties>
-        <java.version>1.8</java.version>
-        <sap.cloud.security.ams.version>0.14.0</sap.cloud.security.ams.version>
-        <sap.cloud.security.version>2.13.5</sap.cloud.security.version>
-        <apache.httpclient.version>4.5.13</apache.httpclient.version>
-        <junit.jupiter.version>5.7.2</junit.jupiter.version>
-        <commons.io.version>2.11.0</commons.io.version>
+        <java.version>17</java.version>
+        <sap.cloud.security.ams.version>1.1.0-SNAPSHOT</sap.cloud.security.ams.version>
+        <sap.cloud.security.version>3.3.2</sap.cloud.security.version>
+        <apache.httpclient.version>4.5.14</apache.httpclient.version>
+        <junit.jupiter.version>5.9.3</junit.jupiter.version>
+        <commons.io.version>2.15.1</commons.io.version>
         <maven.formatter.plugin.version>2.22.0</maven.formatter.plugin.version>
         <maven.impsort.plugin.version>1.8.0</maven.impsort.plugin.version>
         <maven.jacoco.plugin.version>0.8.8</maven.jacoco.plugin.version>
@@ -68,10 +68,10 @@ SPDX-License-Identifier: Apache-2.0
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-security</artifactId>
         </dependency>
-
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
+            <version>${apache.httpclient.version}</version>
         </dependency>
 
         <!-- test utilities -->
