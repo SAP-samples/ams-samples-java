@@ -20,7 +20,7 @@ The relevant `PVC` is defined in the [deployment.yml](https://github.wdf.sap.cor
 The application developers have complete autonomy over how the files are provided to the `PVC`. In this example, the process is performed by including DCL files in the application's docker image then using an `initContainer` to transfer them via the shell command `cp`. 
 You can see this defined in these lines of the [deployment.yml](https://github.wdf.sap.corp/CPSecurity/ams-samples-java/blob/main/spring-security-ams/k8s/deployment.yml#L61-L70).
 
-In addition, a sidecar process is necessary to compute authorizations from the policies. For this, a pre-built image is added in [deployment.yml](https://github.wdf.sap.corp/CPSecurity/ams-samples-java/blob/main/spring-security-ams/k8s/deployment.yml#L63)
+In addition, a sidecar process is necessary to compute authorizations from the policies. For this, a pre-built image is added in [deployment.yml](https://github.wdf.sap.corp/CPSecurity/ams-samples-java/blob/main/spring-security-ams/k8s/deployment.yml#L88)
 
 Follow the following steps below to setup the AMS sample application:
 
