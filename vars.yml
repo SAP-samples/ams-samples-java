@@ -7,10 +7,8 @@
 ID: 00-00-00
 
 # Choose cfapps.eu10.hana.ondemand.com for the EU10 landscape, cfapps.us10.hana.ondemand.com for US10
-LANDSCAPE_APPS_DOMAIN: cfapps.sap.hana.ondemand.com
+LANDSCAPE_APPS_DOMAIN: cfapps.eu12.hana.ondemand.com
 
 # Required only for the multitenant app java-security-ams sample setup.
-PROVIDER_TENANT_NAME: ""
-PROVIDER_TENANT_ID: ""
-SUBSCRIBER_TENANT_NAME: ""
-SUBSCRIBER_TENANT_ID: ""
+PROVIDER_SUBACCOUNT_SUBDOMAIN:
+SUBSCRIBER_SUBACCOUNT_SUBDOMAIN:
