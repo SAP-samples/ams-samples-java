@@ -29,7 +29,7 @@ public class CallbackServlet extends HttpServlet {
     private static final Logger LOGGER = LoggerFactory.getLogger(CallbackServlet.class);
 
     static final long serialVersionUID = 1L;
-    static final String ENDPOINT = "/v1.0/callback/zones/*";
+    static final String ENDPOINT = "/v1.0/callback/tenants/*";
     final PolicyDecisionPoint policyDecisionPoint;
 
     private static final DefaultJsonObject vcapApplication = new DefaultJsonObject(
@@ -72,9 +72,8 @@ public class CallbackServlet extends HttpServlet {
         LOGGER.debug("Subscription request data {}", requestData);
         JSONObject jsonData = new JSONObject(requestData);
         JSONObject subscriber = jsonData.getJSONObject("subscriber");
-        String tenantName = ((String) subscriber.get("tenantHost")).split("\\.")[0];
 
-        String url = String.format("\"https://%s--%s-%s\"", subscriber.get("zoneId"), tenantName, appRouterUri);
+        String url = String.format("\"https://%s-%s\"", subscriber.get("subaccountSubdomain"), appRouterUri);
         LOGGER.debug("Generated subscription url: {}", url);
         return url;
     }

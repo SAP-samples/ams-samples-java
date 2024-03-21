@@ -5,7 +5,7 @@
   "appCallbacks": {
     "dependenciesCallbacks" : {},
     "subscriptionCallbacks" : {
-      "url" : "https://jakarta-ams-((ID)).((LANDSCAPE_APPS_DOMAIN))/v1.0/callback/zones/{zoneId}"
+      "url" : "https://jakarta-ams-((ID)).((LANDSCAPE_APPS_DOMAIN))/v1.0/callback/tenants/{app_tid}"
     }
   },
   "displayName": "jakarta-ams-((ID)) sample",

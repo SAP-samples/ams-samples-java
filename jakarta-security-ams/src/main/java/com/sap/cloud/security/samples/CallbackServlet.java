@@ -29,7 +29,7 @@ public class CallbackServlet extends HttpServlet {
     private static final Logger LOGGER = LoggerFactory.getLogger(CallbackServlet.class);
 
     static final long serialVersionUID = 1L;
-    static final String ENDPOINT = "/v1.0/callback/zones/*";
+    static final String ENDPOINT = "/v1.0/callback/tenants/*";
     final PolicyDecisionPoint policyDecisionPoint;
 
     private static final DefaultJsonObject vcapApplication = new DefaultJsonObject(

@@ -37,10 +37,12 @@ applications:
       - nodejs_buildpack
     memory: 128M
     routes:
-      - route: ((PROVIDER_TENANT_ID))--((PROVIDER_TENANT_NAME))-ar-((ID)).((LANDSCAPE_APPS_DOMAIN))
+      - route: ((PROVIDER_SUBACCOUNT_SUBDOMAIN))-ar-((ID)).((LANDSCAPE_APPS_DOMAIN))
+      - route: ((SUBSCRIBER_SUBACCOUNT_SUBDOMAIN))-ar-((ID)).((LANDSCAPE_APPS_DOMAIN))
     services:
       - name: java-ams-ias
         parameters: { "credential-type": "X509_GENERATED", "app-identifier": "java-ams" }
+      - java-ams-sms
     env:
       TENANT_HOST_PATTERN: ^(.*)-ar-((ID)).((LANDSCAPE_APPS_DOMAIN))
       destinations: >

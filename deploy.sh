@@ -38,19 +38,26 @@ function check_output_with_timeout {
 function deploy_app {
   local folder=$1
   local service_instance_name=$2
+  local service_instance_name_sms=$3
 
+  echo
   echo
   echo "This script will now deploy the sample app by"
   echo "  1. Creating the AMS service instance using 'cf create-service identity application $service_instance_name -c $folder/ias-config.json'"
-  echo "  2. Deploying the actual application using 'cf push -f $folder/manifest.yml --vars-file vars.yml'"
+  if [ -n "$service_instance_name_sms" ]; then
+    echo "  2. Creating the SMS (Subscription Manager) service instance using 'cf create-service subscription-manager provider $service_instance_name_sms -c $folder/sms-config.json'"
+    echo "  3. Deploying the actual application using 'cf push -f $folder/manifest.yml --vars-file vars.yml'"
+  else
+    echo "  2. Deploying the actual application using 'cf push -f $folder/manifest.yml --vars-file vars.yml'"
+  fi
   echo "You can use these commands also manually to re-deploy the app later."
   read -p "Please press any key to continue..." -n 1 -r
   echo
 
-  ## Check if the service instance already exists
+  ## Check if the AMS service instance already exists
   cf service "$service_instance_name"  > /dev/null 2>&1
   if [ $? -eq 0 ]; then
-    read -p "The AMS service instance '$service_instance_name' already exists in your space. Do you want to use the sample with this instance? Y/n " -n 1 -r
+    read -p "The AMS service instance '$service_instance_name' already exists in your space. Do you want to use the sample with the already existing instance? Y/n " -n 1 -r
     echo # Move to a new line
     if [[ ! $REPLY =~ ^[Yy]$ ]] && [[ ! -z $REPLY ]]; then
       echo "Please delete the instance manually or restart this script and select space cleaning."
@@ -58,15 +65,42 @@ function deploy_app {
     fi
   else
     ## Create AMS/IAS service instance
-    sed -e "s/((ID))/$username/g; s/((LANDSCAPE_APPS_DOMAIN))/$landscape_apps_domain/g" "$folder"/ias-config.json.template > "$folder"/ias-config.json
+    if [ -n "$service_instance_name_sms" ]; then # multi tenant
+      sed -e "s/((ID))/$username/g; s/((LANDSCAPE_APPS_DOMAIN))/$landscape_apps_domain/g" "$folder"/ias-config-multi-tenant.json.template > "$folder"/ias-config.json
+    else
+      sed -e "s/((ID))/$username/g; s/((LANDSCAPE_APPS_DOMAIN))/$landscape_apps_domain/g" "$folder"/ias-config-single-tenant.json.template > "$folder"/ias-config.json
+    fi
     cf create-service identity application "$service_instance_name" -c "$folder"/ias-config.json
     echo "Waiting for AMS service instance creation to be finished... (90sec timeout)"
     check_output_with_timeout 90 3 "cf service $service_instance_name | grep 'status:\s*create succeeded' | wc -l" 1
     echo "Service instance creation finished successfully"
   fi
 
+  if [ -n "$service_instance_name_sms" ]; then # multi tenant
+      ## Check if the SMS service instance already exists
+      cf service "$service_instance_name_sms"  > /dev/null 2>&1
+      if [ $? -eq 0 ]; then
+        read -p "The SMS service instance '$service_instance_name_sms' already exists in your space. Do you want to use the sample with the already existing instance? Y/n" -n 1 -r
+        echo # Move to a new line
+        if [[ ! $REPLY =~ ^[Yy]$ ]] && [[ ! -z $REPLY ]]; then
+          echo "Please delete the instance manually or restart this script and select space cleaning."
+          exit 1
+        else
+          echo "Using the existing SMS service instance..."
+          echo "HINT: If you recreated the IAS/SMS service instance, you also have to recreate the SMS instance. Otherwise the connection between the two is broken."
+        fi
+      else
+        ## Create AMS/IAS service instance
+        sed -e "s/((ID))/$username/g; s/((LANDSCAPE_APPS_DOMAIN))/$landscape_apps_domain/g" "$folder"/sms-config.json.template > "$folder"/sms-config.json
+        cf create-service subscription-manager provider "$service_instance_name_sms" -c "$folder"/sms-config.json
+        echo "Waiting for SMS service instance creation to be finished... (90sec timeout)"
+        check_output_with_timeout 90 3 "cf service $service_instance_name_sms | grep 'status:\s*create succeeded' | wc -l" 1
+        echo "Service instance creation finished successfully"
+      fi
+  fi
+
   cf push -f "$folder"/manifest.yml --vars-file vars.yml
-  assertSuccess $? "The application deployment has failed "
+  assertSuccess $? "The application deployment has failed. Please check the logs "
 }
 
 function check_maven_installation {
@@ -106,43 +140,63 @@ function prepare_java_deployment {
   echo
   read -p "This Java sample app supports multi-tenancy with one demo subscriber. This requires additional setup! Would you like to activate multi-tenancy? (optionally) y/N " -n 1 -r
   echo # Move to a new line
+  local multi_tenant=0
   if [[ ! $REPLY =~ ^[Nn]$ ]] && [[ ! -z $REPLY ]]; then
-    echo "The multi-tenant setup is not yet fully supported by this script. Please restart without multi-tenancy"
-    exit 1
-    # TODO multi tenant setup is not yet complete
+    echo "Continuing with multi-tenancy enabled. Copying template manifest-multi-tenant.yml to manifest.yml"
+    multi_tenant=1
     cp "$java_dir/manifest-multi-tenant.yml" "$java_dir/manifest.yml"
-    echo "Continuing with multi-tenancy enabled"
 
-      provider_tenant_name=$(echo vars.yml | grep -o '^PROVIDER_TENANT_NAME: ')
-      provider_tenant_id=$(echo vars.yml | grep -o '^PROVIDER_TENANT_ID: ')
-      subscriber_tenant_name=$(echo vars.yml | grep -o '^SUBSCRIBER_TENANT_NAME: ')
-      subscriber_tenant_id=$(echo vars.yml | grep -o '^SUBSCRIBER_TENANT_ID: ')
+    provider_subaccount_subdomain=$(awk '/^PROVIDER_SUBACCOUNT_SUBDOMAIN: / {print $2}' vars.yml)
+    subscriber_subaccount_subdomain=$(awk '/^SUBSCRIBER_SUBACCOUNT_SUBDOMAIN: / {print $2}' vars.yml)
+    echo
+    
+    if [ -n "$provider_subaccount_subdomain" ]; then
+      read -p  "Do you want to use the already configured PROVIDER Tenant Name '$provider_subaccount_subdomain' from vars.yml? Y/n " -n 1 -r
+      if [[ ! $REPLY =~ ^[Yy]$ ]] && [[ ! -z $REPLY ]]; then
+        provider_subaccount_subdomain=""
+      fi
+    fi
+    if [ -z "$provider_subaccount_subdomain" ]; then
+      echo # empty line
+      read -p "Please enter the Subdomain of your BTP PROVIDER Subaccount (This is where this sample application is deployed):  " -r provider_subaccount_subdomain
+      while [ -z "$provider_subaccount_subdomain"  ]; do # Empty input
+        echo # empty line
+        read -p "Provider Subaccount Subdomain must not be empty. Please try again: " -r provider_subaccount_subdomain
+      done
+      sed -i '' -e "s/^PROVIDER_SUBACCOUNT_SUBDOMAIN:.*/PROVIDER_SUBACCOUNT_SUBDOMAIN: $provider_subaccount_subdomain/" vars.yml
+    fi
 
-      if [[ $provider_tenant_name == '""' ]]; then
-        read -p "Please enter the IAS tenant name to which you established trust in your the PROVIDER subaccount. (This is where this sample application is deployed).  " -r provider_tenant_name
-        sed -i '' -e "s/^PROVIDER_TENANT_NAME: .*/PROVIDER_TENANT_NAME: $provider_tenant_name/" vars.yml
+    if [ -n "$subscriber_subaccount_subdomain" ]; then
+      read -p  "Do you want to use the already configured SUBSCRIBER Tenant Name '$subscriber_subaccount_subdomain' from vars.yml? Y/n " -n 1 -r
+      if [[ ! $REPLY =~ ^[Yy]$ ]] && [[ ! -z $REPLY ]]; then
+        subscriber_subaccount_subdomain=""
       fi
-      if [[ $provider_tenant_id == '""' ]]; then
-        read -p "Please enter the tenant ID of your provider subaccount (this is where this sample application is deployed). You can find this on the Overview page of your subaccount in the BTP Cockpit. " -r provider_tenant_name
-        # TODO
-      fi
-      if [[ $subscriber_tenant_name == '""' ]]; then
-        read -p "Please enter the IAS tenant name to which you established trust in your the SUBSCRIBER subaccount. (This can be any subaccount in the same global account as your provider subaccount).  " -r provider_tenant_name
-        # TODO
-      fi
-      if [[ $subscriber_tenant_id == '""' ]]; then
-        read -p "Please enter the tenant ID of your subscriber subaccount. " -r provider_tenant_name
+    fi
+    if [ -z "$subscriber_subaccount_subdomain" ]; then
+      echo # empty line
+      read -p "Please enter the Subdomain of your BTP SUBSCRIBER Subaccount (This is where this sample application is deployed):  " -r subscriber_subaccount_subdomain
+      while [ -z "$subscriber_subaccount_subdomain"  ]; do # Empty input
+        echo # empty line
+        read -p "SUBSCRIBER Subaccount Subdomain must not be empty. Please try again: " -r subscriber_subaccount_subdomain
+      done
+      sed -i '' -e "s/^SUBSCRIBER_SUBACCOUNT_SUBDOMAIN:.*/SUBSCRIBER_SUBACCOUNT_SUBDOMAIN: $subscriber_subaccount_subdomain/" vars.yml
+    fi
 
-        # TODO
-      fi
   else
+    echo "Continuing without multi-tenancy. Copying template manifest-single-tenant.yml to manifest.yml"
     cp "$java_dir/manifest-single-tenant.yml" "$java_dir/manifest.yml"
-    echo "Continuing without multi-tenancy"
   fi
 
-  echo
-  echo "Running 'mvn clean package -DskipTests --batch-mode'"
+  echo # empty line
+  echo # empty line
+  echo "The script will now run the Maven Build via 'mvn clean package -DskipTests --batch-mode' as a preparation the deployment"
+  read -p "Please press any key to continue..." -n 1 -r
+  echo # empty line
+  echo # empty line
   (cd "$java_dir" && mvn clean package -DskipTests --batch-mode)
+  assertSuccess $? "The Maven Build has failed. Please check the logs "
+
+  return $multi_tenant
 }
 
 echo
@@ -260,8 +314,12 @@ while true; do
     1|java)
       choice=java
       echo "Continuing with the deployment of the Java sample app."
-      prepare_java_deployment
-      deploy_app $java_dir java-ams-ias
+      prepare_java_deployment # returns 1 if multi_tenancy is enabled
+      if [ "$?" -eq 1 ]; then
+        deploy_app $java_dir java-ams-ias java-ams-sms
+      else
+        deploy_app $java_dir java-ams-ias
+      fi
       break
       ;;
     2|spring)
