@@ -16,45 +16,34 @@ To check if your Identity tenant is enabled for multi-tenancy, go to identity te
 To enable the IAS-tenant please create a bcp ticket on `BC-IAM-IDS` component.
 For additional information see [here](https://github.wdf.sap.corp/CPSecurity/Knowledge-Base/tree/master/08_Tutorials/iasbroker).
 
-## Create required service instances
-Make sure you're in `java-security-ams` folder and execute the `setup-services.sh` script.
+# Deployment on Cloud Foundry
 
-:bulb: if you don't have permissions to execute the script apply shell command `chmod 741`
-```shell
-./setup-services.sh 
-```
-> `setup-services.sh ` will create identity and subscription-manager service instances
+## Wizard guided: Create required service instances and deployment
+Make sure you're in the root folder of this repository and execute the `deploy.sh` script.
+You need to be logged in to your BTP Subaccount with the Cloud Foundry CLI before executing the wizard.
 
-:information_source: [identity service info](https://pages.github.tools.sap/KernelServices/adoption-guide/identity-service) <br>
+:information_source: [identity service info](https://github.wdf.sap.corp/CPSecurity/Knowledge-Base/tree/master/08_Tutorials/iasbroker) <br>
 :information_source: [subscription-manager info](https://int.controlcenter.ondemand.com/index.html#/knowledge_center/articles/7961284168e848efb9e0462e38b4075d)
 
 :bulb: If error `The application cannot be set as multi-tenant` is returned during the identity service creation, it is an indicator that identity tenant is not multi-tenant enabled. Revisit the [Identity tenant prerequisite](#check-identity-tenant-configuration) section.
 
-# Deployment on Cloud Foundry
+## Manual steps
 
-## Compile the Java application
+### Compile the Java application
 Run maven to package the application
 ```shell
 mvn clean package
 ```
 
-## Configure the manifest
+### Configure the manifest
 The [vars](../vars.yml) contains hosts and paths that need to be adopted.
-- `PROVIDER_TENANT_NAME` is the IAS tenant name for the subaccount where the application is deployed. 
-- `SUBSCRIBER_TENANT_NAME` is the tenant name for the  subaccount where the application will be subscribed from. 
-
-ℹ️ You can find the name of the tenant by going to SAP BTP Cockpit subaccount -> Security -> Trust Configuration and checking the Custom Identity Provider for Applications. The 'Host Name' is prefixed with the tenant name e.g. ams.accounts.sap.com tenant name is ams
-
-- `PROVIDER_TENANT_ID` is the Tenant ID that can be found in the Overview section in SAP BTP Cockpit of subaccount where the application is deployed.
-- `SUBSCRIBER_TENANT_ID`is the Tenant ID that can be found in the Overview section in SAP BTP Cokcpit of subaccount where the application will be subscribed from.
-
-
-  <br><img src="../docs/images/btp-cockpit-tenantid.png" alt="tenant-id" width="600"/> 
+- `PROVIDER_SUBACCOUNT_SUBDOMAIN` is the subdomain of your BTP subaccount in which you deploy the application. 
+- `SUBSCRIBER_SUBACCOUNT_SUBDOMAIN` is the subdomain of your BTP subaccount where the application will be subscribed from.
 
 On Cloud Foundry your application gets deployed together with [AMS buildpack](https://github.com/SAP/cloud-authorization-buildpack), so that the policy decision runtime is available as a *sidecar*. In the manifest you may need to adapt the ``appName`` and `directories` to your `AMS_DCL_ROOT`. The `directories` serves the `.dcl` files and the data which contains the assignments of users to policies.
 
 
-## Deploy the application
+### Deploy the application
 Deploy the application using cf push. It will expect 1 GB of free memory quota.
 During application deployment cloud authorization buildpack is responsible to upload the base policies specified by the application to the AMS. Therefore, the ``AMS_DCL_ROOT`` needs to specify the location of the dcls in the environment.
 
@@ -63,10 +52,10 @@ cf push --vars-file ../vars.yml
 ```
 > Use cf CLI v7. See Upgrading to [cf CLI v7](https://docs.cloudfoundry.org/cf-cli/v7.html).
 
-## Subscribe to the app from another subaccount
+### Subscribe to the app from another subaccount
 In SAP BTP Cockpit go to another subaccount which is bound to another `identity` tenant. Select `Instances and Subscriptions` from the left pane, click on `Create` button, look for `AMS java-security-sample` in the dropdown list and click on `create`. 
 
-⚠️ Both subaccounts need to reside in the same region (e.g. US10)
+⚠️ Both subaccounts need to reside in the same region (e.g. EU12)
 
 ![subscribe](./cf-cockpit-subscribe.png)
 
