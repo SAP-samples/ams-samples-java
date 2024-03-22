@@ -83,7 +83,7 @@ def unitTests() {
             dir('java-security-ams') {
                 def mvnLocalRepository = getConfigProperty('mavenLocalJavaRepository')
 
-                sh 'mvn -q clean test -U --settings ${mvnLocalSettingsFilePath} -Dmaven.repo.local=${HOME}/${mvnLocalRepository}'
+                sh 'mvn -q clean test -U --settings ../${mvnLocalSettingsFilePath} -Dmaven.repo.local=${HOME}/${mvnLocalRepository}'
                 // get results for the jenkins junit plugin
                 junit 'target/surefire-reports/*.xml'
             }
@@ -92,7 +92,7 @@ def unitTests() {
             dir('spring-security-ams') {
                 def mvnLocalRepository = getConfigProperty('mavenLocalSpringRepository')
 
-                sh 'mvn -q clean test -U --settings ${mvnLocalSettingsFilePath} -Dmaven.repo.local=${HOME}/${mvnLocalRepository}'
+                sh 'mvn -q clean test -U --settings ../${mvnLocalSettingsFilePath} -Dmaven.repo.local=${HOME}/${mvnLocalRepository}'
                 // get results for the jenkins junit plugin
                 junit 'target/surefire-reports/*.xml'
             }
