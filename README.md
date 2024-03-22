@@ -19,7 +19,7 @@ AMS consists of several components, namely
   perform a specific action on a specific resource. In BTP Clod Foundry environment it is initialized with
   the [cloud authorization buildpack](https://github.com/SAP/cloud-authorization-buildpack).
 
-<img src="https://github.wdf.sap.corp/CPSecurity/AMS/blob/master/Overview/images/AMS_BigPicture_CF_simple.drawio.svg" alt="drawing" width="800px"/>
+<img src="https://github.wdf.sap.corp/CPSecurity/AMS/blob/master/_00_TeamDocsInternal/Overview/images/AMS_BigPicture.drawio.svg" alt="drawing" width="800px"/>
 
 - During application deployment the Cloud Authorization Buildpack is responsible to upload the base policies specified
   by the application to the AMS. Therefore, the environment variable `AMS_DCL_ROOT` (set in manifest.yml) needs to
@@ -35,14 +35,15 @@ A more detailed description can be found [here](https://github.wdf.sap.corp/page
 
 ## Overview Samples
 
-| Feature                         | Version | [Java](java-security-ams) | [Spring](spring-security-ams) | 
-|---------------------------------|---------|---------------------------|-------------------------------|
-| unit testing                    |         | x                         | x                             | 
-| local setup / testing           |         | x                         | x                             | 
-| multi-tenancy                   | 0.8.0   | x                         |                               |                      
-| value help (odata)              | 0.9.0   | x                         |                               |                      
-| privileged mode for techn. comm | 0.9.0   |                           | x                             |                      
-| kyma/kubernetes deployment      | 0.9.0   |                           | x                             |              
+| Feature                         | Version | [Java](java-security-ams) | [Spring](spring-security-ams) | [Jakarta](jakarta-security-ams) | 
+|---------------------------------|---------|---------------------------|-------------------------------|---------------------------------|
+| unit testing                    |         | x                         | x                             | x                               | 
+| local setup / testing           |         | x                         | x                             | x                               | 
+| multi-tenancy                   | 0.8.0   | x                         |                               |                                 |                      
+| value help (odata)              | 0.9.0   | x                         |                               |                                 |                      
+| privileged mode for techn. comm | 0.9.0   |                           | x                             |                                 |                      
+| kyma/kubernetes deployment      | 0.9.0   |                           | x                             |                                 |              
+| Java version                    |         | 11                        | 17                            | 17                              |
 
 ## Download and Installation
 

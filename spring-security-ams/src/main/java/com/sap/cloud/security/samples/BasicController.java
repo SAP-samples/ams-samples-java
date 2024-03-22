@@ -8,6 +8,7 @@ package com.sap.cloud.security.samples;
 import com.sap.cloud.security.ams.api.Principal;
 import com.sap.cloud.security.ams.dcl.client.pdp.Attributes;
 import com.sap.cloud.security.ams.dcl.client.pdp.PolicyDecisionPoint;
+import com.sap.cloud.security.config.Environments;
 import com.sap.cloud.security.config.ServiceConstants;
 import com.sap.cloud.security.json.DefaultJsonObject;
 import com.sap.cloud.security.json.JsonObject;
@@ -61,10 +62,8 @@ public class BasicController {
     // required for the UI
     @GetMapping(value = "/uiurl")
     public String getAmsUiUrl() {
-        String vcapServices = System.getenv(ServiceConstants.VCAP_SERVICES);
-        JsonObject serviceJsonObject = new DefaultJsonObject(vcapServices).getJsonObjects("authorization").get(0);
-        Map<String, String> credentialsMap = serviceJsonObject.getJsonObject("credentials").getKeyValueMap();
-        return credentialsMap.get("ui_url");
+        String iasUrl = Environments.getCurrent().getIasConfiguration().getUrl().toString();
+        return iasUrl + "/admin";
     }
 
     @GetMapping(value = "/authorized")
