@@ -13,21 +13,22 @@ SPDX-License-Identifier: Apache-2.0
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
-        <maven.surefire.plugin.version>3.0.0</maven.surefire.plugin.version>
+        <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
+        <maven.war.plugin.version>3.4.0</maven.war.plugin.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <sap.cloud.security.version>3.3.3</sap.cloud.security.version>
+        <sap.cloud.security.version>3.3.5</sap.cloud.security.version>
         <sap.cloud.security.ams.version>1.1.0</sap.cloud.security.ams.version>
-        <slf4j.api.version>2.0.9</slf4j.api.version>
+        <slf4j.api.version>2.0.12</slf4j.api.version>
         <apache.httpclient.version>4.5.14</apache.httpclient.version>
         <jakarta.servlet.api.version>6.0.0</jakarta.servlet.api.version>
         <maven.formatter.plugin.version>2.22.0</maven.formatter.plugin.version>
         <maven.impsort.plugin.version>1.8.0</maven.impsort.plugin.version>
-        <maven.jacoco.plugin.version>0.8.8</maven.jacoco.plugin.version>
-        <junit.version>5.9.2</junit.version>
+        <maven.jacoco.plugin.version>0.8.11</maven.jacoco.plugin.version>
+        <junit.version>5.9.3</junit.version>
         <assertj.version>3.24.2</assertj.version>
         <!-- audit log service -->
-        <sap.xs.auditlog.version>2.0.16</sap.xs.auditlog.version>
+        <sap.xs.auditlog.version>2.0.17</sap.xs.auditlog.version>
         <sap.xs.env.version>1.8.5</sap.xs.env.version>
         <sap.cf.logging.version>3.7.0</sap.cf.logging.version>
     </properties>
@@ -136,7 +137,7 @@ SPDX-License-Identifier: Apache-2.0
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-war-plugin</artifactId>
-                <version>3.3.2</version>
+                <version>${maven.war.plugin.version}</version>
             </plugin>
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
@@ -146,7 +147,7 @@ SPDX-License-Identifier: Apache-2.0
             <plugin>
                 <groupId>com.sap.cloud.security.ams.client</groupId>
                 <artifactId>dcl-surefire-plugin</artifactId>
-                <version>0.17.0-SNAPSHOT</version>
+                <version>${sap.cloud.security.ams.version}</version>
                 <executions>
                     <execution>
                         <goals>
@@ -162,7 +163,7 @@ SPDX-License-Identifier: Apache-2.0
             <plugin>
                 <groupId>com.sap.cloud.security.ams.client</groupId>
                 <artifactId>dcl-compiler-plugin</artifactId>
-                <version>0.17.0-SNAPSHOT</version>
+                <version>${sap.cloud.security.ams.version}</version>
                 <executions>
                     <execution>
                         <goals>
