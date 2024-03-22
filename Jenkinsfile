@@ -76,12 +76,12 @@ def prepareScm() {
 }
 
 def unitTests() {
-    def mvnLocalSettingsFilePath = getConfigProperty('mavenLocalSettingsFilePath')
+    def mvnLocalSettingsFilePath = '.pipeline/maven-settings.xml'
 
     parallel(
         'Java': {
             dir('java-security-ams') {
-                def mvnLocalRepository = getConfigProperty('mavenLocalJavaRepository')
+                def mvnLocalRepository = '.m2/java-security-ams/repository'
 
                 sh 'mvn -q clean test -U --settings ../${mvnLocalSettingsFilePath} -Dmaven.repo.local=${HOME}/${mvnLocalRepository}'
                 // get results for the jenkins junit plugin
@@ -90,7 +90,7 @@ def unitTests() {
         },
         'Spring': {
             dir('spring-security-ams') {
-                def mvnLocalRepository = getConfigProperty('mavenLocalSpringRepository')
+                def mvnLocalRepository = '.m2/spring-security-ams/repository'
 
                 sh 'mvn -q clean test -U --settings ../${mvnLocalSettingsFilePath} -Dmaven.repo.local=${HOME}/${mvnLocalRepository}'
                 // get results for the jenkins junit plugin
@@ -114,8 +114,4 @@ def integrationTests() {
             string(name: 'TREEISH_SAMPLES', value: env.CHANGE_BRANCH)
         ]
     }
-}
-
-def getConfigProperty(property) {
-    return globalPipelineEnvironment.configuration.general[property]
 }
