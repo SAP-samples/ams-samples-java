@@ -76,14 +76,13 @@ def prepareScm() {
 }
 
 def unitTests() {
-    def mvnLocalSettingsFilePath = '.pipeline/maven-settings.xml'
-
     parallel(
+        def mvnLocalSettingsFilePath = '../.pipeline/maven-settings.xml'
         'Java': {
             dir('java-security-ams') {
                 def mvnLocalRepository = '.m2/java-security-ams/repository'
 
-                sh 'mvn -q clean test -U --settings ../${mvnLocalSettingsFilePath} -Dmaven.repo.local=${HOME}/${mvnLocalRepository}'
+                sh 'mvn -q clean test -U --settings ${mvnLocalSettingsFilePath} -Dmaven.repo.local=${HOME}/${mvnLocalRepository}'
                 // get results for the jenkins junit plugin
                 junit 'target/surefire-reports/*.xml'
             }
@@ -92,7 +91,7 @@ def unitTests() {
             dir('spring-security-ams') {
                 def mvnLocalRepository = '.m2/spring-security-ams/repository'
 
-                sh 'mvn -q clean test -U --settings ../${mvnLocalSettingsFilePath} -Dmaven.repo.local=${HOME}/${mvnLocalRepository}'
+                sh 'mvn -q clean test -U --settings ${mvnLocalSettingsFilePath} -Dmaven.repo.local=${HOME}/${mvnLocalRepository}'
                 // get results for the jenkins junit plugin
                 junit 'target/surefire-reports/*.xml'
             }
