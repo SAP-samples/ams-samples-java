@@ -7,23 +7,23 @@ SPDX-License-Identifier: Apache-2.0
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sap.cloud.security.ams.samples</groupId>
     <artifactId>java-security-ams</artifactId>
-    <version>0.14.0</version>
+    <version>0.18.0</version>
     <packaging>war</packaging>
 
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
-        <maven.surefire.plugin.version>3.0.0-M10-patch-vadam-atlassian-1</maven.surefire.plugin.version>
-        <maven.compiler.source>1.8</maven.compiler.source>
-        <maven.compiler.target>1.8</maven.compiler.target>
-        <sap.cloud.security.version>2.13.5</sap.cloud.security.version>
-        <sap.cloud.security.ams.version>0.14.0</sap.cloud.security.ams.version>
-        <slf4j.api.version>2.0.6</slf4j.api.version>
+        <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
+        <maven.compiler.source>11</maven.compiler.source>
+        <maven.compiler.target>11</maven.compiler.target>
+        <sap.cloud.security.version>2.17.3</sap.cloud.security.version>
+        <sap.cloud.security.ams.version>0.18.0</sap.cloud.security.ams.version>
+        <slf4j.api.version>2.0.7</slf4j.api.version>
         <apache.httpclient.version>4.5.14</apache.httpclient.version>
         <javax.servlet.api.version>4.0.1</javax.servlet.api.version>
         <maven.formatter.plugin.version>2.22.0</maven.formatter.plugin.version>
         <maven.impsort.plugin.version>1.8.0</maven.impsort.plugin.version>
-        <maven.jacoco.plugin.version>0.8.8</maven.jacoco.plugin.version>
+        <maven.jacoco.plugin.version>0.8.11</maven.jacoco.plugin.version>
         <junit.version>5.9.2</junit.version>
         <assertj.version>3.24.2</assertj.version>
         <!-- audit log service -->
@@ -35,6 +35,13 @@ SPDX-License-Identifier: Apache-2.0
 
     <dependencyManagement>
         <dependencies>
+            <dependency>
+                <groupId>com.sap.cloud.security</groupId>
+                <artifactId>java-bom</artifactId>
+                <version>${sap.cloud.security.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
             <dependency>
                 <groupId>com.sap.cloud.security.ams.client</groupId>
                 <artifactId>parent</artifactId>
@@ -49,12 +56,10 @@ SPDX-License-Identifier: Apache-2.0
         <dependency>
             <groupId>com.sap.cloud.security.ams.client</groupId>
             <artifactId>java-ams</artifactId>
-            <version>${sap.cloud.security.ams.version}</version>
         </dependency>
         <dependency>
             <groupId>com.sap.cloud.security</groupId>
             <artifactId>java-security</artifactId>
-            <version>${sap.cloud.security.version}</version>
         </dependency>
         <dependency>
             <groupId>org.apache.httpcomponents</groupId>
