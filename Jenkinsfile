@@ -77,9 +77,9 @@ def prepareScm() {
 
 def unitTests() {
     parallel(
-        def mvnLocalSettingsFilePath = '../.pipeline/maven-settings.xml'
         'Java': {
             dir('java-security-ams') {
+                def mvnLocalSettingsFilePath = '../.pipeline/maven-settings.xml'
                 def mvnLocalRepository = '.m2/java-security-ams/repository'
 
                 sh 'mvn -q clean test -U --settings ${mvnLocalSettingsFilePath} -Dmaven.repo.local=${HOME}/${mvnLocalRepository}'
@@ -89,6 +89,7 @@ def unitTests() {
         },
         'Spring': {
             dir('spring-security-ams') {
+                def mvnLocalSettingsFilePath = '../.pipeline/maven-settings.xml'
                 def mvnLocalRepository = '.m2/spring-security-ams/repository'
 
                 sh 'mvn -q clean test -U --settings ${mvnLocalSettingsFilePath} -Dmaven.repo.local=${HOME}/${mvnLocalRepository}'
