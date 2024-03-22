@@ -41,7 +41,7 @@ sap.ui.define([
 					},
 					{
 						title: "AMS Admin UI - Maintain permissions",
-						text: "You need to be an ias_admin within your IAS application. In the AMS Admin UI select 'webshop' (product_label)."
+						text: "Link to your IAS Admin Console"
 					},
 					{
 						title: "Link to Knowledge Base",
@@ -56,7 +56,7 @@ sap.ui.define([
 			},
 
 			onNavToKnowledgeBase: function () {
-				let sUrl = "https://github.wdf.sap.corp/pages/CPSecurity/AMS/Overview/HowTo_AMSConfig/";
+				let sUrl = "https://go.sap.corp/amsauthz";
 				window.open(sUrl, "_blank", "noopener");
 			},
 
