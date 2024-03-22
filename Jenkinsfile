@@ -115,3 +115,7 @@ def integrationTests() {
         ]
     }
 }
+
+def getConfigProperty(property) {
+    return globalPipelineEnvironment.configuration.general[property]
+}
