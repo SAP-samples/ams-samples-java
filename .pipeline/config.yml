@@ -1,5 +1,5 @@
 general:
   sapPiperDownloadCredentialsId: GITHUB_API_TOKEN_SCPSECCASBOT
-  mavenLocalSettingsFilePath: '.pipeline/settings.xml'
+  mavenLocalSettingsFilePath: '.pipeline/maven-settings.xml'
   mavenLocalJavaRepository: '.m2/java-security-ams/repository'
   mavenLocalSpringRepository: '.m2/spring-security-ams/repository'
