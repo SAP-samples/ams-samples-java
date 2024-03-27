@@ -25,7 +25,7 @@ SPDX-License-Identifier: Apache-2.0
         <maven.formatter.plugin.version>2.22.0</maven.formatter.plugin.version>
         <maven.impsort.plugin.version>1.8.0</maven.impsort.plugin.version>
         <maven.jacoco.plugin.version>0.8.11</maven.jacoco.plugin.version>
-        <junit.version>5.9.3</junit.version>
+        <junit.version>5.10.2</junit.version>
         <assertj.version>3.24.2</assertj.version>
         <!-- audit log service -->
         <sap.xs.auditlog.version>2.0.17</sap.xs.auditlog.version>
@@ -103,7 +103,7 @@ SPDX-License-Identifier: Apache-2.0
         </dependency>
         <dependency>
             <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter-api</artifactId>
+            <artifactId>junit-jupiter</artifactId>
             <version>${junit.version}</version>
             <scope>test</scope>
         </dependency>
