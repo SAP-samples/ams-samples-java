@@ -47,8 +47,11 @@ public class CallbackServlet extends HttpServlet {
             String requestData = req.getReader().lines().collect(Collectors.joining());
             String url = generateUrlForSubscriber(requestData);
 
+            JSONObject jsonResponse = new JSONObject();
+            jsonResponse.put("applicationURL", url);
+
             response.setContentType(MediaType.APPLICATION_JSON.value());
-            response.getWriter().write(url);
+            response.getWriter().write(jsonResponse.toString());
             response.setStatus(HttpServletResponse.SC_OK);
         } catch (JSONException | IOException e) {
             LOGGER.error("Couldn't subscribe to the app", e);
@@ -73,7 +76,7 @@ public class CallbackServlet extends HttpServlet {
         JSONObject jsonData = new JSONObject(requestData);
         JSONObject subscriber = jsonData.getJSONObject("subscriber");
 
-        String url = String.format("\"https://%s-%s\"", subscriber.get("subaccountSubdomain"), appRouterUri);
+        String url = String.format("https://%s-%s", subscriber.get("subaccountSubdomain"), appRouterUri);
         LOGGER.debug("Generated subscription url: {}", url);
         return url;
     }
