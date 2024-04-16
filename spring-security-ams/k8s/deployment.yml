@@ -87,6 +87,9 @@ spec:
               value: "/bindings"
         - image: cloud-security-integration.common.repositories.cloud.sap/ams-k8s-sidecar:0.53.1-sap-0.3.3-1
           imagePullPolicy: Always
+          securityContext:
+            runAsNonRoot: true
+            runAsUser: 443
           name: adc-sidecar
           ports:
             - name: sidecar
@@ -136,7 +139,7 @@ spec:
       containers:
         - name: upload-container
           imagePullPolicy: Always
-          image: cloud-security-integration.common.repositories.cloud.sap/dcl-uploader:0.0.1
+          image: cloud-security-integration.common.repositories.cloud.sap/dcl-uploader:0.0.2
           env:
             - name: AMS_LOG_LEVEL
               value: debug
