@@ -17,8 +17,8 @@ SPDX-License-Identifier: Apache-2.0
         <maven.war.plugin.version>3.4.0</maven.war.plugin.version>
         <maven.compiler.source>17</maven.compiler.source>
         <maven.compiler.target>17</maven.compiler.target>
-        <sap.cloud.security.version>3.3.5</sap.cloud.security.version>
-        <sap.cloud.security.ams.version>1.2.0</sap.cloud.security.ams.version>
+        <sap.cloud.security.version>3.4.1</sap.cloud.security.version>
+        <sap.cloud.security.ams.version>1.4.0</sap.cloud.security.ams.version>
         <slf4j.api.version>2.0.12</slf4j.api.version>
         <apache.httpclient.version>4.5.14</apache.httpclient.version>
         <jakarta.servlet.api.version>6.0.0</jakarta.servlet.api.version>
