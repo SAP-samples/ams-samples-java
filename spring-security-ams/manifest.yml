@@ -4,51 +4,63 @@
 
 ---
 applications:
-#----------------------------------------------------------
-# Spring Boot application
-#----------------------------------------------------------
-- name: spring-ams
-  instances: 1
-  memory: 800M
-  health-check-type: http
-  health-check-http-endpoint: /health
-  routes:
-    - route: spring-ams-((ID)).((LANDSCAPE_APPS_DOMAIN))
-    - route: spring-ams-((ID)).cert.((LANDSCAPE_APPS_DOMAIN))
-  path: target/spring-security-ams.jar
-  services:
-    - name: spring-ams-ias
-      parameters: { "credential-type": "X509_GENERATED", "app-identifier": "spring-ams" }
-  buildpacks:
-    - https://github.com/SAP/cloud-authorization-buildpack/releases/latest/download/opa_buildpack.zip
-    - java_buildpack
-  env:
-    JBP_CONFIG_OPEN_JDK_JRE: '[memory_calculator: {headroom: 10}]'
-    # the cloud authorization buildpack needs to be configured with the directories
-    #     that contains the dcls to be uploaded to AMS during startup
-    AMS_DCL_ROOT: "/BOOT-INF/classes/"
-#----------------------------------------------------------
-# Application Router
-#----------------------------------------------------------
-- name: spring-ams-approuter
-  path: approuter
-  buildpacks:
-    - nodejs_buildpack
-  memory: 128M
-  routes:
-    - route: spring-ams-web-((ID)).((LANDSCAPE_APPS_DOMAIN))
-  services:
-    - name: spring-ams-ias
-      parameters: { "credential-type": "X509_GENERATED", "app-identifier": "spring-ams" }
-  env:
-    # To enable returning both (backend and local content-security-policy headers)
-    MERGE_CSP_HEADERS: "true"
-    httpHeaders: >
-      [{"Content-Security-Policy-Report-Only": "default-src 'self' https://sapui5.hana.ondemand.com; style-src 'self' 'unsafe-inline' https://sapui5.hana.ondemand.com; img-src 'self' https://sapui5.hana.ondemand.com; report-uri /.ui5/csp/report.csplog;"}]
-    destinations: >
-      [
-        {"name":"ams-spring-app-destination",
-         "url":"https://spring-ams-((ID)).((LANDSCAPE_APPS_DOMAIN))",
-         "forwardAuthToken": true}
-      ]
+  # -----------------------------------------------------------------------------------
+  # AMS Policies Content Deployer App
+  # -----------------------------------------------------------------------------------
+  - name: spring-security-ams-dcl-deployer
+    path: dcldeployer
+    no-route: true
+    health-check-type: none
+    memory: 256M
+    instances: 1
+    buildpack: nodejs_buildpack
+    command: (npm start && echo "This application may now be stopped to free resources." || echo "AMS Policy Deployment unsuccessful.") && sleep infinity
+    services:
+      - name: spring-security-ams-identity
+        parameters:
+          credential-type: X509_GENERATED
+          app-identifier: dcl-deployer
+  #----------------------------------------------------------
+  # Spring Boot application
+  #----------------------------------------------------------
+  - name: spring-security-ams-backend
+    instances: 1
+    memory: 800M
+    health-check-type: http
+    health-check-http-endpoint: /health
+    routes:
+      - route: spring-security-ams-backend-((ID)).((LANDSCAPE_APPS_DOMAIN))
+      - route: spring-security-ams-backend-((ID)).cert.((LANDSCAPE_APPS_DOMAIN))
+    path: target/spring-security-ams.jar
+    services:
+      - name: spring-security-ams-identity
+        parameters: { "credential-type": "X509_GENERATED", "app-identifier": "backend" }
+    buildpacks:
+      - sap_java_buildpack_jakarta
+    env:
+      JBP_CONFIG_OPEN_JDK_JRE: '[memory_calculator: {headroom: 10}]'
+  #----------------------------------------------------------
+  # Application Router
+  #----------------------------------------------------------
+  - name: spring-security-ams-approuter
+    path: approuter
+    buildpacks:
+      - nodejs_buildpack
+    memory: 128M
+    routes:
+      - route: spring-security-ams-((ID)).((LANDSCAPE_APPS_DOMAIN))
+    services:
+      - name: spring-security-ams-identity
+        parameters: { "credential-type": "X509_GENERATED", "app-identifier": "approuter" }
+    env:
+      # To enable returning both (backend and local content-security-policy headers)
+      MERGE_CSP_HEADERS: "true"
+      httpHeaders: >
+        [{"Content-Security-Policy-Report-Only": "default-src 'self' https://sapui5.hana.ondemand.com; style-src 'self' 'unsafe-inline' https://sapui5.hana.ondemand.com; img-src 'self' https://sapui5.hana.ondemand.com; report-uri /.ui5/csp/report.csplog;"}]
+      destinations: >
+        [
+          {"name":"ams-spring-app-destination",
+           "url":"https://spring-security-ams-backend-((ID)).((LANDSCAPE_APPS_DOMAIN))",
+           "forwardAuthToken": true}
+        ]
 ...

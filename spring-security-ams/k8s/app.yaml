@@ -1,0 +1,56 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: spring-security-ams-deployment
+  labels:
+    app: spring-security-ams
+spec:
+  selector:
+    matchLabels:
+      app: spring-security-ams
+  template:
+    metadata:
+      labels:
+        app: spring-security-ams
+    spec:
+      imagePullSecrets:
+        - name: common-artifactory
+      containers:
+        - image: cloud-security-integration.common.repositories.cloud.sap/spring-security-ams:1.1.0
+          imagePullPolicy: Always
+          name: backend
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: identity-service-volume
+              mountPath: "/bindings/identity"
+              readOnly: true
+          env:
+            - name: SERVICE_BINDING_ROOT
+              value: "/bindings"
+        - image: cloud-security-integration.common.repositories.cloud.sap/spring-security-ams-approuter:1.1.0
+          imagePullPolicy: Always
+          name: approuter
+          ports:
+            - name: http
+              containerPort: 5000
+          volumeMounts:
+            - name: identity-service-volume
+              mountPath: "/bindings/identity"
+              readOnly: true
+          env:
+            - name: SERVICE_BINDING_ROOT
+              value: "/bindings"
+            - name: destinations
+              value: |-
+                [{
+                    "name": "ams-spring-app-destination",
+                    "url": "http://localhost:8080",
+                    "forwardAuthToken": true
+                }]
+      volumes:
+        - name: identity-service-volume
+          secret:
+            secretName: spring-security-ams-identity-binding

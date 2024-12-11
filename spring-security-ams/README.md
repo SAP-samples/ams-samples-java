@@ -1,199 +1,162 @@
-# Description
-This sample is a Spring Boot application that utilizes the [spring-ams](https://github.wdf.sap.corp/CPSecurity/cloud-authorization-client-library-java/tree/master/spring-ams) and [spring-security](https://github.com/SAP/cloud-security-services-integration-library/tree/main/spring-security) client libraries to authenticate JWT tokens issued by the [SAP Identity service](https://help.sap.com/docs/identity-authentication) and to authorize resource access managed by [AMS (Authorization Management Service)](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/).
+# Authorization Management Service (AMS) for Spring Boot Sample Application
+This Spring Boot sample application utilizes the [spring-ams](https://github.wdf.sap.corp/CPSecurity/cloud-authorization-client-library-java/tree/master/spring-ams) and [spring-security](https://github.com/SAP/cloud-security-services-integration-library/tree/main/spring-security) client libraries to validate JWT tokens issued by the [SAP Identity service](https://help.sap.com/docs/identity-authentication).
 The application uses the [SAP application router](https://www.npmjs.com/package/@sap/approuter) as OAuth 2.0 client and forwards the requests as reverse proxy to a Spring Boot backend application.
-The Spring Boot backend application checks for all incoming requests whether the user is authenticated and whether the user has the requested permissions assigned with AMS.
+The backend application checks for all incoming requests whether the user is authenticated and authorized via [AMS (Authorization Management Service)](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/).
 
-# Steps
-1. Setup the IAS tenant follow this [guide](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/Overview/HowTo_AMSConfig)
+The application declares its authorization model by providing [DCL files](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/DCLLanguage/Declare) to the AMS service.
+The upload is handled by a dcl deployer app which can be build as part of the deployment process (see CF deployment of this sample app).
+Alternatively, a pre-build deployer image can be used (see the K8s deployment of this sample app).
+For a deeper understanding of how the AMS client library operates, refer to the [documentation](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/ClientLibs/Enforce).
 
-2. Enable authorization checks, application needs to declare authorization model in a form of [DCL files](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/DCLLanguage/Declare) and provide these files to the AMS service. 
-For a deeper understanding of how the AMS client library operates, refer to https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/ClientLibs/EnforceJava
+## Getting Started
+Before deploying the sample app on Kyma/Kubernetes or Cloud Foundry, we need to setup an IAS tenant and [establish trust](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/HowTo_AMSConfig#establish-ias-trust) in the target subaccount.
+<details>
+<summary>Deployment on Kyma/Kubernetes</summary>
 
-3. Follow the deployment steps for [Kyma/Kubernetes](#deployment-on-kymakubernetes) or [Cloud Foundry](#deployment-on-cloud-foundry)
+The k8s deployment contains two pods:
+* The [first pod](k8s/app.yaml) consists of two containers, one for the app and one for the approuter.
+* The [second pod](k8s/policies-deployer-job.yaml) is just for uploading the DCL files to the AMS server.
+  It copies the DCL files from the app image via an init container and then runs a container from a pre-build image to do the actual upload.
+  This pod is configured to be removed 5 minutes after the job is done.
 
-
-# Deployment on Kyma/Kubernetes
-The compiled base DCLs have to be uploaded to the AMS server, this part is handled by the [ams-dcl-uploader](https://github.wdf.sap.corp/CPSecurity/ams-dcl-uploader).
-The `ams-dcl-uploader` expects to locate the DCL files in a [PVC](https://kubernetes.io/docs/concepts/storage/persistent-volumes/) at path ``/dcl-files``.
-The relevant `PVC` is defined in the [deployment.yml](https://github.wdf.sap.corp/CPSecurity/ams-samples-java/blob/main/spring-security-ams/k8s/deployment.yml#L2-L12).
-
-The application developers have complete autonomy over how the files are provided to the `PVC`. In this example, the process is performed by including DCL files in the application's docker image then using an `initContainer` to transfer them via the shell command `cp`. 
-You can see this defined in these lines of the [deployment.yml](https://github.wdf.sap.corp/CPSecurity/ams-samples-java/blob/main/spring-security-ams/k8s/deployment.yml#L61-L70).
-
-In addition, a sidecar process is necessary to compute authorizations from the policies. For this, a pre-built image is added in [deployment.yml](https://github.wdf.sap.corp/CPSecurity/ams-samples-java/blob/main/spring-security-ams/k8s/deployment.yml#L88)
-
-Follow the following steps below to setup the AMS sample application:
-
-## Build docker images and push them to repository
-The images must be accessible externally.
+### Build, tag and push docker images to a repository
+:bulb: If you just want to try out the sample application, you can skip this step and use the pre-build docker images.
 
 #### Backend application
-> Dockerfile that includes the DCL files in the image is provided [here](Dockerfile).
+On the console change into the `spring-security-ams` folder.
+Then use the following commands to build and pushed the spring boot application to a repository:
 ```bash
-docker build -t <repositoryName>/<imageName> -f ./Dockerfile . 
-docker push <repositoryName>/<imageName>
+mvn clean package
+docker build -t <repository>/<backendImage> .
+docker push <repository>/<backendImage>
 ```
-
+The [docker file of the application](Dockerfile) expects the DCL files to be located in the folder `dcldeployer/dcl`.
 
 #### Approuter
-> The Dockerfile for the approuter can be found [here](approuter/Dockerfile).
+Change into the `spring-security-ams/approuter` folder and use the following docker CLI commands to build and push the approuter:
 ```bash
-docker build -t <repositoryName>/<imageName> -f ./Dockerfile . 
-docker push <repositoryName>/<imageName>
+docker build -t <repository>/<approuterImage> .
+docker push <repository>/<approuterImage>
 ```
+The [dockerfile of the approuter](approuter/Dockerfile) does not need to be adapted.
+:warning: Don't forget to change back into the `spring-security-ams` folder afterwards.
 
-## Configure the deployment.yml
-1. In [deployment.yml](https://github.wdf.sap.corp/CPSecurity/ams-samples-java/blob/main/spring-security-ams/k8s/deployment.yml#L63) replace the image repository placeholders `<YOUR IMAGE REPOSITORY>` and `<YOUR APPROUTER IMAGE REPOSITORY` with the URLs of the repository(ies) used in the previous step.
- 
-2. [Create an image pull secret](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line) with `--docker-server=cloud-security-integration.common.repositories.cloud.sap` parameter for https://common.repositories.cloud.sap. This requires a user account for https://common.repositories.cloud.sap
-The secret is required to access the `ams-k8s-sidecar` (Authorization decision controller side-car image ) and `ams-dcl-uploader` images.
-    
-3. Replace `<YOUR IMAGE PULL SECRET>` in [deployment.yml](https://github.wdf.sap.corp/CPSecurity/ams-samples-java/blob/main/spring-security-ams/k8s/deployment.yml#L48) with the name of the secret created in the previous step.                                                                                  
-
-## Deploy the application
-Deploy the applications using [kubectl cli](https://kubernetes.io/docs/reference/kubectl/)
-```shell script
-kubectl apply -f ./k8s/deployment.yml -n <YOUR NAMESPACE>
-``` 
-
-## Identity service configuration
-Before we can log in, we need to add the service URL as redirect URI within our IAS application as depicted in the screenshot below.
-
-![](/docs/images/IAS_OpenIDConnectConfiguration.png)
-
-The URL of the exposed service can be found in <br>Kyma Console - ``<Your Namenspace>`` - Discovery and Network - API Rules - ```ams-sample-app-api```.
-
-![](/docs/images/KymaConsole_APIRule.png)
-
-To do so, login as admin to your IAS tenant (you can find the identity service ``url`` in the ``identity`` secrets), select your application and manually configure these urls as redirect urls within the OpenID Connect Configuration:
-
-- ```<ams-sample-app-api>```/login/callback?authType=ias
-- ```<ams-sample-app-api>```/login/callback
-
-## Access the application
-Now we can call the url to access the application
-- ```<ams-sample-app-api>```/health <br>should return "ok" (Status Code `200`). If not check the application logs, whether the AMS Service is unavailable (search for `/v1/data/dcr._default_/ping`).
-- ```<ams-sample-app-api>```<br>  
-
-It redirects you to a login screen for authentication.
-If the login fails, it will return an error status code `401`. 
-Upon successful login, the index page presents a variety of links for convenient access to different endpoints.
-
-#### Assign policies
-To assign policies to a user, go to the `identity` service admin console. Follow this [guide](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/Policies/Manage#assign-policies) for more details.
-
-After a delay of maximum 60 seconds, repeat the forbidden test request. A re-login is not required.
-
-## Cleanup
-Finally, delete your application and your service instances using the following command:
-```shell script
- kubectl delete -f ./k8s/deployment.yml -n <YOUR NAMESPACE>
+### Configure the k8s deployment
+1. The pre-build policies deployer image [is configured](k8s/policies-deployer-job.yaml) to be pulled from `common.repositories.cloud.sap`.
+This requires a user account and an access token that can be generated at https://common.repositories.cloud.sap/ui/user_profile.
+The access token then needs to be stored as a [k8s secret](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line) named `common-artifactory` using the k8s CLI:
+```bash
+kubectl create secret docker-registry common-artifactory --docker-server=cloud-security-integration.common.repositories.cloud.sap --docker-username=<YOUR USERNAME> --docker-password=<YOUR IDENTITY TOKEN> --docker-email=<YOUR EMAIL> -n <YOUR NAMESPACE>
 ```
+1. If you have build and pushed your own app and/or approuter image in the previous step, you need to replace the default image tags specified in [the app configuration](k8s/app.yaml) and [the policies deployer job configuration](k8s/policies-deployer-job.yaml).
+If the images were not pushed to `common.repositories.cloud.sap`, you also need to adapt the corresponding `imagePullSecrets`.
+:bulb: In case the images are to be pulled from a public repository, no image pull secret is required.
+1. Finally, [the identity service instance configuration](k8s/identity-service-instance.yaml) needs to be completed by providing two redirect URLs for the approuter.
+If you know the unique shoot name of your Kyma Cluster, then you can simply replace the `SHOOT_NAME` placeholder.
+Otherwise, you can deploy only the API rule with
+```shell script
+kubectl apply -f k8s/apirule.yaml -n <YOUR NAMESPACE>
+```
+and afterwards retrieve the hostname for the redirect URLs from the API rule in the Kyma cluster dashboard.
+Alternatively, you can also deploy the whole app twice and retrieve the URLs in between.
 
-# Deployment on Cloud Foundry
-On Cloud Foundry, your application gets deployed together with [AMS buildpack](https://github.com/SAP/cloud-authorization-buildpack), which uploads the DCL policies to the AMS server and provides a policy decision runtime as a *sidecar* process.
-In the manifest you may need to adapt the ``appName`` and `directories` to your `AMS_DCL_ROOT`. The `directories` serves the `.dcl` files and the data which contains the assignments of users to policies.
+### Deploy the application
+After successful configuration you can deploy the applications using [kubectl cli](https://kubernetes.io/docs/reference/kubectl/)
+```shell script
+kubectl apply -f k8s -n <YOUR NAMESPACE>
+```
+</details>
 
-## Create the OAuth2 identity service instance (with AMS enabled)
-Make sure you are in the project root of the spring sample. You need to replace all ``((LANDSCAPE_APPS_DOMAIN))`` and ``((ID))`` placeholders with your d/c/i-User.
-Use the IAS service broker and create an ``identity`` service instance:
+<details>
+<summary>Deployment on Cloud Foundry</summary>
+
+### Configure the CF deployment
+First you need to login using the CF CLI:
 ```shell
-cf create-service identity application spring-ams-ias -c ias-config.json
+cf login -u <YOUR USER> -o <CF ORG of your subaccount> -s <CF SPACE in your subaccount>
+```
+
+Adapt the [vars](../vars.yml) file by:
+- specifying a unique value for `ID`, e.g. your user id
+- setting `LANDSCAPE_APPS_DOMAIN` according to your landscape, e.g. `cfapps.eu12.hana.ondemand.com` for Canary
+
+### Create the identity service instance (with AMS enabled)
+You need to manually replace all ``((LANDSCAPE_APPS_DOMAIN))`` and ``((ID))`` placeholders in `ìas-config.json`.
+Then use the IAS service broker to create the ``identity`` service instance:
+```shell
+cf create-service identity application spring-security-ams-identity -c ias-config.json
 ```
 Further information about identity service and its configuration can be found [here](https://github.wdf.sap.corp/CPSecurity/Knowledge-Base/tree/master/08_Tutorials/iasbroker).
 
-## Test Locally
-#### Configure the local environment
-This demo application can be tested locally in a hybrid setup. That means that the application, as well as Open Policy Agent (OPA) runs locally but for token-validation it uses the OAuth2 Identity Service that was created on Cloud Foundry in the previous step. Perform these steps to adapt your configuration.
-
-1. Get the ``clientid``, the ``domain`` and the `url` from your Identity Service as follows
-    ```shell
-    cf create-service-key spring-ams-ias authn-sk
-    cf service-key spring-ams-ias authn-sk
-    ```
-2. Open the [application-local.yml](./src/main/resources/application-local.yml) file and overwrite the ``sap.security.services.identity`` properties accordingly.
-
-#### Start application locally
-Ensure that your current Maven profile is configured to use SAP Internal corporate network Artifactory as a plugin repository (e.g. https://int.repositories.cloud.sap/artifactory/build-milestones).
-
-Run your sample Spring Boot application `samples/spring-security-ams` in local-mode in order to start the OPA locally: 
-```shell
-mvn spring-boot:run -Dspring-boot.run.useTestClasspath -Dspring-boot.run.profiles=local
-```  
-
-> With `mvn spring-boot:run` the application gets compiled and the [`dcl-compiler-plugin` maven plugin](https://github.wdf.sap.corp/CPSecurity/cloud-authorization-client-library-java/blob/master/docs/maven-plugins.md#dcl-compiler) generates based on the `src/main/resources/ams/*.dcl` files `*.rego` files that can be consumed by OPA.   
-   
-> With ``-Dspring-boot.run.useTestClasspath`` the OPA policy engine gets started locally, and it gets preconfigured with all generated `*.rego` files. The debug logs give you the ``host:port``, the OPA service is started, e.g. ``127.0.0.1:51631``.
-
-> In order to configure ``spring-security`` for hybrid execution we added some ```sap.security.services.identity``` properties [application-local.yml](/src/main/resources/application.yml) which are only active on ``local``profile.
-
-> Example (debug) logs:
->```shell script
-> INFO  29887 --- [main] c.s.c.s.a.d.r.o.s.OpaPdpLocalServer      : Connected to local running OPA with version=0.23.2 (Port=60629, retries=0, duration=240).
-> DEBUG 29926 --- [main] a.f.TestServerPolicyDecisionPointFactory : instantiate PolicyDecisionPoint for kind server:opa and args [sources, /Users/me/git/cloud-authorization-client-library-java/samples/spring-security-ams/target/dcl_opa].
->```
-
-#### Test locally
-When your application is successfully started (check the console logs) you can perform the following GET-requests with your http client (e.g. Postman):
-
-- `http://localhost:8080/health` should return "ok" (Status Code `200`). If not please check the application logs whether the local OPA Service is unavailable.
-- `http://localhost:8080/salesOrders/readByCountry/IT` with a valid token from your identity service. See also [here](https://github.com/SAP/cloud-security-xsuaa-integration/blob/main/docs/HowToFetchToken.md) on how to fetch a token from identity service. 
-This `GET` request tries to execute a secured method. It will respond with error status code `403` (`unauthorized`) in case your user does not have any policy assigned, that grants access for action `read` on any resources in `Country` = `<your country Code, e.g. 'IT'>`.
-
-#### Assign permission locally
-Check the application logs on your console to find out the user id and the zone id and the result of the authorization check. 
-```
-Derived potential action/resource authorities for 'Principal {zoneId='4b0c2b7a-1279-4352-a68d-a9a228a4f1e9', id='6f3cae35-b391-4af2-9fe7-2395b280de61', policies=[]}': [].
-```
-
-In case you have a lack of permissions you need to make sure your user (from `<zone-id>`, `<user-id>`) has the `common.readAll_Europe` policy assigned. 
-
-To fix the missing permissions locally, you can generate a binding from your user to the policy by making use of the [`dcl-compiler-plugin` maven plugin](/docs/maven-plugins.md#dcl-compiler):
-
-```shell script
-mvn dcl-compiler:principalToPolicies -DzoneId=4b0c2b7a-1279-4352-a68d-a9a228a4f1e9 -DprincipalId=d9403e85-2029-46f1-9c09-ee32e881c081 -Dpolicies=common.readAll_Europe,common.viewAll
-```
-
-Now restart the application and repeat the forbidden test request.
-
-## Configure the manifest
-The [vars](../vars.yml) contains hosts and paths that need to be adopted. Use your d/c/i-User as ID and use `cfapps.sap.hana.ondemand.com` as `LANDSCAPE_APPS_DOMAIN`.
-
-## Compile and deploy the application
-Deploy the application using `cf push`. It will expect 800MB of free memory quota.
-
+### Build and deploy the application
+Use maven and the cf CLI to compile, package and push the application to Cloud Foundry:
 ```shell
 mvn clean package
 cf push --vars-file ../vars.yml
 ```
-> Use cf CLI v7. See Upgrading to [cf CLI v7](https://docs.cloudfoundry.org/cf-cli/v7.html).
+</details>
 
-## Access the application
-After successful deployment, we access our spring sample via approuter. 
+### Access the application
+After successful deployment, the sample application is accessible via browser at:
+- `https://spring-security-ams.<<SHOOT_NAME>>.stage.kyma.ondemand.com/` (for the Kubernetes deployment)
+- `https://spring-security-ams-<<ID>>.<<LANDSCAPE_APPS_DOMAIN>>` (for the Cloud Foundry deployment)
 
-- `https://spring-ams-web-<<ID>>.<<LANDSCAPE_APPS_DOMAIN>>/health` <br>should return "ok" (Status Code `200`). If not check the application logs ( e.g. using `cf logs spring-security-ams --recent`), whether the AMS Service is unavailable (search for `/v1/data/dcr._default_/ping`).
-- `https://spring-ams-web-<<ID>>.<<LANDSCAPE_APPS_DOMAIN>>`   
-It redirects you to a login-screen to authenticate yourself. <br>It will respond with error status code ``401`` in case of failing logon. <br>After a successful logon the index page provides a list of links to access the different endpoints conveniently.
+The approuter redirects you to a login screen for authentication.
+If the login fails, it will return an error status code `401`.
+Upon successful login, the index page presents a variety of links for convenient access to different endpoints.
 
-#### Assign permissions
-The approuter also contains a direct link to the AMS Admin UI to assign the missing permissions. <br>Please follow the [Guide](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/Overview/HowTo_AMSConfig) on how to setup the IAS tenant.  
+#### Assign policies
+The index page also contains a direct link to the AMS Admin UI where you can assign policies to a user.
+Follow this [guide](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/Manage/UserAssignments) for more details.
 
-After a delay of maximum 60 seconds, repeat the forbidden test request. A re-login is not required.
+Changes should take effect after at most 60 seconds.
+A re-login is not required.
 
-> **Note** You can find the link to the AMS user interface in ``VCAP_SERVICES.identity.credentials.authorization_ui_url``.<br>
-> It consists of ``https://<yourZone>--<ias tenant aoxk2addh>.authorization.cfapps.sap.hana.ondemand.com``.
+#### Troubleshooting
+In case you run into any issues running the sample applicatin, a look into the logs might be helpful:
+<details>
+<summary>Checking logs with Kubernetes</summary>
 
-## Clean-Up
-Finally, delete your application and your service instances using the following commands:
+```shell
+kubectl logs -l app=spring-security-ams -n <YOUR NAMESPACE>
 ```
-cf delete-service-key spring-ams-ias authn-sk
-cf delete -f spring-ams
-cf delete -f spring-ams-approuter
-cf delete-service -f spring-ams-ias
+</details>
+
+<details>
+<summary>Checking logs with Cloud Foundry</summary>
+
+```shell
+cf logs spring-security-ams --recent
 ```
+</details>
+
+### Cleanup
+If you no longer need the sample application, you can free up resources using the Kubernetes CLI or the cf CLI.
+<details>
+<summary>Cleanup command for Kubernetes</summary>
+
+```shell
+kubectl delete -f k8s -n <YOUR NAMESPACE>
+```
+</details>
+
+<details>
+<summary>Cleanup commands for Cloud Foundry</summary>
+
+```shell
+cf unbind-service spring-security-ams-backend spring-security-ams-identity
+cf unbind-service spring-security-ams-approuter spring-security-ams-identity
+cf unbind-service spring-security-ams-dcl-deployer spring-security-ams-identity
+cf delete -f spring-security-ams-backend
+cf delete -f spring-security-ams-approuter
+cf delete -f spring-security-ams-dcl-deployer
+cf delete-service -f spring-security-ams-identity
+```
+</details>
 
 # Further References
 - [Cloud Authorization Service Client Library for Spring Boot Applications](https://github.wdf.sap.corp/CPSecurity/cloud-authorization-client-library-java/tree/master/spring-ams)
 - [Authorization Management Service (AMS) - Basics](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/)
-- [Identity Service Broker](https://github.wdf.sap.corp/CPSecurity/Knowledge-Base/tree/master/08_Tutorials/iasbroker)
+- [Identity Service Broker](https://github.wdf.sap.corp/pages/CPSecurity/sci-dev-guide/docs/BTP/identity-broker)
 - [How to fetch Token](https://github.com/SAP/cloud-security-xsuaa-integration/blob/main/docs/HowToFetchToken.md)
+- [Draft on local testing](LocalTesting.md)

@@ -326,7 +326,7 @@ while true; do
       choice=spring
       echo "Continuing with the deployment of the Spring sample app."
       prepare_spring_deployment
-      deploy_app $spring_dir spring-ams-ias
+      deploy_app $spring_dir spring-security-ams-identity
       break
       ;;
     *)

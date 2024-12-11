@@ -2,19 +2,17 @@
   "authorization": {
     "enabled": true
   },
+  "display-name": "Spring Security AMS Sample App (CF)",
   "oauth2-configuration": {
     "post-logout-redirect-uris": [
-      "https://spring-ams-web-((ID)).((LANDSCAPE_APPS_DOMAIN))/logout.html",
+      "https://spring-security-ams-((ID)).((LANDSCAPE_APPS_DOMAIN))/logout.html",
       "http://localhost:5000/logout.html"
     ],
     "redirect-uris": [
-      "https://spring-ams-web-((ID)).((LANDSCAPE_APPS_DOMAIN))/login/callback?authType=ias",
-      "https://spring-ams-web-((ID)).((LANDSCAPE_APPS_DOMAIN))/login/callback",
-      "https://*.c-3c178dc.kyma-stage.shoot.live.k8s-hana.ondemand.com/login/callback?authType=ias",
-      "https://*.c-3c178dc.kyma-stage.shoot.live.k8s-hana.ondemand.com/login/callback",
+      "https://spring-security-ams-((ID)).((LANDSCAPE_APPS_DOMAIN))/login/callback?authType=ias",
+      "https://spring-security-ams-((ID)).((LANDSCAPE_APPS_DOMAIN))/login/callback",
       "http://localhost:5000/login/callback?authType=ias",
       "http://localhost:5000/login/callback"
     ]
-  },
-  "display-name": "spring-ams-ias-((ID))"
+  }
 }

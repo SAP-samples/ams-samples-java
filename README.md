@@ -1,5 +1,8 @@
 # Samples using Authorization Service
 
+:warning: This file is outdated and needs to be updated/rewritten.
+Please refer to the README.md files in the subfolders of the actual sample applications.
+
 ## Description
 
 All samples deployed on Cloud Foundry use the [SAP application router](https://www.npmjs.com/package/@sap/approuter) as

@@ -1,5 +1,5 @@
 # base image build time
-FROM docker.wdf.sap.corp:50001/com.sap.html5.apps/approuter-10.6:10.6.0
+FROM docker.wdf.sap.corp:50001/com.sap.html5.apps/approuter:18.0.0
 
 WORKDIR /app
 
