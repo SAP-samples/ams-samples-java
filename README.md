@@ -1,5 +1,8 @@
 # Samples using Authorization Service
 
+:warning: This file is outdated and needs to be updated/rewritten.
+Please refer to the README.md files in the subfolders of the actual sample applications.
+
 ## Description
 
 All samples deployed on Cloud Foundry use the [SAP application router](https://www.npmjs.com/package/@sap/approuter) as
@@ -35,15 +38,15 @@ A more detailed description can be found [here](https://github.wdf.sap.corp/page
 
 ## Overview Samples
 
-| Feature                         | Version | [Java](java-security-ams) | [Spring](spring-security-ams) | [Jakarta](jakarta-security-ams) | 
-|---------------------------------|---------|---------------------------|-------------------------------|---------------------------------|
-| unit testing                    |         | x                         | x                             | x                               | 
-| local setup / testing           |         | x                         | x                             | x                               | 
-| multi-tenancy                   | 0.8.0   | x                         |                               |                                 |                      
-| value help (odata)              | 0.9.0   | x                         |                               |                                 |                      
-| privileged mode for techn. comm | 0.9.0   |                           | x                             |                                 |                      
-| kyma/kubernetes deployment      | 0.9.0   |                           | x                             |                                 |              
-| Java version                    |         | 11                        | 17                            | 17                              |
+| Feature                         | Version | [Java](java-security-ams) | [Spring](spring-security-ams) | [Jakarta](jakarta-ams-sample) | 
+|---------------------------------|---------|---------------------------|-------------------------------|--------------------------|
+| unit testing                    |         | x                         | x                             | x                        | 
+| local setup / testing           |         | x                         | x                             | x                        | 
+| multi-tenancy                   | 0.8.0   | x                         |                               |                          |                      
+| value help (odata)              | 0.9.0   | x                         |                               |                          |                      
+| privileged mode for techn. comm | 0.9.0   |                           | x                             |                          |                      
+| kyma/kubernetes deployment      | 0.9.0   |                           | x                             |                          |              
+| Java version                    |         | 11                        | 17                            | 17                       |
 
 ## Download and Installation
 

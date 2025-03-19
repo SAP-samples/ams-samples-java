@@ -1,0 +1,13 @@
+{
+  "name": "ams-dcl-content-deployer",
+  "version": "2.0.0",
+  "dependencies": {
+    "@sap/ams": "^2"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "start": "npx --package=@sap/ams deploy-dcl"
+  }
+}

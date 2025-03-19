@@ -92,8 +92,8 @@ def unitTests() {
             }
         },
         'Jakarta': {
-            dir('jakarta-security-ams') {
-                sh 'mvn dependency:purge-local-repository  -q clean test -U --settings ../.pipeline/maven-settings.xml -Dmaven.repo.local=${HOME}/.m2/jakarta-security-ams/repository'
+            dir('jakarta-ams-sample') {
+                sh 'mvn dependency:purge-local-repository  -q clean test -U --settings ../.pipeline/maven-settings.xml -Dmaven.repo.local=${HOME}/.m2/jakarta-ams-sample/repository'
                 // get results for the jenkins junit plugin
                 junit 'target/surefire-reports/*.xml'
             }

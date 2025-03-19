@@ -1,0 +1,92 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jakarta-ams-approuter-deployment
+  labels:
+    app: jakarta-ams-sample
+    component: approuter
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jakarta-ams-sample
+      component: approuter
+  template:
+    metadata:
+      labels:
+        app: jakarta-ams-sample
+        component: approuter
+    spec:
+      {{- with .Values.imagePullSecrets }}
+      imagePullSecrets:
+        {{- toYaml . | nindent 8 }}
+      {{- end }}
+      containers:
+        - image: "{{ .Values.approuter.image }}:{{ .Values.approuter.version | default .Chart.AppVersion }}"
+          imagePullPolicy: Always
+          name: approuter
+          ports:
+            - name: http
+              containerPort: 5000
+          volumeMounts:
+            - name: identity-service-volume
+              mountPath: "/bindings/identity"
+              readOnly: true
+          env:
+            - name: CF_NODEJS_LOGGING_LEVEL
+              value: "debug"
+            - name: TENANT_HOST_PATTERN
+              value: "^(.*){{ .Values.subscription.suffix }}-{{ .Release.Namespace }}.{{ .Values.clusterDomain }}"
+            - name: SERVICE_BINDING_ROOT
+              value: "/bindings"
+            - name: destinations
+              value: |-
+                [{
+                    "name": "jakarta-ams-backend-destination",
+                    "url": "https://{{ .Values.backend.prefix }}-{{ .Release.Namespace }}.{{ .Values.clusterDomain }}",
+                    "forwardAuthToken": true
+                }]
+      volumes:
+        - name: identity-service-volume
+          secret:
+            secretName: jakarta-ams-identity-binding
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jakarta-ams-approuter-service
+  labels:
+    app: jakarta-ams-sample
+    component: approuter
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 5000
+  selector:
+    app: jakarta-ams-sample
+    component: approuter
+---
+{{- range .Values.subscription.subdomains }}
+apiVersion: gateway.kyma-project.io/v2alpha1
+kind: APIRule
+metadata:
+  name: jakarta-ams-approuter-api-{{ . }}
+  labels:
+    app: jakarta-ams-sample
+    component: approuter
+spec:
+  hosts:
+    - {{ . }}{{ $.Values.subscription.suffix }}-{{ $.Release.Namespace }}.{{ $.Values.clusterDomain }}
+  service:
+    name: jakarta-ams-approuter-service
+    port: 80
+  gateway: kyma-system/kyma-gateway
+  rules:
+    - path: /*
+      methods: ["GET", "POST"]
+      noAuth: true
+---
+{{- end }}
