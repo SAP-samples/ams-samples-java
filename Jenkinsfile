@@ -27,7 +27,7 @@ properties([
 try {
     node('ams-agent') {
              
-        if (job.isTriggeredByDepB())) {
+        if (job.isTriggeredByDepB()) {
             stage('Setup') {
                 prepareScm()
             }
