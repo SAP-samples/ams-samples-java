@@ -38,15 +38,15 @@ A more detailed description can be found [here](https://github.wdf.sap.corp/page
 
 ## Overview Samples
 
-| Feature                         | Version | [Java](java-security-ams) | [Spring](spring-security-ams) | [Jakarta](jakarta-security-ams) | 
-|---------------------------------|---------|---------------------------|-------------------------------|---------------------------------|
-| unit testing                    |         | x                         | x                             | x                               | 
-| local setup / testing           |         | x                         | x                             | x                               | 
-| multi-tenancy                   | 0.8.0   | x                         |                               |                                 |                      
-| value help (odata)              | 0.9.0   | x                         |                               |                                 |                      
-| privileged mode for techn. comm | 0.9.0   |                           | x                             |                                 |                      
-| kyma/kubernetes deployment      | 0.9.0   |                           | x                             |                                 |              
-| Java version                    |         | 11                        | 17                            | 17                              |
+| Feature                         | Version | [Java](java-security-ams) | [Spring](spring-security-ams) | [Jakarta](jakarta-ams-sample) | 
+|---------------------------------|---------|---------------------------|-------------------------------|--------------------------|
+| unit testing                    |         | x                         | x                             | x                        | 
+| local setup / testing           |         | x                         | x                             | x                        | 
+| multi-tenancy                   | 0.8.0   | x                         |                               |                          |                      
+| value help (odata)              | 0.9.0   | x                         |                               |                          |                      
+| privileged mode for techn. comm | 0.9.0   |                           | x                             |                          |                      
+| kyma/kubernetes deployment      | 0.9.0   |                           | x                             |                          |              
+| Java version                    |         | 11                        | 17                            | 17                       |
 
 ## Download and Installation
 

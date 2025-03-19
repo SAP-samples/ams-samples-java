@@ -53,8 +53,9 @@ If the images were not pushed to `common.repositories.cloud.sap`, you also need 
 :bulb: In case the images are to be pulled from a public repository, no image pull secret is required.
 1. Finally, [the identity service instance configuration](k8s/identity-service-instance.yaml) needs to be completed by providing two redirect URLs for the approuter.
 If you know the unique shoot name of your Kyma Cluster, then you can simply replace the `SHOOT_NAME` placeholder.
-Otherwise, you can deploy only the API rule with
+Otherwise, you can deploy only the service and API rule with
 ```shell script
+kubectl apply -f k8s/service.yaml -n <YOUR NAMESPACE>
 kubectl apply -f k8s/apirule.yaml -n <YOUR NAMESPACE>
 ```
 and afterwards retrieve the hostname for the redirect URLs from the API rule in the Kyma cluster dashboard.

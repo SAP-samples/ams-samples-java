@@ -41,6 +41,8 @@ spec:
               mountPath: "/bindings/identity"
               readOnly: true
           env:
+            - name: CF_NODEJS_LOGGING_LEVEL
+              value: "debug"
             - name: SERVICE_BINDING_ROOT
               value: "/bindings"
             - name: destinations

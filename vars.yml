@@ -10,6 +10,6 @@ ID: 00-00-00
 # and cfapps.eu12.hana.ondemand.com for Canary
 LANDSCAPE_APPS_DOMAIN: cfapps.eu12.hana.ondemand.com
 
-# Required only for the multitenant app java-security-ams sample setup.
-PROVIDER_SUBACCOUNT_SUBDOMAIN:
-SUBSCRIBER_SUBACCOUNT_SUBDOMAIN:
+# Required only for the multitenant app jakarta-ams-sample.
+PROVIDER_SUBDOMAIN:
+SUBSCRIPTION_SUFFIX: -j-ams
