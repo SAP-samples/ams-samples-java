@@ -27,7 +27,7 @@ properties([
 try {
     node('ams-agent') {
              
-        if (isTriggeredByUpstreamProject(upstreamProject: 'CPSecurity/cas-ams-dependency-builder/master')) {
+        if (job.isTriggeredByDepB()) {
             stage('Setup') {
                 prepareScm()
             }
