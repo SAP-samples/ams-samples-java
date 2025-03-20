@@ -61,7 +61,7 @@ try {
 }
 
 def getMavenVersion() {
-    def mavenPom = readMavenPom (file: 'java-security-ams/pom.xml')
+    def mavenPom = readMavenPom (file: 'jakarta-ams-sample/pom.xml')
     def mavenVersion = mavenPom.getVersion().split("-", 2)[0]
     echo "Maven Version: ${mavenVersion}"
     return mavenVersion
@@ -77,13 +77,6 @@ def prepareScm() {
 
 def unitTests() {
     parallel(
-        'Java': {
-            dir('java-security-ams') {
-                sh 'mvn -q clean test -U --settings ../.pipeline/maven-settings.xml -Dmaven.repo.local=${HOME}/.m2/java-security-ams/repository'
-                // get results for the jenkins junit plugin
-                junit 'target/surefire-reports/*.xml'
-            }
-        },
         'Spring': {
             dir('spring-security-ams') {
                 sh 'mvn -q clean test -U --settings ../.pipeline/maven-settings.xml -Dmaven.repo.local=${HOME}/.m2/spring-security-ams/repository'
