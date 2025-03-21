@@ -27,7 +27,7 @@ SPDX-License-Identifier: Apache-2.0
         <junit.version>5.10.2</junit.version>
         <assertj.version>3.24.2</assertj.version>
         <!-- audit log service -->
-        <sap.xs.auditlog.version>2.0.17</sap.xs.auditlog.version>
+        <sap.xs.auditlog.version>2.0.21</sap.xs.auditlog.version>
         <sap.xs.env.version>1.8.5</sap.xs.env.version>
         <sap.cf.logging.version>3.7.0</sap.cf.logging.version>
     </properties>
