@@ -1,4 +1,4 @@
-FROM --platform=linux/amd64 openjdk:17-jdk-slim AS runtime
+FROM --platform=linux/amd64 openjdk:17.0.2-jdk-slim AS runtime
 
 COPY dcldeployer/dcl/ /dcl
 
