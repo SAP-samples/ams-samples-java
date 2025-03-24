@@ -55,14 +55,14 @@ public class AmsUiServlet extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
         String forwardedHeader = request.getHeader("x-forwarded-host");
         LOGGER.debug("x-forwarded-host = {}", forwardedHeader);
-        if (forwardedHeader.isEmpty()) {
+        if (forwardedHeader == null || forwardedHeader.isEmpty()) {
             String iasUrl = serviceConfig.getUrl().toString();
             response.getWriter().write(iasUrl + "/admin");
             response.setContentType("text/plain");
             response.setStatus(HttpServletResponse.SC_OK);
             return;
         }
-        String subdomain = forwardedHeader.substring(0, forwardedHeader.indexOf("-ar-"));
+        String subdomain = forwardedHeader.substring(0, forwardedHeader.indexOf(System.getenv("SUBSCRIPTION_SUFFIX")));
 
         JsonObject serviceJsonObject = vcapServices.getJsonObjects("subscription-manager").get(0);
         Map<String, String> credentialsMap = serviceJsonObject.getJsonObject("credentials").getKeyValueMap();
