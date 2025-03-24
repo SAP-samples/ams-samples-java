@@ -19,7 +19,7 @@ SPDX-License-Identifier: Apache-2.0
         <jakarta.servlet.api.version>6.1.0</jakarta.servlet.api.version>
         <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
         <maven.war.plugin.version>3.4.0</maven.war.plugin.version>
-        <slf4j.api.version>2.0.12</slf4j.api.version>
+        <slf4j.api.version>2.0.17</slf4j.api.version>
         <apache.httpclient.version>4.5.14</apache.httpclient.version>
         <maven.formatter.plugin.version>2.22.0</maven.formatter.plugin.version>
         <maven.impsort.plugin.version>1.8.0</maven.impsort.plugin.version>
