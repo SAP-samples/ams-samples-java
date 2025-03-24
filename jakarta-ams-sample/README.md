@@ -78,7 +78,7 @@ The [dockerfile of the approuter](approuter/Dockerfile) does not need to be adap
    If you already know any subaccount from which you plan to [subscribe to the application](#subscribe-to-the-app-from-another-subaccount), you can already configure those as well.
    Simply add all corresponding subaccount subdomains to the `subscription.subdomains` property in the [values.yaml](helmchart/values.yaml) file.
 
-   :bulb: The subdomains can for example be found in the BTP Cockpit in te Overview section.
+   :bulb: The subdomains can for example be found in the BTP Cockpit in the Overview section.
 
 ### Deploy the application
 After successful configuration you can deploy the applications using [helm](https://helm.sh/)
@@ -217,11 +217,11 @@ helm uninstall jakarta-ams-sample --namespace <YOUR NAMESPACE>
 <summary>Cleanup commands for Cloud Foundry</summary>
 
 ```shell
-cf unbind-service jakarta-ams-backend jakarta-ams-sms
-cf unbind-service jakarta-ams-backend jakarta-ams-identity
-cf unbind-service jakarta-ams-approuter jakarta-ams-sms
-cf unbind-service jakarta-ams-approuter jakarta-ams-identity
-cf unbind-service jakarta-ams-dcl-deployer jakarta-ams-identity
+cf unbind-service jakarta-ams-backend jakarta-ams-sms --wait
+cf unbind-service jakarta-ams-backend jakarta-ams-identity --wait
+cf unbind-service jakarta-ams-approuter jakarta-ams-sms --wait
+cf unbind-service jakarta-ams-approuter jakarta-ams-identity --wait
+cf unbind-service jakarta-ams-dcl-deployer jakarta-ams-identity --wait
 cf delete -f jakarta-ams-backend
 cf delete -f jakarta-ams-approuter
 cf delete -f jakarta-ams-dcl-deployer
