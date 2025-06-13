@@ -1,0 +1,18 @@
+{
+  "authorization": {
+    "enabled": true
+  },
+  "display-name": "Spring Security AMS Sample App (CF)",
+  "oauth2-configuration": {
+    "post-logout-redirect-uris": [
+      "https://spring-security-ams-((ID)).((LANDSCAPE_APPS_DOMAIN))/logout.html",
+      "http://localhost:5000/logout.html"
+    ],
+    "redirect-uris": [
+      "https://spring-security-ams-((ID)).((LANDSCAPE_APPS_DOMAIN))/login/callback?authType=ias",
+      "https://spring-security-ams-((ID)).((LANDSCAPE_APPS_DOMAIN))/login/callback",
+      "http://localhost:5000/login/callback?authType=ias",
+      "http://localhost:5000/login/callback"
+    ]
+  }
+}

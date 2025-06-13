@@ -1,0 +1,24 @@
+// SPDX-FileCopyrightText: 2020
+// SPDX-License-Identifier: Apache-2.0
+
+@startuml
+skinparam Monochrome true
+hide footbox
+
+-> Application: /health
+Application -> "Spring Security (+ams)" : authenticated()
+"Spring Security (+ams)" -> "Spring Security (+ams)" : validate OIDC token
+"Spring Security (+ams)" -> "Authorization Decision Controller (ADC)" : collect potential authorities POST ADC_URL/v1/data/rbac/compile (ignores conditions)
+"Spring Security (+ams)" -> "Spring Security (+ams)" : enrich authorities (SecurityContext)
+Application -> "Authorization Decision Controller (ADC)" : GET ADC_URL/health
+
+
+
+-> Application: /readByCountry/{country}
+Application -> "Spring Security (+ams)" : access("hasBaseAuthority('read', 'salesOrders')")
+"Spring Security (+ams)" -> "Spring Security (+ams)" : has potential authority
+Application -> "Spring Security (+ams)" : @PreAuthorize("forAction('read', 'CountryCode="'+#country+'\"')")
+"Spring Security (+ams)" -> "Authorization Decision Controller (ADC)" : POST ADC_URL/v1/data/rbac/allow
+@enduml
+
+

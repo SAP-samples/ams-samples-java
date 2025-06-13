@@ -1,41 +1,69 @@
-# SAP-samples/repository-template
-This default template for SAP Samples repositories includes files for README, LICENSE, and .reuse/dep5. All repositories on github.com/SAP-samples will be created based on this template.
+# Java Samples for Authorization Management and CAP
 
-# Containing Files
+This repository contains Java-based sample applications demonstrating **authorization integration** using:
 
-1. The LICENSE file:
-In most cases, the license for SAP sample projects is `Apache 2.0`.
+- **Authorization Management Service (AMS)** with Spring Boot and Jakarta EE
+- The **SAP Cloud Application Programming Model (CAP)** with authentication and simple role-based access control
 
-2. The .reuse/dep5 file: 
-The [Reuse Tool](https://reuse.software/) must be used for your samples project. You can find the .reuse/dep5 in the project initial. Please replace the parts inside the single angle quotation marks < > by the specific information for your repository.
+Each sample is self-contained and includes its own setup instructions and deployment configurations for Cloud Foundry and/or Kubernetes.
 
-3. The README.md file (this file):
-Please edit this file as it is the primary description file for your project. You can find some placeholder titles for sections below.
+---
 
-# [Title]
-<!-- Please include descriptive title -->
+## 📁 Samples Overview
 
-<!--- Register repository https://api.reuse.software/register, then add REUSE badge:
-[![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/REPO-NAME)](https://api.reuse.software/info/github.com/SAP-samples/REPO-NAME)
--->
+| Sample                            | Description                                                        | Tech Stack         |
+|----------------------------------|--------------------------------------------------------------------|--------------------|
+| [`spring-security-ams-sample`](spring-security-ams-sample) | AMS integration in a Spring Boot application                        | Spring Boot + AMS  |
+| [`jakarta-ams-sample`](jakarta-ams-sample)                 | Jakarta EE application secured using AMS                            | Jakarta EE + AMS   |
+| [`cap-bookshop-sample`](cap-bookshop-sample)               | Bookshop demo based on CAP with role-based authorization            | CAP Java           |
 
-## Description
-<!-- Please include SEO-friendly description -->
+---
 
-## Requirements
+## ✅ Requirements
 
-## Download and Installation
+- SAP BTP Subaccount (Cloud Foundry and/or Kyma enabled)
+- SAP Identity Authentication (IAS) tenant
+- Java 11+ and Maven
+- (Optional) Docker and Kubernetes CLI
 
-## Known Issues
-<!-- You may simply state "No known issues. -->
+---
 
-## How to obtain support
-[Create an issue](https://github.com/SAP-samples/<repository-name>/issues) in this repository if you find a bug or have questions about the content.
- 
-For additional support, [ask a question in SAP Community](https://answers.sap.com/questions/ask.html).
+## 🚀 Quick Start
 
-## Contributing
-If you wish to contribute code, offer fixes or improvements, please send a pull request. Due to legal reasons, contributors will be asked to accept a DCO when they create the first pull request to this project. This happens in an automated fashion during the submission process. SAP uses [the standard DCO text of the Linux Foundation](https://developercertificate.org/).
+1. Clone the repository:
+   ```bash
+   git clone https://github.com/SAP-samples/authorization-samples-java.git
+   cd authorization-samples-java
+   ```
 
-## License
-Copyright (c) 2024 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the Apache Software License, version 2.0 except as noted otherwise in the [LICENSE](LICENSE) file.
+2. Choose a sample:
+   ```bash
+   cd spring-security-ams-sample  # or jakarta-ams-sample or cap-bookshop-sample
+   ```
+
+3. Follow the specific `README.md` instructions in the chosen folder.
+
+---
+
+## 🧭 Sample Structure
+
+Each folder contains:
+
+- Complete source code
+- README with setup and deployment steps
+- Sample configurations for IAS, CF or Kyma
+- DCL files for AMS-based authorization
+
+---
+
+## 📚 Further References
+
+- [Authorization Management Service (AMS)](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/)
+- [SAP CAP Documentation](https://cap.cloud.sap)
+- [SAP Identity Authentication Help](https://help.sap.com/docs/identity-authentication)
+
+---
+
+## 📄 License
+
+This project is licensed under the Apache License 2.0 – see the [LICENSE](./LICENSE) file for details.
