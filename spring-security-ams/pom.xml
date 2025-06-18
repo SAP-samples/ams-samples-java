@@ -3,7 +3,7 @@ SPDX-FileCopyrightText: 2020
 
 SPDX-License-Identifier: Apache-2.0
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <parent>
@@ -20,7 +20,7 @@ SPDX-License-Identifier: Apache-2.0
 
     <properties>
         <java.version>17</java.version>
-        <sap.cloud.security.ams.version>1.7.0</sap.cloud.security.ams.version>
+        <sap.cloud.security.ams.version>2.7.0</sap.cloud.security.ams.version>
         <sap.cloud.security.version>3.5.7</sap.cloud.security.version>
         <apache.httpclient.version>4.5.14</apache.httpclient.version>
         <junit.jupiter.version>5.9.3</junit.jupiter.version>

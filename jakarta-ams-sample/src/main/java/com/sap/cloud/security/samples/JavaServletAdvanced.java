@@ -21,33 +21,39 @@ import static com.sap.cloud.security.ams.factory.AmsPolicyDecisionPointFactory.D
 
 @WebServlet(JavaServletAdvanced.ENDPOINT)
 public class JavaServletAdvanced extends HttpServlet {
-    static final long serialVersionUID = 1L;
-    static final String ENDPOINT = "/api/advanced";
-    private final PolicyDecisionPoint policyDecisionPoint;
+  static final long serialVersionUID = 1L;
+  static final String ENDPOINT = "/api/advanced";
+  private final PolicyDecisionPoint policyDecisionPoint;
 
-    public JavaServletAdvanced() {
-        policyDecisionPoint = PolicyDecisionPoint.create(DEFAULT);
+  public JavaServletAdvanced() {
+    policyDecisionPoint = PolicyDecisionPoint.create(DEFAULT);
+  }
+
+  /**
+   * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+   */
+  @Override
+  @SuppressWarnings("squid:S1166")
+  protected void doGet(HttpServletRequest request, HttpServletResponse response)
+      throws IOException {
+    Principal principal = Principal.create();
+    Attributes attributes =
+        principal
+            .getAttributes()
+            .setAction("read")
+            .setResource("salesOrders")
+            .setUnknowns("author", "Country");
+
+    FilterClause clause = policyDecisionPoint.allowFilterClause(attributes);
+    if (clause.isDenied()) {
+      IasSecurityFilter.sendUnauthorizedResponse(response, attributes);
+      return;
     }
-
-    /**
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-     */
-    @Override
-    @SuppressWarnings("squid:S1166")
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        Principal principal = Principal.create();
-        Attributes attributes = principal.getAttributes()
-                .setAction("read").setResource("salesOrders")
-                .setUnknowns("author", "Country");
-
-        FilterClause clause = policyDecisionPoint.allowFilterClause(attributes);
-        if (clause.isDenied()) {
-            IasSecurityFilter.sendUnauthorizedResponse(response, attributes);
-            return;
-        }
-        response.setContentType("text/plain");
-        response.getWriter()
-                .write("Read-protected method called. Retrieved access constraint: " + clause.getCondition());
-        response.setStatus(HttpServletResponse.SC_OK);
-    }
+    response.setContentType("text/plain");
+    response
+        .getWriter()
+        .write(
+            "Read-protected method called. Retrieved access constraint: " + clause.getCondition());
+    response.setStatus(HttpServletResponse.SC_OK);
+  }
 }

@@ -19,12 +19,12 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 @ActiveProfiles("test")
 class ApplicationTest {
 
-    @RegisterExtension
-    static SecurityTestExtension extension = SecurityTestExtension.forService(IAS).setPort(MOCK_SERVER_PORT); //
+  @RegisterExtension
+  static SecurityTestExtension extension =
+      SecurityTestExtension.forService(IAS).setPort(MOCK_SERVER_PORT); //
 
-    @Test
-    void whenLoadApplication_thenSuccess() {
-        assertTrue(true);
-    }
-
+  @Test
+  void whenLoadApplication_thenSuccess() {
+    assertTrue(true);
+  }
 }

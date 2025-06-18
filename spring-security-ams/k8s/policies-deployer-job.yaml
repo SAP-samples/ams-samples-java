@@ -50,4 +50,4 @@ spec:
           secret:
             secretName: spring-security-ams-identity-binding
         - name: dcl-files
-          emptyDir: {}
+          emptyDir: { }

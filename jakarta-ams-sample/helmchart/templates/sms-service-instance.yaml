@@ -9,7 +9,7 @@ spec:
   serviceOfferingName: subscription-manager
   servicePlanName: provider
   parameters:
-    iasServiceInstanceName : jakarta-ams-identity
+    iasServiceInstanceName: jakarta-ams-identity
     applicationType: application
     appName: jakarta-ams-sample-saas-{{ .Release.Namespace }}
     appCallbacks:

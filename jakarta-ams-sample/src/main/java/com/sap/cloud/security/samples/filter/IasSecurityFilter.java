@@ -29,6 +29,23 @@ public class IasSecurityFilter implements Filter {
         iasTokenAuthenticator = new IasTokenAuthenticator();
     }
 
+    public static void sendUnauthorizedResponse(ServletResponse response, Attributes attributes) {
+        sendUnauthorizedResponse(response, attributes, "user has a lack of permissions");
+    }
+
+    public static void sendUnauthorizedResponse(ServletResponse response, Attributes attributes, String message) {
+        if (response instanceof HttpServletResponse httpServletResponse) {
+            try {
+                String user = Objects.nonNull(SecurityContext.getAccessToken())
+                        ? SecurityContext.getToken().getClaimAsString(USER_NAME) : "<Unknown>";
+                LOGGER.error("User {} is unauthorized with {}. Message: '{}'", user, attributes, message);
+                httpServletResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "User " + user + " is unauthorized."); // 403
+            } catch (IOException e) {
+                LOGGER.error("Failed to send error response", e);
+            }
+        }
+    }
+
     @Override
     public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
             throws IOException, ServletException {
@@ -49,23 +66,6 @@ public class IasSecurityFilter implements Filter {
             try {
                 LOGGER.debug("UNAUTHENTICATED: {}", unauthenticatedReason);
                 httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED); // 401
-            } catch (IOException e) {
-                LOGGER.error("Failed to send error response", e);
-            }
-        }
-    }
-
-    public static void sendUnauthorizedResponse(ServletResponse response, Attributes attributes) {
-        sendUnauthorizedResponse(response, attributes, "user has a lack of permissions");
-    }
-
-    public static void sendUnauthorizedResponse(ServletResponse response, Attributes attributes, String message) {
-        if (response instanceof HttpServletResponse httpServletResponse) {
-            try {
-                String user = Objects.nonNull(SecurityContext.getAccessToken())
-                        ? SecurityContext.getToken().getClaimAsString(USER_NAME) : "<Unknown>";
-                LOGGER.error("User {} is unauthorized with {}. Message: '{}'", user, attributes, message);
-                httpServletResponse.sendError(HttpServletResponse.SC_FORBIDDEN, "User " + user + " is unauthorized."); // 403
             } catch (IOException e) {
                 LOGGER.error("Failed to send error response", e);
             }

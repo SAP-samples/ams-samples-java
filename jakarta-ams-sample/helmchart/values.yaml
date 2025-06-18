@@ -23,8 +23,8 @@ imagePullSecrets:
 subscription:
   # The subdomains of the provider subaccount and all subscribed subaccounts.
   subdomains:
-#    - "<subdomain of provider subaccount>"
-#    - "<subdomain of subscribed subaccount>"
+  #    - "<subdomain of provider subaccount>"
+  #    - "<subdomain of subscribed subaccount>"
 
   # Short suffix appended to all subaccount subdomains to create the approuter routes.
   # The namespace will be added as well to help making the resulting URLs unique within the cluster.

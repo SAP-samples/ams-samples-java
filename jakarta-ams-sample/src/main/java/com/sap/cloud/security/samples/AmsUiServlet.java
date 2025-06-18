@@ -31,17 +31,14 @@ import static com.sap.cloud.security.ams.factory.AmsPolicyDecisionPointFactory.D
 
 @WebServlet(AmsUiServlet.ENDPOINT)
 public class AmsUiServlet extends HttpServlet {
-    private static final Logger LOGGER = LoggerFactory.getLogger(AmsUiServlet.class);
-
-    HttpClient httpClient = HttpClient.newHttpClient();
-    private static final OAuth2ServiceConfiguration serviceConfig = Environments.getCurrent().getIasConfiguration();
     static final long serialVersionUID = 1L;
     static final String ENDPOINT = "/uiurl";
-
-    final PolicyDecisionPoint policyDecisionPoint;
-
+    private static final Logger LOGGER = LoggerFactory.getLogger(AmsUiServlet.class);
+    private static final OAuth2ServiceConfiguration serviceConfig = Environments.getCurrent().getIasConfiguration();
     private static final DefaultJsonObject vcapServices = new DefaultJsonObject(
             System.getenv(ServiceConstants.VCAP_SERVICES));
+    final PolicyDecisionPoint policyDecisionPoint;
+    HttpClient httpClient = HttpClient.newHttpClient();
 
     public AmsUiServlet() {
         policyDecisionPoint = PolicyDecisionPoint.create(DEFAULT);

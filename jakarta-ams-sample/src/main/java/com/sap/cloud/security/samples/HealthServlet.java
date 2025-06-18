@@ -19,23 +19,23 @@ import static com.sap.cloud.security.ams.factory.AmsPolicyDecisionPointFactory.D
 
 @WebServlet(HealthServlet.ENDPOINT)
 public class HealthServlet extends HttpServlet {
-    static final long serialVersionUID = 1L;
-    static final String ENDPOINT = "/health";
-    final PolicyDecisionPoint policyDecisionPoint;
+  static final long serialVersionUID = 1L;
+  static final String ENDPOINT = "/health";
+  final PolicyDecisionPoint policyDecisionPoint;
 
-    public HealthServlet() {
-        policyDecisionPoint = PolicyDecisionPoint.create(DEFAULT, STARTUP_HEALTH_CHECK_TIMEOUT, 10L);
-    }
+  public HealthServlet() {
+    policyDecisionPoint = PolicyDecisionPoint.create(DEFAULT, STARTUP_HEALTH_CHECK_TIMEOUT, 10L);
+  }
 
-    /**
-     * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
-     */
-    @Override
-    @SuppressWarnings("squid:S1166")
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws IOException {
-        response.setContentType(MediaType.APPLICATION_JSON.value());
-        response.getWriter().write(policyDecisionPoint.getHealthStatus().toString());
-        response.setStatus(HttpServletResponse.SC_OK);
-    }
-
+  /**
+   * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+   */
+  @Override
+  @SuppressWarnings("squid:S1166")
+  protected void doGet(HttpServletRequest request, HttpServletResponse response)
+      throws IOException {
+    response.setContentType(MediaType.APPLICATION_JSON.value());
+    response.getWriter().write(policyDecisionPoint.getHealthStatus().toString());
+    response.setStatus(HttpServletResponse.SC_OK);
+  }
 }

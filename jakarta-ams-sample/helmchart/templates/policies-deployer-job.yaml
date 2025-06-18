@@ -12,10 +12,10 @@ spec:
   ttlSecondsAfterFinished: 300 # 5 minutes
   template:
     spec:
-      {{- with .Values.imagePullSecrets }}
+      { { - with .Values.imagePullSecrets } }
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        { { - toYaml . | nindent 8 } }
+      { { - end } }
       initContainers:
         - name: copy-dcl-files
           image: "{{ .Values.backend.image }}:{{ .Values.backend.version | default .Chart.AppVersion }}"
@@ -53,4 +53,4 @@ spec:
           secret:
             secretName: jakarta-ams-identity-binding
         - name: dcl-files
-          emptyDir: {}
+          emptyDir: { }

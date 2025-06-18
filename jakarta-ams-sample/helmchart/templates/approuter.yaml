@@ -18,10 +18,10 @@ spec:
         app: jakarta-ams-sample
         component: approuter
     spec:
-      {{- with .Values.imagePullSecrets }}
+      { { - with .Values.imagePullSecrets } }
       imagePullSecrets:
-        {{- toYaml . | nindent 8 }}
-      {{- end }}
+        { { - toYaml . | nindent 8 } }
+      { { - end } }
       containers:
         - image: "{{ .Values.approuter.image }}:{{ .Values.approuter.version | default .Chart.AppVersion }}"
           imagePullPolicy: Always
@@ -69,7 +69,7 @@ spec:
     app: jakarta-ams-sample
     component: approuter
 ---
-{{- range .Values.subscription.subdomains }}
+  { { - range .Values.subscription.subdomains } }
 apiVersion: gateway.kyma-project.io/v2alpha1
 kind: APIRule
 metadata:
@@ -79,14 +79,14 @@ metadata:
     component: approuter
 spec:
   hosts:
-    - {{ . }}{{ $.Values.subscription.suffix }}-{{ $.Release.Namespace }}.{{ $.Values.clusterDomain }}
+    - { { . } }{ { $.Values.subscription.suffix } }-{{ $.Release.Namespace }}.{{ $.Values.clusterDomain }}
   service:
     name: jakarta-ams-approuter-service
     port: 80
   gateway: kyma-system/kyma-gateway
   rules:
     - path: /*
-      methods: ["GET", "POST"]
+      methods: [ "GET", "POST" ]
       noAuth: true
 ---
-{{- end }}
+{ { - end } }

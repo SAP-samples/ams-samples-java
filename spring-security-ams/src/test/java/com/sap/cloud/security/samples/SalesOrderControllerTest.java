@@ -28,63 +28,79 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @AutoConfigureMockMvc
 @ActiveProfiles("test")
 class SalesOrderControllerTest {
-    // https://docs.spring.io/spring-security/site/docs/current/reference/html5/#testing-oauth2-login
-    static final int MOCK_SERVER_PORT = ThreadLocalRandom.current().nextInt(49152, 50000);
+  // https://docs.spring.io/spring-security/site/docs/current/reference/html5/#testing-oauth2-login
+  static final int MOCK_SERVER_PORT = ThreadLocalRandom.current().nextInt(49152, 50000);
 
-    @RegisterExtension
-    static SecurityTestExtension extension = SecurityTestExtension.forService(IAS).setPort(MOCK_SERVER_PORT);
+  @RegisterExtension
+  static SecurityTestExtension extension =
+      SecurityTestExtension.forService(IAS).setPort(MOCK_SERVER_PORT);
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @Test
-    void read_403() throws Exception {
-        mockMvc.perform(get("/salesOrders").with(userWithoutPolicies(extension.getContext())))
-                .andExpect(status().isForbidden());
-    }
+  @Test
+  void read_403() throws Exception {
+    mockMvc
+        .perform(get("/salesOrders").with(userWithoutPolicies(extension.getContext())))
+        .andExpect(status().isForbidden());
+  }
 
-    @Test
-    void read_200() throws Exception {
-        mockMvc.perform(get("/salesOrders").with(userWithPolicies(extension.getContext(), "sales.adminAllSales")))
-                .andExpect(status().isOk());
-    }
+  @Test
+  void read_200() throws Exception {
+    mockMvc
+        .perform(
+            get("/salesOrders")
+                .with(userWithPolicies(extension.getContext(), "sales.adminAllSales")))
+        .andExpect(status().isOk());
+  }
 
-    @Test
-    void readSalesOrders_Type_200() throws Exception {
-        mockMvc.perform(get("/salesOrders/readByCountryAndType/IT/101")
+  @Test
+  void readSalesOrders_Type_200() throws Exception {
+    mockMvc
+        .perform(
+            get("/salesOrders/readByCountryAndType/IT/101")
                 .with(userWithPolicies(extension.getContext(), "sales.readSalesOrders_Type")))
-                .andExpect(status().isOk());
-    }
+        .andExpect(status().isOk());
+  }
 
-    @Test
-    void readSalesOrders_Type_403() throws Exception {
-        mockMvc.perform(get("/salesOrders/readByCountryAndType/IT/501")
+  @Test
+  void readSalesOrders_Type_403() throws Exception {
+    mockMvc
+        .perform(
+            get("/salesOrders/readByCountryAndType/IT/501")
                 .with(userWithPolicies(extension.getContext(), "sales.readSalesOrders_Type")))
-                .andExpect(status().isForbidden());
-    }
+        .andExpect(status().isForbidden());
+  }
 
-    @Test
-    void readByCountry_200() throws Exception {
-        mockMvc.perform(get("/salesOrders/readByCountry/IT")
-                .with(userWithPolicies(extension.getContext(), "common.readAll_Europe"))).andExpect(status().isOk());
-
-        mockMvc.perform(
-                get("/salesOrders/readByCountry/IT").with(userWithPolicies(extension.getContext(), "common.readAll")))
-                .andExpect(status().isOk());
-    }
-
-    @Test
-    void readByCountry_403() throws Exception {
-        mockMvc.perform(get("/salesOrders/readByCountry/US")
+  @Test
+  void readByCountry_200() throws Exception {
+    mockMvc
+        .perform(
+            get("/salesOrders/readByCountry/IT")
                 .with(userWithPolicies(extension.getContext(), "common.readAll_Europe")))
-                .andExpect(status().isForbidden());
-    }
+        .andExpect(status().isOk());
 
-    @Test
-    void readByCountryWithEmptyCountryCode_403() throws Exception {
-        mockMvc.perform(get("/salesOrders/readByCountry/ ")
+    mockMvc
+        .perform(
+            get("/salesOrders/readByCountry/IT")
+                .with(userWithPolicies(extension.getContext(), "common.readAll")))
+        .andExpect(status().isOk());
+  }
+
+  @Test
+  void readByCountry_403() throws Exception {
+    mockMvc
+        .perform(
+            get("/salesOrders/readByCountry/US")
                 .with(userWithPolicies(extension.getContext(), "common.readAll_Europe")))
-                .andExpect(status().isForbidden());
-    }
+        .andExpect(status().isForbidden());
+  }
 
+  @Test
+  void readByCountryWithEmptyCountryCode_403() throws Exception {
+    mockMvc
+        .perform(
+            get("/salesOrders/readByCountry/ ")
+                .with(userWithPolicies(extension.getContext(), "common.readAll_Europe")))
+        .andExpect(status().isForbidden());
+  }
 }

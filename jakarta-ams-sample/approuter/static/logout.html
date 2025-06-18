@@ -1,15 +1,15 @@
 <!DOCTYPE HTML>
 <html>
 <head>
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta content="IE=edge" http-equiv="X-UA-Compatible"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta charset="UTF-8">
 
-    <script id="sap-ui-bootstrap"
-            src="https://sapui5.hana.ondemand.com/resources/sap-ui-core.js"
+    <script data-sap-ui-appCacheBuster="./"
             data-sap-ui-libs="sap.m"
             data-sap-ui-theme="sap_fiori_3"
-            data-sap-ui-appCacheBuster="./"
+            id="sap-ui-bootstrap"
+            src="https://sapui5.hana.ondemand.com/resources/sap-ui-core.js"
     >
     </script>
 
@@ -20,7 +20,7 @@
     </style>
 
     <script>
-        sap.ui.getCore().attachInit(function() {
+        sap.ui.getCore().attachInit(function () {
             new sap.m.MessagePage({
                 title: "Log Off",
                 description: "You are logged off.",

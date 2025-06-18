@@ -24,10 +24,9 @@ import static com.sap.cloud.security.ams.factory.AmsPolicyDecisionPointFactory.D
 @WebServlet(urlPatterns = { CallbackServlet.ENDPOINT })
 public class CallbackServlet extends HttpServlet {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger(CallbackServlet.class);
-
     static final long serialVersionUID = 1L;
     static final String ENDPOINT = "/v1.0/callback/tenants/*";
+    private static final Logger LOGGER = LoggerFactory.getLogger(CallbackServlet.class);
     final PolicyDecisionPoint policyDecisionPoint;
 
     public CallbackServlet() {

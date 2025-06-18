@@ -21,34 +21,36 @@ import java.io.IOException;
 
 @WebFilter(filterName = "x5tValidator", urlPatterns = "/app/callback/*")
 public class X5tValidatorFilter implements Filter {
-    private static final Logger LOGGER = LoggerFactory.getLogger(X5tValidatorFilter.class);
-    JwtX5tValidator x5tValidator;
+  private static final Logger LOGGER = LoggerFactory.getLogger(X5tValidatorFilter.class);
+  JwtX5tValidator x5tValidator;
 
-    public X5tValidatorFilter() {
-        OAuth2ServiceConfiguration config = Environments.getCurrent().getIasConfiguration();
-        x5tValidator = new JwtX5tValidator(config);
-    }
+  public X5tValidatorFilter() {
+    OAuth2ServiceConfiguration config = Environments.getCurrent().getIasConfiguration();
+    x5tValidator = new JwtX5tValidator(config);
+  }
 
-    @Override
-    public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain) throws ServletException, IOException {
-        if (request instanceof HttpServletRequest httpRequest) {
-            ValidationResult validationResult = x5tValidator.validate(Token.create(httpRequest.getHeader("Authorization")));
-            if (validationResult.isValid()) {
-                chain.doFilter(request, response);
-            } else {
-                sendUnauthenticatedResponse(response, validationResult.getErrorDescription());
-            }
-        }
+  @Override
+  public void doFilter(ServletRequest request, ServletResponse response, FilterChain chain)
+      throws ServletException, IOException {
+    if (request instanceof HttpServletRequest httpRequest) {
+      ValidationResult validationResult =
+          x5tValidator.validate(Token.create(httpRequest.getHeader("Authorization")));
+      if (validationResult.isValid()) {
+        chain.doFilter(request, response);
+      } else {
+        sendUnauthenticatedResponse(response, validationResult.getErrorDescription());
+      }
     }
+  }
 
-    private void sendUnauthenticatedResponse(ServletResponse response, String unauthenticatedReason) {
-        if (response instanceof HttpServletResponse httpServletResponse) {
-            try {
-                LOGGER.error("UNAUTHENTICATED: {}", unauthenticatedReason);
-                httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED); // 401
-            } catch (IOException e) {
-                LOGGER.error("Failed to send error response", e);
-            }
-        }
+  private void sendUnauthenticatedResponse(ServletResponse response, String unauthenticatedReason) {
+    if (response instanceof HttpServletResponse httpServletResponse) {
+      try {
+        LOGGER.error("UNAUTHENTICATED: {}", unauthenticatedReason);
+        httpServletResponse.sendError(HttpServletResponse.SC_UNAUTHORIZED); // 401
+      } catch (IOException e) {
+        LOGGER.error("Failed to send error response", e);
+      }
     }
+  }
 }

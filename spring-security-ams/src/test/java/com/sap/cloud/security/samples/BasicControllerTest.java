@@ -35,89 +35,108 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @ActiveProfiles("test")
 class BasicControllerTest {
 
-    static final int MOCK_SERVER_PORT = ThreadLocalRandom.current().nextInt(49152, 50000);
+  static final int MOCK_SERVER_PORT = ThreadLocalRandom.current().nextInt(49152, 50000);
 
-    @RegisterExtension
-    static SecurityTestExtension extension = SecurityTestExtension.forService(IAS).setPort(MOCK_SERVER_PORT); // optionally
+  @RegisterExtension
+  static SecurityTestExtension extension =
+      SecurityTestExtension.forService(IAS).setPort(MOCK_SERVER_PORT); // optionally
 
-    @Autowired
-    private MockMvc mockMvc;
+  @Autowired private MockMvc mockMvc;
 
-    @Test
-    void authenticateWithoutPermission_200() throws Exception {
-        mockMvc.perform(get("/authenticate").with(userWithoutPolicies(extension.getContext())))
-                .andExpect(status().isOk());
-    }
+  @Test
+  void authenticateWithoutPermission_200() throws Exception {
+    mockMvc
+        .perform(get("/authenticate").with(userWithoutPolicies(extension.getContext())))
+        .andExpect(status().isOk());
+  }
 
-    @Test
-    void healthAsAnonymous_200() throws Exception {
-        mockMvc.perform(get("/health")).andExpect(status().isOk());
-    }
+  @Test
+  void healthAsAnonymous_200() throws Exception {
+    mockMvc.perform(get("/health")).andExpect(status().isOk());
+  }
 
-    @Test
-    void readWithoutPermision_403() throws Exception {
-        mockMvc.perform(get("/read").with(userWithoutPolicies(extension.getContext())))
-                .andExpect(status().isForbidden());
-    }
+  @Test
+  void readWithoutPermision_403() throws Exception {
+    mockMvc
+        .perform(get("/read").with(userWithoutPolicies(extension.getContext())))
+        .andExpect(status().isForbidden());
+  }
 
-    @Test
-    void readWithPermision_200() throws Exception {
-        mockMvc.perform(get("/read").with(userWithPolicies(extension.getContext(), "common.readAll")))
-                .andExpect(status().isOk());
-    }
+  @Test
+  void readWithPermision_200() throws Exception {
+    mockMvc
+        .perform(get("/read").with(userWithPolicies(extension.getContext(), "common.readAll")))
+        .andExpect(status().isOk());
+  }
 
-    @Test
-    void tokenExpired_401() throws Exception {
-        JwtGenerator jwtGenerator = extension.getContext().getPreconfiguredJwtGenerator();
-        jwtGenerator.withExpiration(Instant.now().minusSeconds(1000));
+  @Test
+  void tokenExpired_401() throws Exception {
+    JwtGenerator jwtGenerator = extension.getContext().getPreconfiguredJwtGenerator();
+    jwtGenerator.withExpiration(Instant.now().minusSeconds(1000));
 
-        mockMvc.perform(get("/authenticate").with(userWithoutPolicies(jwtGenerator)))
-                .andExpect(status().isUnauthorized());
-    }
+    mockMvc
+        .perform(get("/authenticate").with(userWithoutPolicies(jwtGenerator)))
+        .andExpect(status().isUnauthorized());
+  }
 
-    @Test
-    void viewWithoutPermision_403() throws Exception {
-        mockMvc.perform(get("/authorized").with(userWithoutPolicies(extension.getContext())))
-                .andExpect(status().isForbidden());
-    }
+  @Test
+  void viewWithoutPermision_403() throws Exception {
+    mockMvc
+        .perform(get("/authorized").with(userWithoutPolicies(extension.getContext())))
+        .andExpect(status().isForbidden());
+  }
 
-    @Test
-    void viewWithPermision_200() throws Exception {
-        mockMvc.perform(get("/authorized").with(userWithPolicies(extension.getContext(), "common.viewAll")))
-                .andExpect(status().isOk());
-    }
+  @Test
+  void viewWithPermision_200() throws Exception {
+    mockMvc
+        .perform(
+            get("/authorized").with(userWithPolicies(extension.getContext(), "common.viewAll")))
+        .andExpect(status().isOk());
+  }
 
-    @Test
-    void readAsAnonymous_401() throws Exception {
-        mockMvc.perform(get("/authenticate")).andExpect(status().isUnauthorized());
-    }
+  @Test
+  void readAsAnonymous_401() throws Exception {
+    mockMvc.perform(get("/authenticate")).andExpect(status().isUnauthorized());
+  }
 
-    @Test
-    void accessAsTechnicalUser_200() throws Exception {
-        String certHeader = IOUtils.resourceToString("/cert-header.txt", StandardCharsets.UTF_8);
-        mockMvc.perform(get("/technical-communication").header(FWD_CLIENT_CERT_HEADER, certHeader)
-                .with(client(extension.getContext().getPreconfiguredJwtGenerator()))).andExpect(status().isOk());
-    }
-
-    @Test
-    void accessAsTechnicalUser_401() throws Exception {
-        String certHeader = IOUtils.resourceToString("/unaccepted-cert-header.txt", StandardCharsets.UTF_8);
-        mockMvc.perform(get("/technical-communication").header(FWD_CLIENT_CERT_HEADER, certHeader)
+  @Test
+  void accessAsTechnicalUser_200() throws Exception {
+    String certHeader = IOUtils.resourceToString("/cert-header.txt", StandardCharsets.UTF_8);
+    mockMvc
+        .perform(
+            get("/technical-communication")
+                .header(FWD_CLIENT_CERT_HEADER, certHeader)
                 .with(client(extension.getContext().getPreconfiguredJwtGenerator())))
-                .andExpect(status().isUnauthorized());
-    }
+        .andExpect(status().isOk());
+  }
 
-    @Test
-    void accessAsTechnicalUser_woCertHeader_401() throws Exception {
-        mockMvc.perform(
-                get("/technical-communication").with(client(extension.getContext().getPreconfiguredJwtGenerator())))
-                .andExpect(status().isUnauthorized());
-    }
+  @Test
+  void accessAsTechnicalUser_401() throws Exception {
+    String certHeader =
+        IOUtils.resourceToString("/unaccepted-cert-header.txt", StandardCharsets.UTF_8);
+    mockMvc
+        .perform(
+            get("/technical-communication")
+                .header(FWD_CLIENT_CERT_HEADER, certHeader)
+                .with(client(extension.getContext().getPreconfiguredJwtGenerator())))
+        .andExpect(status().isUnauthorized());
+  }
 
-    @Test
-    void accessAsUser_woCertHeader_403() throws Exception {
-        mockMvc.perform(get("/technical-communication")
+  @Test
+  void accessAsTechnicalUser_woCertHeader_401() throws Exception {
+    mockMvc
+        .perform(
+            get("/technical-communication")
+                .with(client(extension.getContext().getPreconfiguredJwtGenerator())))
+        .andExpect(status().isUnauthorized());
+  }
+
+  @Test
+  void accessAsUser_woCertHeader_403() throws Exception {
+    mockMvc
+        .perform(
+            get("/technical-communication")
                 .with(userWithoutPolicies(extension.getContext().getPreconfiguredJwtGenerator())))
-                .andExpect(status().isForbidden());
-    }
+        .andExpect(status().isForbidden());
+  }
 }

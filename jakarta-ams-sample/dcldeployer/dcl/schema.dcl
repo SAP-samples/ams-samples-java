@@ -1,7 +1,5 @@
 SCHEMA {
-    author: {
-        createdBy: String,
-        updatedBy: String
-    },
-    Country: String
+author: {
+createdBy: String, updatedBy: String
+}, Country: String
 }

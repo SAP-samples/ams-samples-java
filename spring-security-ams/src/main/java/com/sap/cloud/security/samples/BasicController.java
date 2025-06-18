@@ -28,55 +28,63 @@ import static org.springframework.http.HttpStatus.SERVICE_UNAVAILABLE;
 @RestController
 public class BasicController {
 
-    @Autowired
-    PolicyDecisionPoint policyDecisionPoint;
+  @Autowired PolicyDecisionPoint policyDecisionPoint;
 
-    @GetMapping(value = "/health")
-    public String healthCheck() {
-        if (policyDecisionPoint.isReachable()) {
-            return "{\"status\":\"UP\"}";
-        }
-        throw new HttpServerErrorException(SERVICE_UNAVAILABLE, "Policy engine is not reachable.");
+  @GetMapping(value = "/health")
+  public String healthCheck() {
+    if (policyDecisionPoint.isReachable()) {
+      return "{\"status\":\"UP\"}";
     }
+    throw new HttpServerErrorException(SERVICE_UNAVAILABLE, "Policy engine is not reachable.");
+  }
 
-    @GetMapping(value = "/authenticate")
-    public String secured(@AuthenticationPrincipal Token token) {
-        String name = token.hasClaim(USER_NAME) ? token.getClaimAsString(USER_NAME) : token.getClaimAsString(EMAIL);
-        return "Congratulation, " + name + " - You are an authenticated user.<br>" + "<br>user_uuid: "
-                + token.getClaimAsString(SAP_GLOBAL_USER_ID) + "<br>app_tid: "
-                + token.getClaimAsString(SAP_GLOBAL_APP_TID);
+  @GetMapping(value = "/authenticate")
+  public String secured(@AuthenticationPrincipal Token token) {
+    String name =
+        token.hasClaim(USER_NAME)
+            ? token.getClaimAsString(USER_NAME)
+            : token.getClaimAsString(EMAIL);
+    return "Congratulation, "
+        + name
+        + " - You are an authenticated user.<br>"
+        + "<br>user_uuid: "
+        + token.getClaimAsString(SAP_GLOBAL_USER_ID)
+        + "<br>app_tid: "
+        + token.getClaimAsString(SAP_GLOBAL_APP_TID);
+  }
+
+  @GetMapping(value = "/read")
+  public String authorizedRead() {
+    Principal principal = Principal.create();
+    Attributes attributes = principal.getAttributes().setAction("read");
+    boolean isReadAllowed = policyDecisionPoint.allow(attributes);
+
+    if (isReadAllowed) {
+      return "Read-protected method called!";
     }
+    throw new AccessDeniedException("Principal (" + principal + "') has no permission.");
+  }
 
-    @GetMapping(value = "/read")
-    public String authorizedRead() {
-        Principal principal = Principal.create();
-        Attributes attributes = principal.getAttributes().setAction("read");
-        boolean isReadAllowed = policyDecisionPoint.allow(attributes);
+  // required for the UI
+  @GetMapping(value = "/uiurl")
+  public String getAmsUiUrl() {
+    String iasUrl = Environments.getCurrent().getIasConfiguration().getUrl().toString();
+    return iasUrl + "/admin";
+  }
 
-        if (isReadAllowed) {
-            return "Read-protected method called!";
-        }
-        throw new AccessDeniedException("Principal (" + principal + "') has no permission.");
+  @GetMapping(value = "/authorized")
+  public String authorizedView() {
+    return "Endpoint access allowed for action 'view'";
+  }
+
+  @GetMapping(value = "/technical-communication")
+  public String authorizedSystemUser() {
+    Attributes attributes =
+        Principal.create().getAttributes().setAction("read").setResource("system");
+    if (policyDecisionPoint.allow(attributes)) {
+      return "Technical user accessed 'system' resources!";
     }
-
-    // required for the UI
-    @GetMapping(value = "/uiurl")
-    public String getAmsUiUrl() {
-        String iasUrl = Environments.getCurrent().getIasConfiguration().getUrl().toString();
-        return iasUrl + "/admin";
-    }
-
-    @GetMapping(value = "/authorized")
-    public String authorizedView() {
-        return "Endpoint access allowed for action 'view'";
-    }
-
-    @GetMapping(value = "/technical-communication")
-    public String authorizedSystemUser() {
-        Attributes attributes = Principal.create().getAttributes().setAction("read").setResource("system");
-        if (policyDecisionPoint.allow(attributes)) {
-            return "Technical user accessed 'system' resources!";
-        }
-        throw new AccessDeniedException("Technical user isn't allowed to access 'system' resources"); // 403
-    }
+    throw new AccessDeniedException(
+        "Technical user isn't allowed to access 'system' resources"); // 403
+  }
 }

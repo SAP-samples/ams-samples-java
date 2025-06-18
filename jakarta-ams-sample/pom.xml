@@ -3,7 +3,8 @@ SPDX-FileCopyrightText: 2020
 
 SPDX-License-Identifier: Apache-2.0
 -->
-<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
     <groupId>com.sap.cloud.security.ams.samples</groupId>
     <artifactId>jakarta-ams-sample</artifactId>
@@ -15,7 +16,7 @@ SPDX-License-Identifier: Apache-2.0
         <project.build.resourceEncoding>UTF-8</project.build.resourceEncoding>
         <maven.compiler.release>17</maven.compiler.release>
         <sap.cloud.security.version>3.5.7</sap.cloud.security.version>
-        <sap.cloud.security.ams.version>1.7.0</sap.cloud.security.ams.version>
+        <sap.cloud.security.ams.version>2.7.0</sap.cloud.security.ams.version>
         <jakarta.servlet.api.version>6.1.0</jakarta.servlet.api.version>
         <maven.surefire.plugin.version>3.2.5</maven.surefire.plugin.version>
         <maven.war.plugin.version>3.4.0</maven.war.plugin.version>

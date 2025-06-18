@@ -3,8 +3,7 @@
 
 // Schema can not be splitted, and CountryCode is required in multiple DCLs
 schema {
-    salesOrder: {
-        type: number
-    },
-	CountryCode: string
+salesOrder: {
+type: number
+}, CountryCode: string
 }

@@ -22,26 +22,35 @@ import org.springframework.security.web.access.intercept.RequestAuthorizationCon
 import static org.springframework.http.HttpMethod.GET;
 
 @Configuration
-@PropertySource(factory = IdentityServicesPropertySourceFactory.class, ignoreResourceNotFound = true, value = { "" })
+@PropertySource(
+    factory = IdentityServicesPropertySourceFactory.class,
+    ignoreResourceNotFound = true,
+    value = {""})
 public class SecurityConfiguration {
 
-    @Autowired
-    Converter<Jwt, AbstractAuthenticationToken> amsAuthenticationConverter;
+  @Autowired Converter<Jwt, AbstractAuthenticationToken> amsAuthenticationConverter;
 
-    @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, SecurityExpressionHandler<RequestAuthorizationContext> amsHttpExpressionHandler) throws Exception {
-        WebExpressionAuthorizationManager hasBaseAuthority = new WebExpressionAuthorizationManager("hasBaseAuthority('read', 'salesOrders')");
-        hasBaseAuthority.setExpressionHandler(amsHttpExpressionHandler);
-        http.authorizeHttpRequests(authz -> {
-                    authz.requestMatchers(GET, "/health", "/", "/uiurl")
-                            .permitAll();
-                    authz.requestMatchers(GET, "/salesOrders/**")
-                            .access(hasBaseAuthority);
-                    authz.requestMatchers(GET, "/authorized")
-                            .hasAuthority("view").anyRequest().authenticated();
-                })
-                .oauth2ResourceServer(oauth2 ->
-                        oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(amsAuthenticationConverter)));
-        return http.build();
-    }
+  @Bean
+  public SecurityFilterChain filterChain(
+      HttpSecurity http,
+      SecurityExpressionHandler<RequestAuthorizationContext> amsHttpExpressionHandler)
+      throws Exception {
+    WebExpressionAuthorizationManager hasBaseAuthority =
+        new WebExpressionAuthorizationManager("hasBaseAuthority('read', 'salesOrders')");
+    hasBaseAuthority.setExpressionHandler(amsHttpExpressionHandler);
+    http.authorizeHttpRequests(
+            authz -> {
+              authz.requestMatchers(GET, "/health", "/", "/uiurl").permitAll();
+              authz.requestMatchers(GET, "/salesOrders/**").access(hasBaseAuthority);
+              authz
+                  .requestMatchers(GET, "/authorized")
+                  .hasAuthority("view")
+                  .anyRequest()
+                  .authenticated();
+            })
+        .oauth2ResourceServer(
+            oauth2 ->
+                oauth2.jwt(jwt -> jwt.jwtAuthenticationConverter(amsAuthenticationConverter)));
+    return http.build();
+  }
 }

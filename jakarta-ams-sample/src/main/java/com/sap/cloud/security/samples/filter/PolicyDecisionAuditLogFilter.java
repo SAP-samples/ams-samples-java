@@ -26,9 +26,9 @@ import static com.sap.cloud.security.ams.logging.PolicyEvaluationV2AuditLogger.M
 
 @WebFilter(filterName = "ams-audit-logging", urlPatterns = "/app/*")
 public class PolicyDecisionAuditLogFilter implements Filter {
+    private static final Logger LOGGER = LoggerFactory.getLogger(PolicyDecisionAuditLogFilter.class);
     private final PolicyDecisionPoint policyDecisionPoint;
     PolicyEvaluationV2AuditLogger auditLogger;
-    private static final Logger LOGGER = LoggerFactory.getLogger(PolicyDecisionAuditLogFilter.class);
     AuditLogMessageFactory auditLogFactory;
 
     public PolicyDecisionAuditLogFilter() {
