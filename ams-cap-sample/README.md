@@ -48,10 +48,6 @@ cf deploy mta_archives/<your_sample_app_name>_1.0.0-SNAPSHOT.mtar
    The name is part of the identity configuration in the `mta.yaml` file. On the tab `Authorization Policies`, you can assign your user to an available policy.
    Requests to the protected route are now working.
 
-## Multi-tenant bookshop (CF)
-
->comming soon
-
 ### AMS artifacts
 
 After these steps, you should have a working single-tenant CAP bookshop sample application that uses IAS for authentication and AMS for authorization.
@@ -60,7 +56,7 @@ The configuration and artifacts relevant to AMS are:
 #### identity
 
 The configuration for the identity instance is located in the `mta.yaml` file with the name `<your_sample_app_name>-auth`.
-This flag enables the AMS for your identity instance:
+This flag enables the AMS for your identity instance:a
 ```YAML
 authorization:
     enabled: true

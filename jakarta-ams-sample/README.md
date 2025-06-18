@@ -1,33 +1,33 @@
 # Authorization Management Service (AMS) Jakarta EE Sample Application with Multitenancy
-This Jakarta EE sample application utilizes the [jakarta-ams](https://github.wdf.sap.corp/CPSecurity/cloud-authorization-client-library-java/tree/master-1.x/jakarta-ams) and [java-security](https://github.com/SAP/cloud-security-services-integration-library/tree/main/java-security) client libraries to authenticate JWT tokens issued by the [SAP Identity service](https://help.sap.com/docs/identity-authentication) and to authorize resource access managed by [AMS (Authorization Management Service)](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/).
+This Jakarta EE sample application utilizes the [jakarta-ams (internal)](https://github.wdf.sap.corp/CPSecurity/cloud-authorization-client-library-java/tree/master-1.x/jakarta-ams) and [java-security](https://github.com/SAP/cloud-security-services-integration-library/tree/main/java-security) client libraries to authenticate JWT tokens issued by the [SAP Identity service](https://help.sap.com/docs/identity-authentication) and to authorize resource access managed by [AMS (Authorization Management Service)](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/).
 The application uses the [SAP application router](https://www.npmjs.com/package/@sap/approuter) as OAuth 2.0 client and forwards the requests as reverse proxy to a Jakarta EE backend application.
-The backend application checks for all incoming requests whether the user is authenticated and authorized via [AMS (Authorization Management Service)](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/).
+The backend application checks for all incoming requests whether the user is authenticated and authorized via AMS (Authorization Management Service)
 
 The sample is deployed in a provider subaccount and subscribed to from a consumer subaccount.
 The latter is used to access the application and needs to reside in the same region as the provider subaccount.
 
-The application declares its authorization model by providing [DCL files](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/DCLLanguage/Declare) to the AMS service.
+The application declares its authorization model by providing DCL files to the AMS service.
 The upload is handled by a dcl deployer app which can be build as part of the deployment process (see CF deployment of this sample app).
 Alternatively, a pre-build deployer image can be used (see k8s deployment of this sample app).
-For a deeper understanding of how the AMS client library operates, refer to the [documentation](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/ClientLibs/Enforce).
+For a deeper understanding of how the AMS client library operates, refer to the [internal SAP documentation](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/ClientLibs/Enforce).
 
 ## Getting Started
-Before deploying the sample app on Kyma/Kubernetes or Cloud Foundry, we need to setup an IAS tenant and [establish trust](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/HowTo_AMSConfig#establish-ias-trust) in the provider subaccount.
+Before deploying the sample app on Kyma/Kubernetes or Cloud Foundry, we need to setup an IAS tenant and establish trust in the provider subaccount.
 
 <details>
 <summary>Deployment on Kyma/Kubernetes</summary>
 
 The k8s deployment is done via a [helm 3 chart](helmchart) and contains three pods:
-* The [first pod](k8s/backend.yaml) is used to run the backend app (i.e. the actual sample application).
-* The [second pod](k8s/approuter.yaml) contains only the approuter.
-* The [third pod](k8s/policies-deployer-job.yaml) is just for uploading the DCL files to the AMS server.
+* The [first pod](helmchart/templates/backend.yaml) is used to run the backend app (i.e. the actual sample application).
+* The [second pod](helmchart/templates/approuter.yaml) contains only the approuter.
+* The [third pod](helmchart/templates/policies-deployer-job.yaml) is just for uploading the DCL files to the AMS server.
   It copies the DCL files from the backend app image via an init container and then runs a container from a pre-build image to do the actual upload.
   This pod is configured to be removed 5 minutes after the job is done.
 
 ### Build, tag and push docker images to a repository
 :bulb: If you just want to try out the sample application, you can skip this step and use the pre-build docker images.
 
-Make sure that you are logged in to the docker registry you want to push the images to (e.g.`cloud-security-integration.common.repositories.cloud.sap`):
+Make sure that you are logged in to the docker registry you want to push the images to:
 ```bash
 docker login <repository>
 ```
@@ -62,7 +62,7 @@ The [dockerfile of the approuter](approuter/Dockerfile) does not need to be adap
     <SHOOT_NAME>.stage.kyma.ondemand.com
     ```
    If you don't know the shoot name, you can deploy the chart twice and retrieve the cluster domain from the created API rules (e.g. in the Kyma cluster dashboard).
-1. The pre-build policies deployer image [is configured](k8s/policies-deployer-job.yaml) to be pulled from `common.repositories.cloud.sap`.
+1. The pre-build policies deployer image [is configured](helmchart/templates/policies-deployer-job.yaml) to be pulled from `common.repositories.cloud.sap`.
    This requires a user account and an access token that can be generated at https://common.repositories.cloud.sap/ui/user_profile.
    The access token then needs to be stored as a [k8s secret](https://kubernetes.io/docs/tasks/configure-pod-container/pull-image-private-registry/#create-a-secret-by-providing-credentials-on-the-command-line) named `common-artifactory` using the k8s CLI:
     ```bash
@@ -140,7 +140,7 @@ The callback responds with a subscription URL of the form
 https://<subscriber subaccount subdomain>-<suffix to make URL unique>.<CF or k8s domain>
 ```
 which is used to access the application in the context of the subscribed subaccount.
-The approuter is configured (see [k8s](k8s/approuter.yaml) and [CF](manifest.yml) deployment) via the environment variable `TENANT_HOST_PATTERN` to extract the subdomain from this URL.
+The approuter is configured (see [k8s](helmchart/templates/approuter.yaml) and [CF](manifest.yml) deployment) via the environment variable `TENANT_HOST_PATTERN` to extract the subdomain from this URL.
 This information is then used to retrieve the corresponding IAS tenant for authentication and authorization.
 
 For this to work, the approuter needs to be reachable under the subscription URL.
@@ -177,13 +177,11 @@ Upon successful login, the index page presents a variety of links for convenient
 
 #### Assign policies
 The index page also contains a direct link to the AMS Admin UI where you can assign policies to a user.
-Follow this [guide](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/Manage/UserAssignments) for more details.
-
 Changes should take effect after at most 60 seconds.
 A re-login is not required.
 
 #### Troubleshooting
-In case you run into any issues running the sample applicatin, a look into the logs might be helpful:
+In case you run into any issues running the sample application, a look into the logs might be helpful:
 <details>
 <summary>Checking logs with Kubernetes</summary>
 
@@ -231,7 +229,4 @@ cf delete-service -f jakarta-ams-identity
 </details>
 
 # Further References
-- [Cloud Authorization Service Client Library for Spring Boot Applications](https://github.wdf.sap.corp/CPSecurity/cloud-authorization-client-library-java/tree/master/jakarta-ams)
-- [Authorization Management Service (AMS) - Basics](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/)
-- [Identity Service Broker](https://github.wdf.sap.corp/pages/CPSecurity/sci-dev-guide/docs/BTP/identity-broker)
 - [How to fetch Token](https://github.com/SAP/cloud-security-xsuaa-integration/blob/main/docs/HowToFetchToken.md)

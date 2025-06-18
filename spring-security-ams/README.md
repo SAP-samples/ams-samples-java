@@ -1,15 +1,14 @@
 # Authorization Management Service (AMS) for Spring Boot Sample Application
-This Spring Boot sample application utilizes the [spring-ams](https://github.wdf.sap.corp/CPSecurity/cloud-authorization-client-library-java/tree/master/spring-ams) and [spring-security](https://github.com/SAP/cloud-security-services-integration-library/tree/main/spring-security) client libraries to validate JWT tokens issued by the [SAP Identity service](https://help.sap.com/docs/identity-authentication).
+This Spring Boot sample application utilizes the [spring-ams (internal)](https://github.wdf.sap.corp/CPSecurity/cloud-authorization-client-library-java/tree/master/spring-ams) and [spring-security](https://github.com/SAP/cloud-security-services-integration-library/tree/main/spring-security) client libraries to validate JWT tokens issued by the [SAP Identity service](https://help.sap.com/docs/identity-authentication).
 The application uses the [SAP application router](https://www.npmjs.com/package/@sap/approuter) as OAuth 2.0 client and forwards the requests as reverse proxy to a Spring Boot backend application.
-The backend application checks for all incoming requests whether the user is authenticated and authorized via [AMS (Authorization Management Service)](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/).
+The backend application checks for all incoming requests whether the user is authenticated and authorized via AMS (Authorization Management Service).
 
-The application declares its authorization model by providing [DCL files](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/DCLLanguage/Declare) to the AMS service.
+The application declares its authorization model by providing DCL files to the AMS service.
 The upload is handled by a dcl deployer app which can be build as part of the deployment process (see CF deployment of this sample app).
 Alternatively, a pre-build deployer image can be used (see the K8s deployment of this sample app).
-For a deeper understanding of how the AMS client library operates, refer to the [documentation](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/ClientLibs/Enforce).
 
 ## Getting Started
-Before deploying the sample app on Kyma/Kubernetes or Cloud Foundry, we need to setup an IAS tenant and [establish trust](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/HowTo_AMSConfig#establish-ias-trust) in the target subaccount.
+Before deploying the sample app on Kyma/Kubernetes or Cloud Foundry, we need to setup an IAS tenant and establish trust in the target subaccount.
 <details>
 <summary>Deployment on Kyma/Kubernetes</summary>
 
@@ -87,7 +86,6 @@ Then use the IAS service broker to create the ``identity`` service instance:
 ```shell
 cf create-service identity application spring-security-ams-identity -c ias-config.json
 ```
-Further information about identity service and its configuration can be found [here](https://github.wdf.sap.corp/CPSecurity/Knowledge-Base/tree/master/08_Tutorials/iasbroker).
 
 ### Build and deploy the application
 Use maven and the cf CLI to compile, package and push the application to Cloud Foundry:
@@ -108,11 +106,8 @@ Upon successful login, the index page presents a variety of links for convenient
 
 #### Assign policies
 The index page also contains a direct link to the AMS Admin UI where you can assign policies to a user.
-Follow this [guide](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/Manage/UserAssignments) for more details.
-
 Changes should take effect after at most 60 seconds.
 A re-login is not required.
-
 #### Troubleshooting
 In case you run into any issues running the sample applicatin, a look into the logs might be helpful:
 <details>
@@ -156,8 +151,5 @@ cf delete-service -f spring-security-ams-identity
 </details>
 
 # Further References
-- [Cloud Authorization Service Client Library for Spring Boot Applications](https://github.wdf.sap.corp/CPSecurity/cloud-authorization-client-library-java/tree/master/spring-ams)
-- [Authorization Management Service (AMS) - Basics](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/)
-- [Identity Service Broker](https://github.wdf.sap.corp/pages/CPSecurity/sci-dev-guide/docs/BTP/identity-broker)
 - [How to fetch Token](https://github.com/SAP/cloud-security-xsuaa-integration/blob/main/docs/HowToFetchToken.md)
 - [Draft on local testing](LocalTesting.md)

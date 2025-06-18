@@ -1,68 +1,65 @@
-# Samples using Authorization Service
+# Overview: Authorization Management Service (AMS) Java Samples
 
-:warning: This file is outdated and needs to be updated/rewritten.
-Please refer to the README.md files in the subfolders of the actual sample applications.
+This repository brings together several sample applications that demonstrate how to integrate the **SAP Authorization Management Service (AMS)** into various Java frameworks. Each sample showcases different architectures and scenarios for authentication and authorization using AMS and the SAP Identity Authentication Service (IAS).
 
-## Description
+## Repository Structure and Sample Overview
 
-All samples deployed on Cloud Foundry use the [SAP application router](https://www.npmjs.com/package/@sap/approuter) as
-OAuth 2.0 client and Business Application Gateway which forwards (reverse proxy) the requests to the backend sample
-application (Spring/Java) running on Cloud Foundry. The application uses a Token Validation Client Library to validate
-the token before serving a resource to the client: it checks for all incoming requests whether the user is
-authenticated. The Authorization Client Library is used to make sure that the subject has the requested permissions
-assigned with **Authorization Management Service (AMS)**.
+| Sample Name                | Description                                                                            | Typical Use Case            | Directory             |
+|----------------------------|----------------------------------------------------------------------------------------|-----------------------------|-----------------------|
+| **Spring Boot Sample**     | A Spring Boot application using AMS and IAS for authentication & authorization with JWT. Includes deployment examples for Kubernetes (Kyma) and Cloud Foundry. | Microservices, Cloud-native apps | `spring-security-ams` |
+| **Jakarta EE Sample**      | Example Jakarta EE application that integrates AMS for resource access authorization and uses IAS for authentication. | Java EE/enterprise projects | `jakarta-ams-sample`  |
+| **CAP Java Sample**        | Demonstrates the integration of AMS into a **SAP CAP Java** application, including policy generation for CAP roles. | SAP CAP projects            | `ams_cap_sample`      |
 
-AMS consists of several components, namely
+---
 
-- the **Authorization Management Service (AMS)**  
-  that stores and bundles application specific policy and data.
-- the **Authorization AddOn**  
-  that uploads application's base dcl policies to AMS and starts the [open source **Open Policy Agent (OPA)
-  **](https://www.openpolicyagent.org/) as policy decision engine to decide whether a given user has the policy to
-  perform a specific action on a specific resource. In BTP Clod Foundry environment it is initialized with
-  the [cloud authorization buildpack](https://github.com/SAP/cloud-authorization-buildpack).
+## Sample Details
 
-<img src="https://github.wdf.sap.corp/CPSecurity/AMS/blob/master/_00_TeamDocsInternal/Overview/images/AMS_BigPicture.drawio.svg" alt="drawing" width="800px"/>
+### 1. Spring Boot Sample (`spring-security-ams`)
+- **Framework:** Spring Boot
+- **Highlights:**
+  - AMS and IAS integration for securing REST APIs via JWT tokens.
+  - Example of using the SAP Application Router as a reverse proxy.
+  - Provides DCL files to define authorization models.
+  - Deployment instructions for both Kyma/Kubernetes and Cloud Foundry.
+- **Typical Use:** Microservice-based Java applications needing SAP IAM integration.
+- **More info:** [Spring Security AMS](spring-security-ams/README.md)
 
-- During application deployment the Cloud Authorization Buildpack is responsible to upload the base policies specified
-  by the application to the AMS. Therefore, the environment variable `AMS_DCL_ROOT` (set in manifest.yml) needs to
-  specify the location of the dcls in the
-  environment.
-- The administrator enriches the base policies and assigns them to the users. The policy engine pulls the policy bundles
-  from the bundle gateway every 60 seconds and updates the policy engine in case of changes.
-- For authorization checks the application sends a requests to the policy engine (sidecar) to check the users
-  permissions. I.e. whether the user is allowed to perform the action X on resource Y by optionally considering instance
-  specific attributes.
+### 2. Jakarta EE Sample (`jakarta-ams-sample`)
+- **Framework:** Jakarta EE
+- **Highlights:**
+  - Shows how to secure Java EE applications using AMS and IAS.
+  - Uses the SAP Application Router as an OAuth 2.0 client.
+  - Contains deployment guides for Kubernetes (Helm chart) and Cloud Foundry.
+- **Typical Use:** Java EE or enterprise applications on SAP BTP.
+- **More info:** [Jakarta AMS Sample](jakarta-ams-sample/README.md)
 
-A more detailed description can be found [here](https://github.wdf.sap.corp/pages/CPSecurity/AMS/Overview/AMS_basics/).
+### 3. CAP Java Sample (`st_ams_cap_sample`)
+- **Framework:** SAP Cloud Application Programming Model (CAP) for Java
+- **Highlights:**
+  - Demonstrates AMS integration in a CAP Java project (example: bookshop).
+  - Shows policy generation for CAP security roles.
+  - Contains instructions for both local development and Cloud Foundry deployment.
+- **Typical Use:** Extending CAP Java projects with AMS-based authorization.
+- **More info:** [AMS CAP Sample](ams-cap-sample/README.md)
 
-## Overview Samples
+---
 
-| Feature                         | Version | [Java](java-security-ams) | [Spring](spring-security-ams) | [Jakarta](jakarta-ams-sample) | 
-|---------------------------------|---------|---------------------------|-------------------------------|--------------------------|
-| unit testing                    |         | x                         | x                             | x                        | 
-| local setup / testing           |         | x                         | x                             | x                        | 
-| multi-tenancy                   | 0.8.0   | x                         |                               |                          |                      
-| value help (odata)              | 0.9.0   | x                         |                               |                          |                      
-| privileged mode for techn. comm | 0.9.0   |                           | x                             |                          |                      
-| kyma/kubernetes deployment      | 0.9.0   |                           | x                             |                          |              
-| Java version                    |         | 11                        | 17                            | 17                       |
+## What Can You Learn From These Samples?
 
-## Download and Installation
+- **Central policy and access management** using AMS and DCL files.
+- **Integrating SAP IAM** in different Java frameworks (Spring Boot, Jakarta EE, CAP).
+- **Cloud-native deployment** patterns for SAP BTP (Kyma/Kubernetes & Cloud Foundry).
+- **Mapping CAP roles to AMS policies** for unified authorization logic.
 
-### Prerequisites
+---
 
-1. A BTP Subaccount (Cloud Foundry enabled)
-2. An Identity Authentication (IAS) tenant
-3. An established Trust between your BTP Subaccount and your IAS tenant (Security -> Trust
-   configuration -> [Establish Trust](https://help.sap.com/docs/btp/sap-business-technology-platform/establish-trust-and-federation-between-uaa-and-identity-authentication))
-4. A functioning Java 11 & Maven installation on your local machine
+## Further References
 
-### Deployment
+- [AMS Documentation (internal)](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/)
+- [SAP Cloud Security Services (public)](https://github.com/SAP/cloud-security-services-integration-library)
+- [SAP CAP Documentation](https://cap.cloud.sap/docs/)
 
-1. Clone this repository to your local machine
-2. Run the Wizard deploy.sh (macOS, Linux, Windows WSL)
+---
 
-
-The used libraries are available in the [SAP Artifactory](https://int.repositories.cloud.sap/artifactory/build-releases/com/sap/cloud/security/ams/client/).
-
+**Note:**  
+Each sample includes its own README with detailed setup, configuration, and deployment instructions.
