@@ -1,41 +1,68 @@
-# SAP-samples/repository-template
-This default template for SAP Samples repositories includes files for README, LICENSE, and .reuse/dep5. All repositories on github.com/SAP-samples will be created based on this template.
+# Samples using Authorization Service
 
-# Containing Files
-
-1. The LICENSE file:
-In most cases, the license for SAP sample projects is `Apache 2.0`.
-
-2. The .reuse/dep5 file: 
-The [Reuse Tool](https://reuse.software/) must be used for your samples project. You can find the .reuse/dep5 in the project initial. Please replace the parts inside the single angle quotation marks < > by the specific information for your repository.
-
-3. The README.md file (this file):
-Please edit this file as it is the primary description file for your project. You can find some placeholder titles for sections below.
-
-# [Title]
-<!-- Please include descriptive title -->
-
-<!--- Register repository https://api.reuse.software/register, then add REUSE badge:
-[![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/REPO-NAME)](https://api.reuse.software/info/github.com/SAP-samples/REPO-NAME)
--->
+:warning: This file is outdated and needs to be updated/rewritten.
+Please refer to the README.md files in the subfolders of the actual sample applications.
 
 ## Description
-<!-- Please include SEO-friendly description -->
 
-## Requirements
+All samples deployed on Cloud Foundry use the [SAP application router](https://www.npmjs.com/package/@sap/approuter) as
+OAuth 2.0 client and Business Application Gateway which forwards (reverse proxy) the requests to the backend sample
+application (Spring/Java) running on Cloud Foundry. The application uses a Token Validation Client Library to validate
+the token before serving a resource to the client: it checks for all incoming requests whether the user is
+authenticated. The Authorization Client Library is used to make sure that the subject has the requested permissions
+assigned with **Authorization Management Service (AMS)**.
+
+AMS consists of several components, namely
+
+- the **Authorization Management Service (AMS)**  
+  that stores and bundles application specific policy and data.
+- the **Authorization AddOn**  
+  that uploads application's base dcl policies to AMS and starts the [open source **Open Policy Agent (OPA)
+  **](https://www.openpolicyagent.org/) as policy decision engine to decide whether a given user has the policy to
+  perform a specific action on a specific resource. In BTP Clod Foundry environment it is initialized with
+  the [cloud authorization buildpack](https://github.com/SAP/cloud-authorization-buildpack).
+
+<img src="https://github.wdf.sap.corp/CPSecurity/AMS/blob/master/_00_TeamDocsInternal/Overview/images/AMS_BigPicture.drawio.svg" alt="drawing" width="800px"/>
+
+- During application deployment the Cloud Authorization Buildpack is responsible to upload the base policies specified
+  by the application to the AMS. Therefore, the environment variable `AMS_DCL_ROOT` (set in manifest.yml) needs to
+  specify the location of the dcls in the
+  environment.
+- The administrator enriches the base policies and assigns them to the users. The policy engine pulls the policy bundles
+  from the bundle gateway every 60 seconds and updates the policy engine in case of changes.
+- For authorization checks the application sends a requests to the policy engine (sidecar) to check the users
+  permissions. I.e. whether the user is allowed to perform the action X on resource Y by optionally considering instance
+  specific attributes.
+
+A more detailed description can be found [here](https://github.wdf.sap.corp/pages/CPSecurity/AMS/Overview/AMS_basics/).
+
+## Overview Samples
+
+| Feature                         | Version | [Java](java-security-ams) | [Spring](spring-security-ams) | [Jakarta](jakarta-ams-sample) | 
+|---------------------------------|---------|---------------------------|-------------------------------|--------------------------|
+| unit testing                    |         | x                         | x                             | x                        | 
+| local setup / testing           |         | x                         | x                             | x                        | 
+| multi-tenancy                   | 0.8.0   | x                         |                               |                          |                      
+| value help (odata)              | 0.9.0   | x                         |                               |                          |                      
+| privileged mode for techn. comm | 0.9.0   |                           | x                             |                          |                      
+| kyma/kubernetes deployment      | 0.9.0   |                           | x                             |                          |              
+| Java version                    |         | 11                        | 17                            | 17                       |
 
 ## Download and Installation
 
-## Known Issues
-<!-- You may simply state "No known issues. -->
+### Prerequisites
 
-## How to obtain support
-[Create an issue](https://github.com/SAP-samples/<repository-name>/issues) in this repository if you find a bug or have questions about the content.
- 
-For additional support, [ask a question in SAP Community](https://answers.sap.com/questions/ask.html).
+1. A BTP Subaccount (Cloud Foundry enabled)
+2. An Identity Authentication (IAS) tenant
+3. An established Trust between your BTP Subaccount and your IAS tenant (Security -> Trust
+   configuration -> [Establish Trust](https://help.sap.com/docs/btp/sap-business-technology-platform/establish-trust-and-federation-between-uaa-and-identity-authentication))
+4. A functioning Java 11 & Maven installation on your local machine
 
-## Contributing
-If you wish to contribute code, offer fixes or improvements, please send a pull request. Due to legal reasons, contributors will be asked to accept a DCO when they create the first pull request to this project. This happens in an automated fashion during the submission process. SAP uses [the standard DCO text of the Linux Foundation](https://developercertificate.org/).
+### Deployment
 
-## License
-Copyright (c) 2024 SAP SE or an SAP affiliate company. All rights reserved. This project is licensed under the Apache Software License, version 2.0 except as noted otherwise in the [LICENSE](LICENSE) file.
+1. Clone this repository to your local machine
+2. Run the Wizard deploy.sh (macOS, Linux, Windows WSL)
+
+
+The used libraries are available in the [SAP Artifactory](https://int.repositories.cloud.sap/artifactory/build-releases/com/sap/cloud/security/ams/client/).
+

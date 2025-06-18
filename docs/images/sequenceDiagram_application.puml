@@ -1,0 +1,27 @@
+//SPDX-FileCopyrightText: 2020
+//SPDX-License-Identifier: Apache-2.0
+
+@startuml
+skinparam Monochrome true
+hide footbox
+
+actor        User #F8CECC
+participant  WebApplication as pep #F8CECC
+participant  "Authorization Decision Controller\n(ADC)" as pdp #D5E8D4
+
+User -> pep: request
+activate pep
+pep -> pdp: request [QUERY,FILTER]
+activate pep
+activate pdp
+pdp -> pep: true | false | filter clause
+deactivate pdp
+pep -> User
+deactivate pep
+deactivate pep
+@enduml
+
+
+
+
+
