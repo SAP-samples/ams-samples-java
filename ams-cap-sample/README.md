@@ -197,13 +197,12 @@ mock.users:
         attributes:
           businessPartner:
             - "10401010"
-          policies: 
-          	- "cap.Admin"
+        policies: 
+          - "cap.Admin"
       user:
         password: user
-        attributes:
-          policies:
-          	- "local.MysteryAdmin"
+        policies:
+          - "local.MysteryAdmin"
 ```
 
 Put the policies in the `local` package to simulate admin policies for testing. This package is ignored during the
