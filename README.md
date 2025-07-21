@@ -66,5 +66,10 @@ authentication and authorization using AMS and the SAP Identity Authentication S
 
 ---
 
+## Licenses
+This repository is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSES/Apache-2.0.txt) file for details.
+
+[![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/ams-samples-java)](https://api.reuse.software/info/github.com/SAP-samples/ams-samples-java)
+
 **Note:**  
 Each sample includes its own README with detailed setup, configuration, and deployment instructions.
