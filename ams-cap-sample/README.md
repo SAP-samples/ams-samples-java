@@ -126,10 +126,12 @@ cf deploy mta_archives/<your_sample_app_name>_1.0.0-SNAPSHOT.mtar
 cf map-route <APP NAME> <YOUR DOMAIN> --hostname <SUBSCRIBER TENANT>-<ORG>-<SPACE>-<APP NAME>
 ```
 see also https://github.com/SAP-samples/cloud-cap-samples-java?tab=readme-ov-file#deploy-to-sap-business-technology-platform-cloud-foundry.
+
 8. After creating the route, you can access the API of the sample application via the route of the application
    router.
    The first attempt to access will require a login for the used IAS tenant.
    Access to protected resources, e.g., `odata/v4/AdminService/Books`, will be denied because it has no authorizations.
+   
 9. To assign a policy to your user, you go to `<your ias tenant>/admin` and open the subaccount where you subscribed to the
    application. Create a new role role based on the `admin` policy and assign it to your user.
     Requests to the protected route are now working.
