@@ -27,7 +27,7 @@ public class HealthServlet extends HttpServlet {
   static final String ENDPOINT = "/health";
   final PolicyDecisionPoint policyDecisionPoint;
   private static final Logger LOGGER = LoggerFactory.getLogger(HealthServlet.class);
-  HttpClient httpClient;
+  final HttpClient httpClient;
 
   public HealthServlet()
       throws GeneralSecurityException,
@@ -42,7 +42,7 @@ public class HealthServlet extends HttpServlet {
   }
 
   @Override
-  protected void doGet(HttpServletRequest request, HttpServletResponse response)
+  protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
     if (X509SourceSingletonWrapper.isSvidAvailable()) {
       LOGGER.info("Health check successful.");
@@ -55,7 +55,8 @@ public class HealthServlet extends HttpServlet {
     }
   }
 
-  private void writeLine(HttpServletResponse response, String string) throws IOException {
+  private void writeLine(final HttpServletResponse response, final String string)
+      throws IOException {
     response.getWriter().append(string);
     response.getWriter().append("\n");
   }

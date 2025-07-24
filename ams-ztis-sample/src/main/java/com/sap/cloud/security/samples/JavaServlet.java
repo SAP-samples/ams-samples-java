@@ -27,7 +27,7 @@ public class JavaServlet extends HttpServlet {
   static final long serialVersionUID = 1L;
   static final String ENDPOINT = "/api/read";
   final PolicyDecisionPoint policyDecisionPoint;
-  HttpClient httpClient;
+  final HttpClient httpClient;
 
   public JavaServlet()
       throws GeneralSecurityException,
@@ -46,9 +46,9 @@ public class JavaServlet extends HttpServlet {
    */
   @Override
   @java.lang.SuppressWarnings("squid:S1166")
-  protected void doGet(HttpServletRequest request, HttpServletResponse response)
+  protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
-    Attributes attributes =
+    final Attributes attributes =
         Principal.create().getAttributes().setAction("read").setResource("salesOrders");
     if (!policyDecisionPoint.allow(attributes)) {
       IasSecurityFilter.sendUnauthorizedResponse(response, attributes);

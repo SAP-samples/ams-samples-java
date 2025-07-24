@@ -21,7 +21,7 @@ public class ZtisSvidServlet extends HttpServlet {
   static final long serialVersionUID = 1L;
   static final String ENDPOINT = "/svid";
   final PolicyDecisionPoint policyDecisionPoint;
-  HttpClient httpClient;
+  final HttpClient httpClient;
 
   public ZtisSvidServlet()
       throws GeneralSecurityException,
@@ -39,13 +39,13 @@ public class ZtisSvidServlet extends HttpServlet {
    * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
    */
   @Override
-  protected void doGet(HttpServletRequest request, HttpServletResponse response)
+  protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
     response.setContentType("text/plain");
     try {
       writeLine(response, "Certificate chain certificate");
       writeLine(response, "");
-      for (X509Certificate cert :
+      for (final X509Certificate cert :
           X509SourceSingletonWrapper.getInstance().getCertificateChainArray()) {
         writeLine(response, cert.toString());
         if (cert.getSubjectAlternativeNames() != null) {
@@ -59,7 +59,7 @@ public class ZtisSvidServlet extends HttpServlet {
       writeLine(response, "");
       writeLine(
           response, X509SourceSingletonWrapper.getInstance().getBundleForTrustDomain().toString());
-    } catch (SocketEndpointAddressException
+    } catch (final SocketEndpointAddressException
         | X509SourceException
         | GeneralSecurityException
         | BundleNotFoundException e) {
@@ -67,7 +67,8 @@ public class ZtisSvidServlet extends HttpServlet {
     }
   }
 
-  private void writeLine(HttpServletResponse response, String string) throws IOException {
+  private void writeLine(final HttpServletResponse response, final String string)
+      throws IOException {
     response.getWriter().append(string);
     response.getWriter().append("\n");
   }

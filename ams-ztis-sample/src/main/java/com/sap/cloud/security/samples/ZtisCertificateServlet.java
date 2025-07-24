@@ -21,7 +21,7 @@ public class ZtisCertificateServlet extends HttpServlet {
   static final long serialVersionUID = 1L;
   static final String ENDPOINT = "/certificate";
   final PolicyDecisionPoint policyDecisionPoint;
-  HttpClient httpClient;
+  final HttpClient httpClient;
 
   public ZtisCertificateServlet()
       throws GeneralSecurityException,
@@ -39,21 +39,24 @@ public class ZtisCertificateServlet extends HttpServlet {
    * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
    */
   @Override
-  protected void doGet(HttpServletRequest request, HttpServletResponse response)
+  protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
     response.setContentType("text/plain");
     try {
-      X509Certificate cert = X509SourceSingletonWrapper.getInstance().getLeaf();
+      final X509Certificate cert = X509SourceSingletonWrapper.getInstance().getLeaf();
       writeLine(response, cert.toString());
       if (cert.getSubjectAlternativeNames() != null) {
         writeLine(response, "  subjectAlternativeNames: " + cert.getSubjectAlternativeNames());
       }
-    } catch (SocketEndpointAddressException | X509SourceException | GeneralSecurityException e) {
+    } catch (final SocketEndpointAddressException
+        | X509SourceException
+        | GeneralSecurityException e) {
       throw new RuntimeException(e);
     }
   }
 
-  private void writeLine(HttpServletResponse response, String string) throws IOException {
+  private void writeLine(final HttpServletResponse response, final String string)
+      throws IOException {
     response.getWriter().append(string);
     response.getWriter().append("\n");
   }
