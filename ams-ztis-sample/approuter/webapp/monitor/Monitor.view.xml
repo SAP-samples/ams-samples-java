@@ -22,13 +22,8 @@
                             <StandardListItem type="Navigation" press="onNavToLink"
                                               title="{links>/3/title}" description="{links>/3/text}"
                                               tooltip="{links>/3/description}"/>
-                            <StandardListItem type="Navigation" press="onNavToLink"
-                                              title="{links>/4/title}" description="{links>/4/text}"
-                                              tooltip="{links>/4/description}"/>
                             <StandardListItem type="Navigation" press="onNavToAmsUi"
-                                              title="{links>/5/title}" description="{links>/5/text}"/>
-                            <StandardListItem type="Navigation" press="onNavToKnowledgeBase"
-                                              title="{links>/6/title}" description="{links>/6/text}"/>
+                                              title="{links>/4/title}" description="{links>/4/text}"/>
                         </items>
                     </List>
                 </Page>

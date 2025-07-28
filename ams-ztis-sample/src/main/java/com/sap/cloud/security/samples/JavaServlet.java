@@ -49,7 +49,7 @@ public class JavaServlet extends HttpServlet {
   protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
       throws IOException {
     final Attributes attributes =
-        Principal.create().getAttributes().setAction("read").setResource("salesOrders");
+        Principal.create().getAttributes().setAction("read").setResource("restrictedContent");
     if (!policyDecisionPoint.allow(attributes)) {
       IasSecurityFilter.sendUnauthorizedResponse(response, attributes);
       return;

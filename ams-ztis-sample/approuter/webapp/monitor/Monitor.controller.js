@@ -29,17 +29,8 @@ sap.ui.define([
                         description: "You will get a 403 (UNAUTHORIZED), in case you do not have permission for 'read' action on sales orders (anyActionOnSales, adminAllSales policy)"
                     },
                     {
-                        title: "/ams-jakarta-app/api/advanced",
-                        text: "GET /advanced calls policyDecisionPoint.allowFilterClause() to check whether your access is granted",
-                        description: "You will get a 403 (UNAUTHORIZED), in case you do not have permission for 'view' action (viewAll policy)"
-                    },
-                    {
                         title: "AMS Admin UI - Maintain permissions",
                         text: "Link to your IAS Admin Console"
-                    },
-                    {
-                        title: "Link to Knowledge Base",
-                        text: "Gain further Knowledge, e.g. on how to create an admin user for your AMS tenant."
                     }
                 ]), "links");
             },
