@@ -111,7 +111,7 @@ found [here](https://int.controlcenter.ondemand.com/index.html#/knowledge_center
 To enable mTLS with ZTIS, create a ``ZTIS`` service instance in the provider subaccount:
 
 ```shell
-cf create-service ztis default ztis-service --wait
+cf create-service ztis standard ztis-service --wait
 ```
 
 Further information about zero trust service and its configuration can be
