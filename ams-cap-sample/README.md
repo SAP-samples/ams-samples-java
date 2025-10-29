@@ -194,21 +194,21 @@ The assignments of the policies to the mock users is done in the `application.ya
 mock.users:
       admin:
         password: admin
+        policies: 
+        	- "cap.Admin"
         attributes:
           businessPartner:
             - "10401010"
-          policies: 
-          	- "cap.Admin"
       user:
         password: user
+        policies:
+        	- "local.MysteryAdmin"
         attributes:
-          policies:
-          	- "local.MysteryAdmin"
 ```
 
 Put the policies in the `local` package to simulate admin policies for testing. This package is ignored during the
 deployment.
-The last step is to configure that the local compiled test sources are used by the PDP. This is done
+The last step is to configure that the local compiled test sources are used by the PDP. Until `3.0.0` This is done
 by adding
 
 ```YAML
@@ -220,6 +220,10 @@ cds:
 ```
 
 to the relevat profile in the `application.yaml`.
+From `3.0.0` it is not required to set the `test-sources` property. Unless, the polcies are stored in 
+a different directory. If mock users are maintained for a certain profile, the policy assignment via mock 
+users is active by default. 
+
 
 Now, everything is set up for local development. The AMS policies can be compiled and assigned to the mock users.
 Starting the application is now done with:
