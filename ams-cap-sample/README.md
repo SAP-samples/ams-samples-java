@@ -5,12 +5,15 @@ To build a sample application from scratch, the sample uses a series of `cds add
 
 Lastest test done with:
 
-- `@sap/cds-dk` 8.6.1
-- `node` 20.18.1
-- `npm` 10.8.2
+- `@sap/cds-dk` 9.1.1
+- `node` 20.19.1
+- `npm` 11.4.2
 - `Maven` 3.9.9
 - `Java` 23.0.2
-- `mbt` 1.2.26
+- `mbt` 1.2.34
+
+## Documentation
+Refer to the [AMS documentation](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/ClientLibs/DeployDcl#ams-cap-java-sample) and the [@SAP/ams CAP integration guide](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/docs/getting_started)  for more details on the sample application and additional documentation.
 
 ## Getting Started
 
@@ -62,6 +65,102 @@ cf deploy mta_archives/<your_sample_app_name>_1.0.0-SNAPSHOT.mtar
    The name is part of the identity configuration in the `mta.yaml` file. On the tab `Authorization Policies`, you can
    assign your user to an available policy.
    Requests to the protected route are now working.
+
+## Multi tenant bookshop (CF)
+
+The multi-tenant bookshop sample is only available for internal usage.
+
+Make sure you have the latest version of the `@sap/cds-dk` installed:
+
+```BASH
+npm update -g @sap/cds-dk
+```
+
+Then you can create a multi-tenant bookshop sample application with the following commands:
+
+1. Create an empty directory for your sample application. Use a unique but short name for your sample application, e.g., `mt_ams_cap_sample` as there could be issues with creating a route with a long name in the next steps.
+
+```BASH
+mkdir <your_sample_ app_name> # mt_ams_cap_sample
+```
+
+2. Change into the new directory and initialize it as CAP Java application
+
+```BASH
+cd <your_sample_app_name> # mt_ams_cap_sample
+cds init bookshop --java 
+```
+3. Now use the [`cds add` command](https://cap.cloud.sap/docs/tools/cds-cli#cds-add) to add the required components.
+
+```BASH
+cds add sample,mta,ias,hana,approuter,ams
+```
+
+Now, you can run this to enable multitenancy for your CAP application:
+
+```BASH
+cds add multitenancy
+```
+
+4. Run a Maven build to verify that everything builds correctly.
+
+```BASH
+mvn clean verify
+```
+
+5. After building the MTA application, it can be deployed to CF
+
+```BASH
+mbt build
+cf deploy mta_archives/<your_sample_app_name>_1.0.0-SNAPSHOT.mtar
+```
+
+6. After a successful deployment you will need to subscribe to the application in your subaccount.
+   You can do this by going to the `Applications` tab in your subaccount and clicking on the `Subscribe` button of your
+   application.
+   
+7. After subscribing to the application, you will need to create a new route for your application.
+   You can do this by going to the `Routes` tab in your subaccount and clicking on the `Create Route` button.
+   The route should point to the `approuter` of your application. You can also use following command to create the route:
+```BASH
+cf map-route <APP NAME> <YOUR DOMAIN> --hostname <SUBSCRIBER TENANT>-<ORG>-<SPACE>-<APP NAME>
+```
+see also https://github.com/SAP-samples/cloud-cap-samples-java?tab=readme-ov-file#deploy-to-sap-business-technology-platform-cloud-foundry.
+
+8. After creating the route, you can access the API of the sample application via the route of the application
+   router.
+   The first attempt to access will require a login for the used IAS tenant.
+   Access to protected resources, e.g., `odata/v4/AdminService/Books`, will be denied because it has no authorizations.
+   
+9. To assign a policy to your user, you go to `<your ias tenant>/admin` and open the subaccount where you subscribed to the
+   application. Create a new role role based on the `admin` policy and assign it to your user.
+    Requests to the protected route are now working.
+see also [Assigning Policies to Users](https://github.com/SAP-samples/cloud-cap-samples-java?tab=readme-ov-file#setup-authorizations-in-sap-business-technology-platform).
+
+### Troubleshooting
+Troubleshooting: 
+If you run into issues with the `mbt build` command in your mtx sidecar, check line 18 in your mtx/sidecar/gen/package.json file.
+Change line 18 to:
+
+```JSON
+"build": "cds build ../.. --for mtx-sidecar --production && npm install --prefix gen"
+```
+
+If some configs are not working straight away, you might need to restart the application, sidecar or the router to pick up the changes.
+```BASH
+cf restart <your_sample_app_name>
+cf restart <your_sample_app_name>-mtx
+cf restart <your_sample_app_name>-approuter
+```
+
+You can check the logs of the application, sidecar or router with the following commands:
+
+```BASH 
+cf logs <your_sample_app_name> --recent
+cf logs <your_sample_app_name>-mtx --recent
+cf logs <your_sample_app_name>-approuter --recent
+```
+
 
 ### AMS artifacts
 
@@ -203,7 +302,6 @@ mock.users:
         password: user
         policies:
         	- "local.MysteryAdmin"
-        attributes:
 ```
 
 Put the policies in the `local` package to simulate admin policies for testing. This package is ignored during the

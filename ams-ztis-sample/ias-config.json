@@ -1,0 +1,19 @@
+{
+  "authorization": {
+    "enabled": true
+  },
+  "display-name": "Jakarta AMS Zero Trust Sample App (CF)",
+  "oauth2-configuration": {
+    "redirect-uris": [
+      "https://*.((LANDSCAPE_APPS_DOMAIN))/login/callback",
+      "https://*.((LANDSCAPE_APPS_DOMAIN))/login/callback?authType=ias",
+      "http://localhost:5000/login/callback?authType=ias",
+      "http://localhost:5000/login/callback"
+    ],
+    "post-logout-redirect-uris": [
+      "https://*.((LANDSCAPE_APPS_DOMAIN))/logout.html",
+      "http://localhost:5000/logout.html"
+    ]
+  },
+  "multi-tenant": true
+}
