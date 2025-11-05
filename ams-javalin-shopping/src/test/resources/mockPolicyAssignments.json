@@ -1,0 +1,13 @@
+{
+    "tenant1": {
+        "alice": [
+            "shopping.CreateOrders",
+            "shopping.DeleteOrders"
+        ]
+    },
+    "tenant2": {
+        "bob": [
+            "local.OrderAccessory"
+        ]
+    }
+}

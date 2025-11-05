@@ -1,0 +1,22 @@
+{
+  "ias_apis": [
+    "ExternalOrder"
+  ],
+  "sub": "bob",
+  "app_tid": "tenant2",
+  "iss": "https://footenant.accounts400.ondemand.com",
+  "given_name": "bob",
+  "ias_iss": "https://footenant.accounts400.ondemand.com",
+  "aud": "d004e600-f613-42b3-8583-9af3e42fa2dd",
+  "scim_id": "bob",
+  "user_uuid": "bob",
+  "azp": "b8eeb173-afdb-4055-a29b-05458deaf7fe",
+  "cnf": {
+    "x5t#S256": "m0v78O94joYipqCfJtbVbegPq6nwcZPho6ZEeUdQOf8"
+  },
+  "exp": 1749631159,
+  "iat": 1749627559,
+  "family_name": "TestUser",
+  "jti": "2441e304-8d7e-4d36-8512-562757b079f8",
+  "email": "bob@sap.com"
+}

@@ -1,0 +1,19 @@
+{
+    "ias_apis": [
+        "ReadProducts",
+        "ReadInvoices"
+    ],
+    "sub": "b8eeb174-afdb-4055-a29b-05458deaf7fe",
+    "app_tid": "tenant1",
+    "iss": "https://footenant.accounts400.ondemand.com",
+    "azpacr": "2",
+    "ias_iss": "https://footenant.accounts400.ondemand.com",
+    "aud": "d004e600-f613-42b3-8583-9af3e42fa2dd",
+    "azp": "b8eeb174-afdb-4055-a29b-05458deaf7fe",
+    "cnf": {
+        "x5t#S256": "m0v78O94joYipqCfJtbVbegPq6nwcZPho6ZEeUdQOf8"
+    },
+    "exp": 1749633339,
+    "iat": 1749629739,
+    "jti": "88bf4303-d882-4f8a-99e9-d6865e0d8b4f"
+}

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Console appender for test output -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} -- %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Root logger level - adjust as needed -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+    <!-- Suppress Jetty debug/trace messages completely -->
+    <logger name="org.eclipse.jetty" level="WARN" />
+    <logger name="org.eclipse.jetty.server" level="WARN" />
+    <logger name="org.eclipse.jetty.http" level="WARN" />
+    <logger name="org.eclipse.jetty.io" level="WARN" />
+    <logger name="org.eclipse.jetty.servlet" level="WARN" />
+    <logger name="org.eclipse.jetty.util" level="WARN" />
+    
+    <!-- Also suppress Javalin's internal messages -->
+    <logger name="io.javalin" level="INFO" />
+    
+    <!-- Your application messages (apply to package and subpackages) -->
+    <logger name="com.sap.cloud.security.ams.samples" level="INFO" />
+    
+    <!-- SAP AMS client library messages -->
+    <logger name="com.sap.cloud.security.ams.v4" level="DEBUG" />
+    
+</configuration>

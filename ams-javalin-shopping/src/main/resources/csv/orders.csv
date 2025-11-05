@@ -1,0 +1,5 @@
+id,productId,quantity,createdBy
+1,1,1,carol
+2,3,1,carol
+3,2,1,alice
+4,4,1,bob

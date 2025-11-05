@@ -1,0 +1,24 @@
+spring:
+  application:
+    name: ams-spring-boot-shopping
+
+sap:
+  spring:
+    ams:
+      test:
+        dcn-root: target/generated-test-sources/dcn
+        default-tenant: provider
+        policy-assignments:
+          tenant1:
+            alice:
+              - shopping.CreateOrders
+              - shopping.DeleteOrders
+          tenant2:
+            bob:
+              - local.OrderAccessory
+
+logging:
+  level:
+    root: WARN
+    com.sap.cloud.security.ams: DEBUG
+    com.sap.cloud.security.ams.samples: DEBUG

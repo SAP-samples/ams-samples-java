@@ -1,0 +1,10 @@
+{
+  "cdsc": {
+    "draftMessages": true
+  },
+  "requires": {
+    "[production]": {
+      "auth": "ias"
+    }
+  }
+}

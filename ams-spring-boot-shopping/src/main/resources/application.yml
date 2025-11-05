@@ -1,0 +1,37 @@
+server:
+  port: 8080
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+      base-path: /actuator
+  endpoint:
+    health:
+      enabled: true
+      show-details: always
+
+spring:
+  application:
+    name: ams-spring-boot-shopping
+
+logging:
+  level:
+    root: INFO
+---
+spring:
+  config:
+    activate:
+      on-profile: debug
+
+logging:
+  level:
+    com:
+      sap:
+        cds:
+          security:
+            authorization: TRACE
+    com.sap.cloud.security.ams: DEBUG
+    com.sap.cloud.security.ams.spring: DEBUG
+    com.sap.cloud.security.ams.samples: DEBUG
