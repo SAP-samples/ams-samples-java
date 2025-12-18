@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2020 
+#
+# SPDX-License-Identifier: Apache-2.0
+---
+logging.level:
+  # wiremock.org: DEBUG
+  # org.springframework.security: DEBUG
+  # com.sap.cloud.security: DEBUG
+  org.springframework: WARN
+  com.sap.cloud.security.ams.logging: INFO
+  com.sap.cloud.environment.servicebinding: DEBUG

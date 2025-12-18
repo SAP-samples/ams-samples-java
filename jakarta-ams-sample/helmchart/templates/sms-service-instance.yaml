@@ -1,0 +1,19 @@
+---
+apiVersion: services.cloud.sap.com/v1
+kind: ServiceInstance
+metadata:
+  name: jakarta-ams-sms
+  labels:
+    app: jakarta-ams-sample
+spec:
+  serviceOfferingName: subscription-manager
+  servicePlanName: provider
+  parameters:
+    iasServiceInstanceName: jakarta-ams-identity
+    applicationType: application
+    appName: jakarta-ams-sample-saas-{{ .Release.Namespace }}
+    appCallbacks:
+      subscriptionCallbacks:
+        url: "https://{{ .Values.backend.prefix }}-{{ .Release.Namespace }}.{{ .Values.clusterDomain }}/v1.0/callback/tenants/{app_tid}"
+    displayName: Jakarta AMS Multitenancy Sample App (k8s)
+    description: Multitenant app that consumes AMS

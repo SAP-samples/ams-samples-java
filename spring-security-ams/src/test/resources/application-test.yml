@@ -1,0 +1,11 @@
+# SPDX-FileCopyrightText: 2020 
+#
+# SPDX-License-Identifier: Apache-2.0
+---
+sap.security.services:
+  identity:
+    clientid: sb-clientId!t0815 # SecurityTest.DEFAULT_CLIENT_ID
+    domains: localhost         # SecurityTest.DEFAULT_DOMAIN
+
+logging.level:
+  com.sap.cloud.security: DEBUG

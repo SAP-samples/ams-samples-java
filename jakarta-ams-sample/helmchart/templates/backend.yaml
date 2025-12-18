@@ -1,0 +1,81 @@
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: jakarta-ams-backend-deployment
+  labels:
+    app: jakarta-ams-sample
+    component: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: jakarta-ams-sample
+      component: backend
+  template:
+    metadata:
+      labels:
+        app: jakarta-ams-sample
+        component: backend
+    spec:
+      { { - with .Values.imagePullSecrets } }
+      imagePullSecrets:
+        { { - toYaml . | nindent 8 } }
+      { { - end } }
+      containers:
+        - image: "{{ .Values.backend.image }}:{{ .Values.backend.version | default .Chart.AppVersion }}"
+          imagePullPolicy: Always
+          name: backend
+          ports:
+            - name: http
+              containerPort: 8080
+          volumeMounts:
+            - name: identity-service-volume
+              mountPath: "/bindings/identity"
+              readOnly: true
+          env:
+            - name: SUBSCRIPTION_SUFFIX
+              value: "{{ .Values.subscription.suffix }}-{{ .Release.Namespace }}"
+            - name: SERVICE_BINDING_ROOT
+              value: "/bindings"
+      volumes:
+        - name: identity-service-volume
+          secret:
+            secretName: jakarta-ams-identity-binding
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: jakarta-ams-backend-service
+  labels:
+    app: jakarta-ams-sample
+    component: backend
+spec:
+  ports:
+    - name: http
+      port: 80
+      protocol: TCP
+      targetPort: 8080
+  selector:
+    app: jakarta-ams-sample
+    component: backend
+---
+apiVersion: gateway.kyma-project.io/v2alpha1
+kind: APIRule
+metadata:
+  name: jakarta-ams-backend-api
+  labels:
+    app: jakarta-ams-sample
+    component: backend
+spec:
+  hosts:
+    - { { .Values.backend.prefix } }-{{ .Release.Namespace }}
+  service:
+    name: jakarta-ams-backend-service
+    port: 80
+  gateway: kyma-system/kyma-gateway
+  rules:
+    - path: /*
+      methods: [ "GET", "POST", "PUT", "DELETE" ]
+      noAuth: true
+---

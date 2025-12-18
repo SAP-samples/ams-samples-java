@@ -1,0 +1,74 @@
+# SPDX-FileCopyrightText: 2020
+#
+# SPDX-License-Identifier: Apache-2.0
+
+---
+# Configuration:
+# configured for EU10. For other landscapes, please adopt LANDSCAPE_APPS_DOMAIN in ../vars.yml
+# If the route is occupied, you might need to change ID in ../vars.yml
+applications:
+  # -----------------------------------------------------------------------------------
+  # AMS Policies Content Deployer App
+  # -----------------------------------------------------------------------------------
+  - name: jakarta-ams-dcl-deployer
+    path: dcldeployer
+    no-route: true
+    health-check-type: none
+    memory: 256M
+    instances: 1
+    buildpacks:
+      - nodejs_buildpack
+    command: (npm start && echo "This application may now be stopped to free resources." || echo "AMS Policy Deployment unsuccessful.") && sleep infinity
+    services:
+      - name: jakarta-ams-identity
+        parameters:
+          credential-type: X509_GENERATED
+          app-identifier: dcl-deployer
+  #----------------------------------------------------------
+  # Jakarta multi-tenant application
+  #----------------------------------------------------------
+  - name: jakarta-ams-backend
+    instances: 1
+    memory: 800M
+    health-check-type: http
+    health-check-http-endpoint: /health
+    routes:
+      - route: jakarta-ams-backend-((ID)).((LANDSCAPE_APPS_DOMAIN))
+    path: target/jakarta-ams-sample.war
+    services:
+      - name: jakarta-ams-identity
+        parameters: { "credential-type": "X509_GENERATED", "app-identifier": "backend" }
+      - jakarta-ams-sms
+    buildpacks:
+      - sap_java_buildpack_jakarta
+    env:
+      SUBSCRIPTION_SUFFIX: ((SUBSCRIPTION_SUFFIX))-((ID))
+      JBP_CONFIG_OPEN_JDK_JRE: '{ jre: { version: 17.+ } }'
+      JBP_CONFIG_TOMCAT: '{ tomcat: { version: 10.+ } }'
+  #----------------------------------------------------------
+  # Application Router
+  #----------------------------------------------------------
+  - name: jakarta-ams-approuter
+    instances: 1
+    path: approuter
+    buildpacks:
+      - nodejs_buildpack
+    memory: 128M
+    routes:
+      - route: ((PROVIDER_SUBDOMAIN))((SUBSCRIPTION_SUFFIX))-((ID)).((LANDSCAPE_APPS_DOMAIN))
+    services:
+      - name: jakarta-ams-identity
+        parameters: { "credential-type": "X509_GENERATED", "app-identifier": "approuter" }
+    env:
+      TENANT_HOST_PATTERN: ^(.*)((SUBSCRIPTION_SUFFIX))-((ID)).((LANDSCAPE_APPS_DOMAIN))
+      # To enable returning both (backend and local content-security-policy headers)
+      MERGE_CSP_HEADERS: "true"
+      httpHeaders: >
+        [{"Content-Security-Policy-Report-Only": "default-src 'self' https://sapui5.hana.ondemand.com; style-src 'self' 'unsafe-inline' https://sapui5.hana.ondemand.com; img-src 'self' https://sapui5.hana.ondemand.com; report-uri /.ui5/csp/report.csplog;"}]
+      destinations: >
+        [
+          {"name":"jakarta-ams-backend-destination",
+           "url":"https://jakarta-ams-backend-((ID)).((LANDSCAPE_APPS_DOMAIN))",
+           "forwardAuthToken": true}
+        ]
+...

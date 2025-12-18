@@ -1,0 +1,56 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: jakarta-ams-policies-deployer-job
+  labels:
+    app: jakarta-ams-sample
+    component: ams-policies-deployer
+spec:
+  completions: 1
+  parallelism: 1
+  ttlSecondsAfterFinished: 300 # 5 minutes
+  template:
+    spec:
+      { { - with .Values.imagePullSecrets } }
+      imagePullSecrets:
+        { { - toYaml . | nindent 8 } }
+      { { - end } }
+      initContainers:
+        - name: copy-dcl-files
+          image: "{{ .Values.backend.image }}:{{ .Values.backend.version | default .Chart.AppVersion }}"
+          imagePullPolicy: Always
+          command: [ 'sh', '-c', 'cp -R /dcl/* /dcl-files' ]
+          volumeMounts:
+            - name: dcl-files
+              mountPath: /dcl-files
+      containers:
+        - image: cloud-security-integration.common.repositories.cloud.sap/ams-policies-deployer:2.0.0
+          imagePullPolicy: Always
+          name: ams-policies-deployer
+          env:
+            - name: SERVICE_BINDING_ROOT
+              value: /bindings
+            - name: AMS_DCL_ROOT
+              value: /dcl-files
+          securityContext:
+            allowPrivilegeEscalation: false
+            capabilities:
+              drop:
+                - ALL
+            privileged: false
+            runAsNonRoot: true
+            readOnlyRootFilesystem: false
+          volumeMounts:
+            - mountPath: /bindings/identity/
+              name: identity-service-volume
+              readOnly: true
+            - name: dcl-files
+              mountPath: /dcl-files
+      restartPolicy: OnFailure
+      volumes:
+        - name: identity-service-volume
+          secret:
+            secretName: jakarta-ams-identity-binding
+        - name: dcl-files
+          emptyDir: { }

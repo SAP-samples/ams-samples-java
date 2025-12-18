@@ -1,0 +1,18 @@
+---
+apiVersion: gateway.kyma-project.io/v2alpha1
+kind: APIRule
+metadata:
+  name: spring-security-ams-api
+  labels:
+    app: spring-security-ams
+spec:
+  hosts:
+    - spring-security-ams
+  service:
+    name: spring-security-ams-service
+    port: 80
+  gateway: kyma-system/kyma-gateway
+  rules:
+    - path: /*
+      methods: [ "GET", "POST" ]
+      noAuth: true

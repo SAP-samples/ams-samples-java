@@ -1,0 +1,19 @@
+---
+apiVersion: services.cloud.sap.com/v1
+kind: ServiceInstance
+metadata:
+  name: jakarta-ams-identity
+  labels:
+    app: jakarta-ams-sample
+spec:
+  serviceOfferingName: identity
+  servicePlanName: application
+  parameters:
+    authorization:
+      enabled: true
+    display-name: Jakarta AMS Multitenancy Sample App (k8s)
+    multi-tenant: true
+    oauth2-configuration:
+      redirect-uris:
+        - "https://*.{{ .Values.clusterDomain }}/login/callback"
+        - "https://*.{{ .Values.clusterDomain }}/login/callback?authType=ias"

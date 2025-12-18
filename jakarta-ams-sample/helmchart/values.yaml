@@ -1,0 +1,31 @@
+# The domain of the cluster.
+clusterDomain: shoot_name.stage.kyma.ondemand.com
+
+approuter:
+  image: cloud-security-integration.common.repositories.cloud.sap/jakarta-ams-sample/approuter
+
+  # Overrides the image version whose default is the chart appVersion.
+  version: ""
+
+backend:
+  image: cloud-security-integration.common.repositories.cloud.sap/jakarta-ams-sample/backend
+
+  # Overrides the image version whose default is the chart appVersion.
+  version: ""
+
+  # The hostname prefix for the backend service.
+  # The namespace will be added as well to help making the hostname unique within the cluster.
+  prefix: jakarta-ams-backend
+
+imagePullSecrets:
+  - name: "common-artifactory"
+
+subscription:
+  # The subdomains of the provider subaccount and all subscribed subaccounts.
+  subdomains:
+  #    - "<subdomain of provider subaccount>"
+  #    - "<subdomain of subscribed subaccount>"
+
+  # Short suffix appended to all subaccount subdomains to create the approuter routes.
+  # The namespace will be added as well to help making the resulting URLs unique within the cluster.
+  suffix: -j-ams

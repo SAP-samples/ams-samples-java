@@ -1,0 +1,13 @@
+{
+  "iasServiceInstanceName": "jakarta-ams-identity",
+  "applicationType": "application",
+  "appName": "jakarta-ams-sample-saas-((ID))",
+  "appCallbacks": {
+    "dependenciesCallbacks": {},
+    "subscriptionCallbacks": {
+      "url": "https://jakarta-ams-backend-((ID)).((LANDSCAPE_APPS_DOMAIN))/v1.0/callback/tenants/{app_tid}"
+    }
+  },
+  "displayName": "Jakarta AMS Multitenancy Sample App (CF)",
+  "description": "Multitenant app that consumes AMS"
+}

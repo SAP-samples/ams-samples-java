@@ -1,0 +1,15 @@
+# NOTE
+#
+# Values in this file are modified by the deploy.sh wizard script.
+
+# some data to make the urls unique
+# change to another value, e.g. your User ID
+ID: 00-00-00
+
+# Choose cfapps.eu10.hana.ondemand.com for the EU10 landscape, cfapps.us10.hana.ondemand.com for US10
+# and cfapps.eu12.hana.ondemand.com for Canary
+LANDSCAPE_APPS_DOMAIN: cfapps.eu12.hana.ondemand.com
+
+# Required only for the multitenant app jakarta-ams-sample and ams-ztis-sample.
+PROVIDER_SUBDOMAIN:
+SUBSCRIPTION_SUFFIX: -j-ams

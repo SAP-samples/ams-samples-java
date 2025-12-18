@@ -1,0 +1,69 @@
+/*
+ * SPDX-FileCopyrightText: 2020
+ *
+ * SPDX-License-Identifier: Apache-2.0
+ */
+package com.sap.cloud.security.samples;
+
+import static com.sap.cloud.security.ams.factory.AmsPolicyDecisionPointFactory.DEFAULT;
+
+import com.sap.cloud.security.ams.api.Principal;
+import com.sap.cloud.security.ams.dcl.client.pdp.Attributes;
+import com.sap.cloud.security.ams.dcl.client.pdp.PolicyDecisionPoint;
+import com.sap.cloud.security.samples.filter.IasSecurityFilter;
+import com.sap.cloud.security.samples.ztis.mtls.X509SourceSingletonWrapper;
+import io.spiffe.exception.SocketEndpointAddressException;
+import io.spiffe.exception.X509SourceException;
+import jakarta.servlet.annotation.WebServlet;
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import java.io.IOException;
+import java.net.http.HttpClient;
+import java.security.GeneralSecurityException;
+
+@WebServlet(JavaServlet.ENDPOINT)
+public class JavaServlet extends HttpServlet {
+  static final long serialVersionUID = 1L;
+  static final String ENDPOINT = "/api/read";
+  final PolicyDecisionPoint policyDecisionPoint;
+  final HttpClient httpClient;
+
+  public JavaServlet()
+      throws GeneralSecurityException,
+          IOException,
+          SocketEndpointAddressException,
+          X509SourceException {
+    httpClient =
+        HttpClient.newBuilder()
+            .sslContext(X509SourceSingletonWrapper.getInstance().getSslContextInstance())
+            .build();
+    policyDecisionPoint = PolicyDecisionPoint.create(DEFAULT, "httpClient", httpClient);
+  }
+
+  /**
+   * @see HttpServlet#doGet(HttpServletRequest request, HttpServletResponse response)
+   */
+  @Override
+  @java.lang.SuppressWarnings("squid:S1166")
+  protected void doGet(final HttpServletRequest request, final HttpServletResponse response)
+      throws IOException {
+    final Attributes attributes =
+        Principal.create().getAttributes().setAction("read").setResource("restrictedContent");
+    if (!policyDecisionPoint.allow(attributes)) {
+      IasSecurityFilter.sendUnauthorizedResponse(response, attributes);
+      return;
+    }
+    // ===== WRITE APPLICATION's audit log ===========
+    response.setContentType("text/plain");
+    response.getWriter().write("Read-protected method called!" + "\n");
+    if (X509SourceSingletonWrapper.isSvidAvailable()) {
+      response
+          .getWriter()
+          .write("Svid available (Svid has been successfully retrieved via Workload API).");
+    } else {
+      response.getWriter().write("No Svid available (No Svid has been retrieved via Workload API)");
+    }
+    response.setStatus(HttpServletResponse.SC_OK);
+  }
+}
