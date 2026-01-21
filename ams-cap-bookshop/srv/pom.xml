@@ -73,6 +73,17 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-security</artifactId>
 		</dependency>
+
+		<dependency>
+			<groupId>com.sap.cds</groupId>
+			<artifactId>cds-starter-cloudfoundry</artifactId>
+			<scope>runtime</scope>
+		</dependency>
+
+		<dependency>
+			<groupId>org.springframework.boot</groupId>
+			<artifactId>spring-boot-starter-actuator</artifactId>
+		</dependency>
 	</dependencies>
 
 	<build>
@@ -167,7 +178,7 @@
                         </goals>
                         <phase>generate-test-resources</phase>
                         <configuration>
-                            <arguments>--package=@sap/ams-dev@2.2.0 compile-dcl
+                            <arguments>--package=@sap/ams-dev compile-dcl
                                 -d ${project.basedir}/src/main/resources/ams -o
                                 ${project.basedir}/target/generated-test-sources/dcn
                             </arguments>
