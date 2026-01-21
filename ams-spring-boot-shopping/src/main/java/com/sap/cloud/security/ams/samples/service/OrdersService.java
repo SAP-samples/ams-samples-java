@@ -1,12 +1,11 @@
 package com.sap.cloud.security.ams.samples.service;
 
-import static com.sap.cloud.security.ams.samples.config.AmsAttributes.ORDER_CREATED_BY;
+import static com.sap.cloud.security.ams.samples.config.AmsAttributes.*;
 import static com.sap.cloud.security.ams.samples.config.Privileges.*;
 
 import java.util.*;
 import java.util.stream.Collectors;
 
-import com.sap.cloud.security.ams.samples.config.AmsAttributes;
 import com.sap.cloud.security.ams.samples.db.SimpleDatabase;
 import com.sap.cloud.security.ams.samples.model.*;
 import com.sap.cloud.security.ams.spring.authorization.annotations.AmsAttribute;
@@ -112,6 +111,27 @@ public class OrdersService {
         if (Math.abs(product.getPrice() * quantity - totalAmount) > 0.01) {
             throw new IllegalArgumentException("Authorization attribute for order total does not match the computed total");
         }
+
+        // --- SHOWCASES CONTEXTUAL AMS AUTHORIZATION CHECK FOR A SINGLE ENTITY ---
+
+        /*
+         * The AMS annotations of this method (plus the sanity checks above) have already triggered an implicit authorization check
+         * that is equivalent to the following programmatic check with the Authorizations bean:
+         *
+         * Authorizations authorizations = authHandler.getAuthorizations();
+         * Decision decision = authorizations.checkPrivilege(
+         *         Privileges.CREATE_ORDERS.getAction(),
+         *         Privileges.CREATE_ORDERS.getResource(),
+         *         Map.of(
+         *             PRODUCT_CATEGORY, product.getCategory(),
+         *             ORDER_TOTAL, totalAmount));
+         * if (!decision.isGranted()) {
+         *     throw new ForbiddenResponse();
+         * }
+         *
+         * Doing a pre-check for the action/resource via route security and an additional programmatic check
+         * for the instance-based checks or using method-level security annotations for both is a matter of preference.
+         */
 
         String userId = SecurityContext.getToken().getClaimAsString(TokenClaims.SAP_GLOBAL_SCIM_ID);
         Order newOrder = new Order(product.getId(), quantity, totalAmount, userId);
