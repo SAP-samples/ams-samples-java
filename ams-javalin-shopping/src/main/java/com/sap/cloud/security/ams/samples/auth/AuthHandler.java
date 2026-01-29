@@ -4,7 +4,10 @@ import java.io.*;
 import java.nio.file.Paths;
 import java.util.Set;
 
+import com.sap.cloud.environment.servicebinding.api.DefaultServiceBindingAccessor;
+import com.sap.cloud.environment.servicebinding.api.ServiceBinding;
 import com.sap.cloud.security.ams.api.*;
+import com.sap.cloud.security.ams.config.CloudAuthorizationManagementServiceConfig;
 import com.sap.cloud.security.ams.core.*;
 import com.sap.cloud.security.config.*;
 import com.sap.cloud.security.servlet.*;
@@ -23,8 +26,7 @@ import static com.sap.cloud.security.ams.api.Principal.fromSecurityContext;
  */
 public class AuthHandler implements Handler {
     private static final Logger LOG = LoggerFactory.getLogger(AuthHandler.class);
-    private OAuth2ServiceConfiguration iasCredentials;
-    private TokenAuthenticator authenticator;
+	private TokenAuthenticator authenticator;
     protected final AuthorizationManagementService ams;
     protected final IasAuthorizationsProvider<ShoppingAuthorizations> authProvider;
 
@@ -35,22 +37,23 @@ public class AuthHandler implements Handler {
     }
 
     protected void setupAuthentication() {
-        InputStream input = null;
-        try {
-            input = new FileInputStream(new File(
-                    Paths.get("ams-javalin-shopping", "src", "main", "resources", "vcap_services.json").toString()));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-            System.exit(1);
-        }
-        this.iasCredentials = Environments.readFromInput(input).getIasConfiguration();
-
-        // this.iasCredentials = Environments.getCurrent().getIasConfiguration();
-        this.authenticator = new IasTokenAuthenticator().withServiceConfiguration(iasCredentials);
+		this.authenticator = new IasTokenAuthenticator().withServiceConfiguration(
+                Environments.getCurrent().getIasConfiguration()
+        );
     }
 
     protected AuthorizationManagementService createAmsClient() {
-        return AuthorizationManagementServiceFactory.fromIasServiceConfiguration(iasCredentials);
+        ServiceBinding identityBinding = DefaultServiceBindingAccessor.getInstance().getServiceBindings().stream()
+                .filter(binding -> "identity".equals(binding.getServiceName().orElse(null)))
+                .findFirst()
+                .orElse(null);
+
+        if (identityBinding == null) {
+            throw new IllegalStateException(
+                    "No SAP Identity Service credentials found in identityBinding. Refer to the documentation for a local test setup.");
+        }
+
+        return AuthorizationManagementServiceFactory.fromIdentityServiceBinding(identityBinding);
     }
 
     private static final Set<String> TECHNICAL_USER_APIS = Set.of("GetProducts");
@@ -101,12 +104,13 @@ public class AuthHandler implements Handler {
     }
 
     private void authorize(Context ctx) {
+        ShoppingAuthorizations authorizations = getAuthorizations();
+
         if (ctx.routeRoles().contains(Role.AUTHENTICATED) && SecurityContext.getToken() != null) {
             // this means successful authentication is enough for access
             return;
         }
 
-        ShoppingAuthorizations authorizations = getAuthorizations();
         for (RouteRole r : ctx.routeRoles()) {
             if (!(r instanceof Role role)) {
                 LOG.error("Unknown role type: " + r.getClass().getName());
