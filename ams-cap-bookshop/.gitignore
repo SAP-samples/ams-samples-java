@@ -30,3 +30,6 @@ hs_err*
 .vscode
 .idea
 .reloadtrigger
+
+# added by cds
+.cdsrc-private.json
