@@ -15,17 +15,18 @@ import org.slf4j.*;
 import io.javalin.http.*;
 import io.javalin.security.RouteRole;
 
+import static com.sap.cloud.security.ams.api.Principal.fromSecurityContext;
+
 /**
  * Javalin handler that showcases authentication and authorization using SAP BTP
  * cloud security and AMS libraries
  */
 public class AuthHandler implements Handler {
     private static final Logger LOG = LoggerFactory.getLogger(AuthHandler.class);
-    private static final ThreadLocal<Authorizations> authorizationsHolder = new ThreadLocal<>();
     private OAuth2ServiceConfiguration iasCredentials;
     private TokenAuthenticator authenticator;
     protected final AuthorizationManagementService ams;
-    protected final IdentityServiceAuthProvider authProvider;
+    protected final IasAuthorizationsProvider<ShoppingAuthorizations> authProvider;
 
     public AuthHandler() {
         this.setupAuthentication();
@@ -55,8 +56,8 @@ public class AuthHandler implements Handler {
     private static final Set<String> TECHNICAL_USER_APIS = Set.of("GetProducts");
     private static final Set<String> PRINCIPAL_PROPAGATION_APIS = Set.of("GetProducts", "ExternalOrder");
 
-    private IdentityServiceAuthProvider createAuthProvider() {
-        return new IdentityServiceAuthProvider(ams)
+    private IasAuthorizationsProvider<ShoppingAuthorizations> createAuthProvider() {
+        return IasAuthorizationsProvider.create(ams, ShoppingAuthorizations::of)
                 .withApiMapper(ApiMapper.ofFunction((String api) -> {
                     if (TECHNICAL_USER_APIS.contains(api)) {
                         return Set.of(String.format("internal.%s", api));
@@ -70,7 +71,7 @@ public class AuthHandler implements Handler {
                     } else {
                         return null;
                     }
-                }), App2AppFlow.RESTRICTED_PRINCIPAL_PROPAGATION);
+                }), App2AppFlow.FILTERED_PRINCIPAL_PROPAGATION);
     }
 
     public AuthorizationManagementService getAmsClient() {
@@ -105,16 +106,14 @@ public class AuthHandler implements Handler {
             return;
         }
 
-        Authorizations authorizations = authProvider.getAuthorizations();
-        authorizationsHolder.set(authorizations);
+        ShoppingAuthorizations authorizations = getAuthorizations();
         for (RouteRole r : ctx.routeRoles()) {
-            if (!(r instanceof Role)) {
+            if (!(r instanceof Role role)) {
                 LOG.error("Unknown role type: " + r.getClass().getName());
                 continue;
             }
 
-            Role role = (Role) r;
-            if (!authorizations.checkPrivilege(role.getAction(), role.getResource()).isDenied()) {
+            if (!authorizations.checkRole(role).isDenied()) {
                 // full or conditional access granted: in the latter case, the filter condition
                 // needs to be handled inside the service handler
                 return;
@@ -130,12 +129,11 @@ public class AuthHandler implements Handler {
      *
      * @return Authorizations instance
      */
-    public Authorizations getAuthorizations() {
-        return authorizationsHolder.get();
+    public ShoppingAuthorizations getAuthorizations() {
+        return authProvider.getAuthorizations(fromSecurityContext());
     }
 
     public void clear(Context ctx) {
         SecurityContext.clear();
-        authorizationsHolder.remove();
     }
 }

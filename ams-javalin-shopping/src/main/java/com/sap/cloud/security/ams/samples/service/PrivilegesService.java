@@ -4,6 +4,7 @@ import java.util.Set;
 
 import com.sap.cloud.security.ams.samples.auth.AuthHandler;
 import com.sap.cloud.security.ams.api.*;
+import com.sap.cloud.security.ams.samples.auth.ShoppingAuthorizations;
 import com.sap.cloud.security.token.*;
 
 import org.slf4j.*;
@@ -26,8 +27,8 @@ public class PrivilegesService {
             LOG.debug("Processing GET /privileges request");
 
             try {
-                Authorizations authorizations = authHandler.getAuthorizations();
-                Set<Privilege> privileges = authorizations.getPotentialPrivileges();
+                ShoppingAuthorizations authorizations = authHandler.getAuthorizations();
+                Set<Privilege> privileges = authorizations.getBaseAuthorizations().getPotentialPrivileges();
 
                 LOG.info("Privileges for user {}: {}",
                         SecurityContext.getToken().getClaimAsString(TokenClaims.SAP_GLOBAL_SCIM_ID), privileges);

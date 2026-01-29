@@ -3,12 +3,11 @@ package com.sap.cloud.security.ams.samples.service;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sap.cloud.security.ams.api.AttributeName;
-import com.sap.cloud.security.ams.api.Authorizations;
 import com.sap.cloud.security.ams.api.Decision;
 import com.sap.cloud.security.ams.dcn.visitor.SqlExtractor;
 import com.sap.cloud.security.ams.samples.auth.AmsAttributes;
 import com.sap.cloud.security.ams.samples.auth.AuthHandler;
-import com.sap.cloud.security.ams.samples.auth.Role;
+import com.sap.cloud.security.ams.samples.auth.ShoppingAuthorizations;
 import com.sap.cloud.security.ams.samples.db.SimpleDatabase;
 import com.sap.cloud.security.ams.samples.model.Order;
 import com.sap.cloud.security.ams.samples.model.Product;
@@ -22,6 +21,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.stream.Collectors;
+
+import static com.sap.cloud.security.ams.samples.auth.Role.*;
 
 /**
  * Service for handling order-related operations
@@ -146,12 +147,10 @@ public class OrdersService {
             double totalAmount = product.getPrice() * quantity;
 
             // --- ENTITY-SPECIFIC PRIVILEGE CHECK IN HANDLER ---
-            Authorizations authorizations = authHandler.getAuthorizations();
-            Decision decision = authorizations.checkPrivilege(
-                    Role.CREATE_ORDERS.getAction(),
-                    Role.CREATE_ORDERS.getResource(),
-                    Map.of(AmsAttributes.PRODUCT_CATEGORY, product.getCategory(),
-                            AmsAttributes.ORDER_TOTAL, totalAmount));
+            ShoppingAuthorizations authorizations = authHandler.getAuthorizations();
+            Decision decision = authorizations.checkCreateOrder(
+                    product.getCategory(),
+                    totalAmount);
             if (!decision.isGranted()) {
                 throw new ForbiddenResponse();
             }
@@ -191,10 +190,8 @@ public class OrdersService {
 
             logger.debug("Processing GET /orders request");
 
-            Authorizations authorizations = authHandler.getAuthorizations();
-            Decision decision = authorizations.checkPrivilege(
-                    Role.READ_ORDERS.getAction(),
-                    Role.READ_ORDERS.getResource());
+            ShoppingAuthorizations authorizations = authHandler.getAuthorizations();
+            Decision decision = authorizations.checkRole(READ_ORDERS);
 
             List<Order> orders;
             if (decision.isDenied()) {
@@ -234,10 +231,7 @@ public class OrdersService {
                 // Alternative 2: Showcases loop-based authorization check (for small resource
                 // sets)
                 orders = database.getOrders().stream()
-                        .filter(order -> authorizations.checkPrivilege(
-                                Role.READ_ORDERS.getAction(),
-                                Role.READ_ORDERS.getResource(),
-                                Map.of(AmsAttributes.ORDER_CREATED_BY, order.getCreatedBy())).isGranted())
+                        .filter(order -> authorizations.checkReadOrder(order.getCreatedBy()).isGranted())
                         .collect(Collectors.toList());
             }
 
