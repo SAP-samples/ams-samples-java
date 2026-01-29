@@ -33,6 +33,12 @@ cds:
     auto-config:
       enabled: false
 
+sap:
+  spring:
+    security:
+      identity:
+        prooftoken: false
+
 management:
   endpoint:
     health:
