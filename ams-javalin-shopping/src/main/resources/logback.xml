@@ -27,6 +27,5 @@
     <logger name="com.sap.cloud.security.ams.samples" level="INFO" />
     
     <!-- SAP AMS client library messages -->
-    <logger name="com.sap.cloud.security.ams.v4" level="DEBUG" />
-    
+    <logger name="com.sap.cloud.security.ams" level="DEBUG" />
 </configuration>
