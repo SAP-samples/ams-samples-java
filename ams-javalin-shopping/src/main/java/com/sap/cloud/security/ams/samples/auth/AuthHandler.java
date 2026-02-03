@@ -1,14 +1,14 @@
 package com.sap.cloud.security.ams.samples.auth;
 
 import java.io.*;
-import java.nio.file.Paths;
+import java.util.Collections;
 import java.util.Set;
 
 import com.sap.cloud.environment.servicebinding.api.DefaultServiceBindingAccessor;
 import com.sap.cloud.environment.servicebinding.api.ServiceBinding;
 import com.sap.cloud.security.ams.api.*;
-import com.sap.cloud.security.ams.config.CloudAuthorizationManagementServiceConfig;
 import com.sap.cloud.security.ams.core.*;
+import com.sap.cloud.security.ams.dcn.PolicyName;
 import com.sap.cloud.security.config.*;
 import com.sap.cloud.security.servlet.*;
 import com.sap.cloud.security.token.SecurityContext;
@@ -61,20 +61,20 @@ public class AuthHandler implements Handler {
 
     private IasAuthorizationsProvider<ShoppingAuthorizations> createAuthProvider() {
         return IasAuthorizationsProvider.create(ams, ShoppingAuthorizations::of)
-                .withApiMapper(ApiMapper.ofFunction((String api) -> {
+                .withApiMapper((String api, Principal principal) -> {
                     if (TECHNICAL_USER_APIS.contains(api)) {
-                        return Set.of(String.format("internal.%s", api));
+                        return Set.of(PolicyName.ofSegments("internal", api));
                     } else {
-                        return null;
+                        return Collections.emptySet();
                     }
-                }), App2AppFlow.TECHNICAL_USER)
-                .withApiMapper(ApiMapper.ofFunction((String api) -> {
+                }, App2AppFlow.TECHNICAL_USER)
+                .withApiMapper((String api, Principal principal) -> {
                     if (PRINCIPAL_PROPAGATION_APIS.contains(api)) {
-                        return Set.of(String.format("internal.%s", api));
+                        return Set.of(PolicyName.ofSegments("internal", api));
                     } else {
-                        return null;
+                        return Collections.emptySet();
                     }
-                }), App2AppFlow.FILTERED_PRINCIPAL_PROPAGATION);
+                }, App2AppFlow.FILTERED_PRINCIPAL_PROPAGATION);
     }
 
     public AuthorizationManagementService getAmsClient() {
@@ -82,7 +82,7 @@ public class AuthHandler implements Handler {
     }
 
     @Override
-    public void handle(Context ctx) throws Exception {
+    public void handle(Context ctx) {
         LOG.debug("Handling path: {}", ctx.path());
 
         if (ctx.routeRoles().isEmpty()) {

@@ -3,6 +3,7 @@ package com.sap.cloud.security.ams.samples.config;
 import com.sap.cloud.security.ams.api.ApiMapper;
 import com.sap.cloud.security.ams.api.Principal;
 import com.sap.cloud.security.ams.core.IasAuthorizationsProvider;
+import com.sap.cloud.security.ams.dcn.PolicyName;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Configuration;
@@ -26,45 +27,32 @@ import static com.sap.cloud.security.ams.api.App2AppFlow.TECHNICAL_USER;
  */
 @Configuration
 public class App2AppAuthorizationConfiguration implements BeanPostProcessor {
+    private final Set<String> TECHNICAL_USER_APIS = Set.of("GetProducts");
+    private final Set<String> PRINCIPAL_PROPAGATION_APIS = Set.of("GetProducts", "ExternalOrder");
 
     @Override
     public Object postProcessBeforeInitialization(@NonNull Object bean, @NonNull String beanName) throws BeansException {
         if (bean instanceof IasAuthorizationsProvider<?> provider) {
-            final ApiMapper PRINCIPAL_PROPAGATION_API_MAPPER = getPrincipalPropagationApiMapper();
-            final ApiMapper TECHNICAL_USER_API_MAPPER = getTechnicalUserApiMapper();
+            final ApiMapper TECHNICAL_USER_API_MAPPER = (String api, Principal principal) -> {
+                if (TECHNICAL_USER_APIS.contains(api)) {
+                    return Set.of(PolicyName.ofSegments("internal", api));
+                } else {
+                    return Collections.emptySet();
+                }
+            };
+            final ApiMapper PRINCIPAL_PROPAGATION_API_MAPPER = (String api, Principal principal) -> {
+                if (PRINCIPAL_PROPAGATION_APIS.contains(api)) {
+                    return Set.of(PolicyName.ofSegments("internal", api));
+                } else {
+                    return Collections.emptySet();
+                }
+            };
 
-            provider.withApiMapper(TECHNICAL_USER_API_MAPPER, TECHNICAL_USER)
+            provider
+                    .withApiMapper(TECHNICAL_USER_API_MAPPER, TECHNICAL_USER)
                     .withApiMapper(PRINCIPAL_PROPAGATION_API_MAPPER, FILTERED_PRINCIPAL_PROPAGATION);
         }
         return bean;
-    }
-
-    /**
-     * This method showcases the definition of an ApiMapper based on an explicit Map data structure.
-     *
-     * @return an ApiMapper that maps principal propagation APIs to internal policies with the same name in the "internal" DCL package.
-     */
-    private ApiMapper getPrincipalPropagationApiMapper() {
-        final Map<String, Set<String>> PRINCIPAL_PROPAGATION_API_TO_POLICY = Map.of(
-                "GetProducts", Set.of("internal.GetProducts"),
-                "ExternalOrder", Set.of("internal.ExternalOrder"));
-        return ApiMapper.ofMap(PRINCIPAL_PROPAGATION_API_TO_POLICY);
-    }
-
-    /**
-     * This method showcases the definition of an ApiMapper with a lambda implementation.
-     *
-     * @return an ApiMapper that maps technical user APIs to internal policies with the same name in the "internal" DCL package.
-     */
-    private static ApiMapper getTechnicalUserApiMapper() {
-        final Set<String> TECHNICAL_USER_APIS = Set.of("GetProducts");
-        return (String api, Principal principal) -> {
-            if (TECHNICAL_USER_APIS.contains(api)) {
-                return Set.of(String.format("internal.%s", api));
-            } else {
-                return Collections.emptySet();
-            }
-        };
     }
 }
 
