@@ -231,7 +231,7 @@ public class OrdersService {
                 // Alternative 2: Showcases loop-based authorization check (for small resource
                 // sets)
                 orders = database.getOrders().stream()
-                        .filter(order -> authorizations.checkReadOrder(order.getCreatedBy()).isGranted())
+                        .filter(order -> decision.apply(Map.of(AmsAttributes.ORDER_CREATED_BY, order.getCreatedBy())).isGranted())
                         .collect(Collectors.toList());
             }
 
