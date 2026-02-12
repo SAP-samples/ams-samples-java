@@ -2,7 +2,7 @@ package com.sap.cloud.security.ams.samples.service;
 
 import java.util.List;
 
-import com.sap.cloud.security.ams.spring.authorization.annotations.CheckPrivilege;
+import com.sap.cloud.security.ams.spring.annotations.CheckPrivilege;
 import org.slf4j.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;

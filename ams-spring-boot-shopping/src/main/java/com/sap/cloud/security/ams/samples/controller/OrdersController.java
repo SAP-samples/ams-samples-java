@@ -1,11 +1,10 @@
 package com.sap.cloud.security.ams.samples.controller;
 
 import java.util.List;
-import java.util.Optional;
 
 import com.sap.cloud.security.ams.samples.model.Product;
 import com.sap.cloud.security.ams.samples.service.ProductsService;
-import com.sap.cloud.security.ams.spring.authorization.annotations.PrecheckPrivilege;
+import com.sap.cloud.security.ams.spring.annotations.PrecheckPrivilege;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;

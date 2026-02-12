@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 
 import com.sap.cloud.security.ams.samples.db.SimpleDatabase;
 import com.sap.cloud.security.ams.samples.model.*;
-import com.sap.cloud.security.ams.spring.authorization.annotations.AmsAttribute;
-import com.sap.cloud.security.ams.spring.authorization.annotations.CheckPrivilege;
-import com.sap.cloud.security.ams.spring.authorization.annotations.PrecheckPrivilege;
+import com.sap.cloud.security.ams.spring.annotations.AmsAttribute;
+import com.sap.cloud.security.ams.spring.annotations.CheckPrivilege;
+import com.sap.cloud.security.ams.spring.annotations.PrecheckPrivilege;
 import com.sap.cloud.security.ams.api.*;
 import com.sap.cloud.security.ams.dcn.visitor.SqlExtractor;
 import com.sap.cloud.security.ams.dcn.visitor.SqlExtractor.SqlResult;
