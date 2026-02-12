@@ -1,6 +1,6 @@
 package com.sap.cloud.security.ams.samples.config;
 
-import com.sap.cloud.security.ams.spring.authorization.AmsRouteSecurity;
+import com.sap.cloud.security.ams.spring.AmsRouteSecurity;
 import com.sap.cloud.security.spring.config.IdentityServicesPropertySourceFactory;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
