@@ -20,35 +20,38 @@ import com.sap.cloud.security.ams.api.Privilege;
 
 import org.junit.jupiter.api.*;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.context.annotation.Import;
 import org.springframework.http.MediaType;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.test.web.servlet.setup.MockMvcBuilders;
+import org.springframework.web.context.WebApplicationContext;
+import static org.springframework.security.test.web.servlet.setup.SecurityMockMvcConfigurers.springSecurity;
+
 
 /**
  * Integration tests for the Spring Boot Shopping application
  */
 @SpringBootTest
-@AutoConfigureMockMvc
 @ActiveProfiles("test")
 @Import(TestSecurityConfiguration.class)
 class ApplicationTest {
 
+    private static MockMvc mockMvc;
+    private static ObjectMapper objectMapper;
+
     @Autowired
-    private MockMvc mockMvc;
+    private WebApplicationContext webApplicationContext;
 
     @Autowired
     private SimpleDatabase database;
 
-    private ObjectMapper objectMapper;
+    @BeforeAll
+    static void setUpAll(@Autowired WebApplicationContext wac) {
+        // @AutoConfigureMockMvc is not backward-compatible from Spring Boot 3 to 4 but this is
+        mockMvc = MockMvcBuilders.webAppContextSetup(wac).apply(springSecurity()).build();
 
-    @BeforeEach
-    void setUp() {
-        // Reset database to initial state before each test to ensure test independence
-        database.reset();
-        
         // Configure ObjectMapper with custom deserializer for Privilege class
         objectMapper = new ObjectMapper();
         SimpleModule module = new SimpleModule();
@@ -60,6 +63,12 @@ class ApplicationTest {
             }
         });
         objectMapper.registerModule(module);
+    }
+
+    @BeforeEach
+    void setUp() {
+        // Reset database to initial state before each test to ensure test independence
+        database.reset();
     }
 
     // Health endpoint test
