@@ -34,8 +34,8 @@
 
         <!-- SAP AMS Client -->
         <dependency>
-            <groupId>com.sap.cloud.security.ams.client</groupId>
-            <artifactId>jakarta-ams</artifactId>
+            <groupId>com.sap.cloud.security.ams</groupId>
+            <artifactId>ams-core</artifactId>
             <version>${sap.cloud.security.ams.version}</version>
         </dependency>
 

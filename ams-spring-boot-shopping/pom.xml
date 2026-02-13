@@ -81,8 +81,13 @@
 
         <!-- SAP AMS -->
         <dependency>
-            <groupId>com.sap.cloud.security.ams.client</groupId>
-            <artifactId>spring-boot-3-starter-ams</artifactId>
+            <groupId>com.sap.cloud.security.ams</groupId>
+            <artifactId>spring-boot-starter-ams</artifactId>
+            <version>${sap.cloud.security.ams.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>com.sap.cloud.security.ams</groupId>
+            <artifactId>spring-boot-3-starter-ams-health</artifactId>
             <version>${sap.cloud.security.ams.version}</version>
         </dependency>
 
@@ -134,7 +139,7 @@
         </dependency>
 
         <dependency>
-            <groupId>com.sap.cloud.security.ams.client</groupId>
+            <groupId>com.sap.cloud.security.ams</groupId>
             <artifactId>spring-boot-starter-ams-test</artifactId>
             <version>${sap.cloud.security.ams.version}</version>
             <scope>test</scope>
