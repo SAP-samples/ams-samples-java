@@ -45,6 +45,15 @@
 				<type>pom</type>
 				<scope>import</scope>
 			</dependency>
+
+			<!-- SAP AMS -->
+			<dependency>
+				<groupId>com.sap.cloud.security.ams</groupId>
+				<artifactId>ams-bom</artifactId>
+				<version>${sap.cloud.security.ams.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
