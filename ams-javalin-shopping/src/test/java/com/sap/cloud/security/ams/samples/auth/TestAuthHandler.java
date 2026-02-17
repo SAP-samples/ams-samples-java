@@ -50,7 +50,7 @@ public class TestAuthHandler extends AuthHandler {
             LocalAuthorizationManagementServiceConfig amsTestConfig = new LocalAuthorizationManagementServiceConfig()
                     .withPolicyAssignmentsPath(Path.of("src", "test", "resources", "mockPolicyAssignments.json"));
             AuthorizationManagementService ams = AuthorizationManagementServiceFactory
-                    .fromLocalDcn(Path.of("target", "generated-test-sources", "ams", "dcn").toString(), amsTestConfig);
+                    .fromLocalDcn(Path.of("target", "classes", "ams", "dcn"), amsTestConfig);
 
             ams.whenReady().get(3, TimeUnit.SECONDS);
 

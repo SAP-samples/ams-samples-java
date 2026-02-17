@@ -6,7 +6,6 @@ sap:
   spring:
     ams:
       test:
-        dcn-root: target/generated-test-sources/dcn
         default-tenant: provider
         policy-assignments:
           tenant1:

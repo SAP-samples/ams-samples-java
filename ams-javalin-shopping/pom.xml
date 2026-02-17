@@ -227,7 +227,7 @@
                         <configuration>
                             <arguments>--package=@sap/ams-dev@2.2.0 compile-dcl
                                 -d src/main/resources/ams/dcl -o
-                                target/generated-test-sources/ams/dcn
+                                target/classes/ams/dcn
                             </arguments>
                         </configuration>
                     </execution>
