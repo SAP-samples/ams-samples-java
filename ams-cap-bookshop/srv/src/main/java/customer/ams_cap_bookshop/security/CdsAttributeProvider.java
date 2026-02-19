@@ -1,7 +1,7 @@
 package customer.ams_cap_bookshop.security;
 
 import com.sap.cds.reflect.CdsEntity;
-import com.sap.cloud.security.ams.api.AttributeName;
+import com.sap.cloud.security.ams.api.expression.AttributeName;
 import org.springframework.stereotype.Component;
 
 import java.util.Map;

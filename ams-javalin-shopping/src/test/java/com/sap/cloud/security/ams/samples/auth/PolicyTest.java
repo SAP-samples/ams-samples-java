@@ -2,7 +2,7 @@ package com.sap.cloud.security.ams.samples.auth;
 
 import com.sap.cloud.security.ams.AmsTestExtension;
 import com.sap.cloud.security.ams.TestAuthorizationsProvider;
-import com.sap.cloud.security.ams.api.AttributeName;
+import com.sap.cloud.security.ams.api.expression.AttributeName;
 import com.sap.cloud.security.ams.api.Authorizations;
 import com.sap.cloud.security.ams.api.DecisionResult;
 import org.junit.jupiter.api.BeforeAll;

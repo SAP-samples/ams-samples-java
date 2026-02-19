@@ -2,7 +2,7 @@ package com.sap.cloud.security.ams.samples.service;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.sap.cloud.security.ams.api.AttributeName;
+import com.sap.cloud.security.ams.api.expression.AttributeName;
 import com.sap.cloud.security.ams.api.Decision;
 import com.sap.cloud.security.ams.dcn.visitor.SqlExtractor;
 import com.sap.cloud.security.ams.samples.auth.AmsAttributes;
@@ -106,17 +106,17 @@ public class OrdersService {
              * The following privilege check is equivalent to the *pre*-check already done
              * via the AuthHandler for POST /orders.
              * Doing the check here or via the AuthHandler is a matter of preference.
-             * 
+             *
              * This check ensures that the service logic executes only if the authorization
              * is granted or depends on a condition.
              * It leads to an early exit with status code 403 if the authorization is
              * unconditionally denied.
-             * 
+             *
              * Authorizations authorizations = authHandler.getAuthorizations();
              * if (authorizations.checkPrivilege("create", "orders").isDenied()) {
              * throw new ForbiddenResponse();
              * }
-             * 
+             *
              * This pattern should be used when the authorization is expected to depend on a
              * condition.
              */
@@ -183,7 +183,7 @@ public class OrdersService {
              * 1. The authorization is unconditionally denied.
              * 2. The authorization is unconditionally granted.
              * 3. The authorization depends on a condition.
-             * 
+             *
              * This pattern should be used when the authorization is expected to potentially
              * (but not necessarily) depend on a condition.
              */
@@ -209,13 +209,13 @@ public class OrdersService {
                  * with parameters for use in an SQL prepared statement.
                  * In this sample though, the data lies in Java collections instead of a
                  * database, so we demonstrate two approaches:
-                 * 
+                 *
                  * 1. SqlExtractor: Transforms DCN to SQL condition template
                  * - Maps AMS attribute names to database field references, e.g.
                  * "$app.order.createdBy" to "createdBy"
                  * - Generates parameterized SQL WHERE clause templates for use with prepared
                  * statements
-                 * 
+                 *
                  * 2. Loop-based filtering: For small resource sets, evaluates the condition for
                  * each entity individually.
                  * - Checks authorization per entity using the actual entity's attribute values

@@ -1,6 +1,6 @@
 package com.sap.cloud.security.ams.samples.config;
 
-import com.sap.cloud.security.ams.api.AttributeName;
+import com.sap.cloud.security.ams.api.expression.AttributeName;
 
 public class AmsAttributes {
     public static final AttributeName PRODUCT_CATEGORY = AttributeName.of("product.category");

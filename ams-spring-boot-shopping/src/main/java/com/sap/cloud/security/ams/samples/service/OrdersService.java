@@ -6,6 +6,7 @@ import static com.sap.cloud.security.ams.samples.config.Privileges.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
+import com.sap.cloud.security.ams.api.expression.AttributeName;
 import com.sap.cloud.security.ams.samples.db.SimpleDatabase;
 import com.sap.cloud.security.ams.samples.model.*;
 import com.sap.cloud.security.ams.spring.annotations.AmsAttribute;
@@ -49,11 +50,11 @@ public class OrdersService {
 
     /**
      * Delete an order
-     * 
+     *
      * <p>
      * Uses simple authorization check without contextual attributes.
      */
-    @CheckPrivilege(action="delete", resource="orders")
+    @CheckPrivilege(action = "delete", resource = "orders")
     public void deleteOrder(int orderId) {
         /*
          * --- SHOWCASES CONTEXT-FREE AMS AUTHORIZATION CHECK ---
@@ -92,19 +93,19 @@ public class OrdersService {
     /**
      * Performs an order creation, secured with instance-based authorization.
      *
-     * @param product the product
-     * @param quantity the quantity
-     * @param totalAmount the calculated total amount (used for authorization)
+     * @param product         the product
+     * @param quantity        the quantity
+     * @param totalAmount     the calculated total amount (used for authorization)
      * @param productCategory the product category (used for authorization)
      * @return the created order
      */
-    @CheckPrivilege(action="create", resource="orders")
+    @CheckPrivilege(action = "create", resource = "orders")
     public Order createOrder(
             Product product,
             int quantity,
-            @AmsAttribute(name="order.total") double totalAmount,
-            @AmsAttribute(name="product.category") String productCategory) {
-        if(!Objects.equals(product.getCategory(), productCategory)) {
+            @AmsAttribute(name = "order.total") double totalAmount,
+            @AmsAttribute(name = "product.category") String productCategory) {
+        if (!Objects.equals(product.getCategory(), productCategory)) {
             throw new IllegalArgumentException("Authorization attribute for product category does not match the product");
         }
 
@@ -144,7 +145,7 @@ public class OrdersService {
 
     /**
      * Get all orders with conditional filtering based on AMS policies
-     * 
+     *
      * <p>
      * This method handles three authorization scenarios:
      * <ul>
@@ -154,7 +155,7 @@ public class OrdersService {
      * only see their own orders)</li>
      * </ul>
      */
-    @PrecheckPrivilege(action="read", resource="orders")
+    @PrecheckPrivilege(action = "read", resource = "orders")
     public List<Order> getOrders() {
         /*
          * --- SHOWCASES CONTEXTUAL AMS AUTHORIZATION CHECK FOR A SET OF ENTITIES
