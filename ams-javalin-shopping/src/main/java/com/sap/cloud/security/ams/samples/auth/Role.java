@@ -1,5 +1,6 @@
 package com.sap.cloud.security.ams.samples.auth;
 
+import com.sap.cloud.security.ams.api.Privilege;
 import io.javalin.security.RouteRole;
 
 public enum Role implements RouteRole {
@@ -12,15 +13,16 @@ public enum Role implements RouteRole {
 
     private final String action;
     private final String resource;
+    private final Privilege privilege;
 
     Role(String action, String resource) {
         this.action = action;
         this.resource = resource;
+        this.privilege = Privilege.of(action, resource);
     }
 
     Role() {
-        this.action = null;
-        this.resource = null;
+        this(null, null);
     }
 
     public String getAction() {
@@ -37,5 +39,9 @@ public enum Role implements RouteRole {
         }
 
         return resource;
+    }
+
+    public Privilege asPrivilege() {
+        return privilege;
     }
 }

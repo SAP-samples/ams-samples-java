@@ -1,24 +1,26 @@
 package com.sap.cloud.security.ams.samples.auth;
 
-import java.nio.file.Path;
-import java.util.concurrent.*;
-
-import org.slf4j.*;
-
 import com.sap.cloud.security.ams.api.AuthorizationManagementService;
 import com.sap.cloud.security.ams.config.LocalAuthorizationManagementServiceConfig;
 import com.sap.cloud.security.ams.core.AuthorizationManagementServiceFactory;
-import com.sap.cloud.security.token.*;
-import com.sap.cloud.security.xsuaa.jwt.*;
-
+import com.sap.cloud.security.token.SapIdToken;
+import com.sap.cloud.security.token.SecurityContext;
+import com.sap.cloud.security.xsuaa.jwt.Base64JwtDecoder;
+import com.sap.cloud.security.xsuaa.jwt.DecodedJwt;
 import io.javalin.http.Context;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.nio.file.Path;
+import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 /**
  * Authentication handler for testing
  */
 public class TestAuthHandler extends AuthHandler {
     private static final Logger LOG = LoggerFactory.getLogger(TestAuthHandler.class);
-    private Base64JwtDecoder jwtDecoder;
+    private final Base64JwtDecoder jwtDecoder;
 
     public TestAuthHandler() {
         super();
@@ -48,9 +50,9 @@ public class TestAuthHandler extends AuthHandler {
     public AuthorizationManagementService createAmsClient() {
         try {
             LocalAuthorizationManagementServiceConfig amsTestConfig = new LocalAuthorizationManagementServiceConfig()
-                    .withPolicyAssignmentsPath(Path.of("src", "test", "resources", "mockPolicyAssignments.json"));
+                    .withPolicyAssignmentsPath(Path.of("src/test/resources/mockPolicyAssignments.json"));
             AuthorizationManagementService ams = AuthorizationManagementServiceFactory
-                    .fromLocalDcn(Path.of("target", "classes", "ams", "dcn"), amsTestConfig);
+                    .fromLocalDcn(Path.of("target/generated-test-resources/ams/dcn"), amsTestConfig);
 
             ams.whenReady().get(3, TimeUnit.SECONDS);
 
