@@ -100,7 +100,7 @@
         <!-- SAP AMS Client -->
         <dependency>
             <groupId>com.sap.cloud.security.ams</groupId>
-            <artifactId>core-ams</artifactId>
+            <artifactId>ams-core</artifactId>
         </dependency>
 
         <!-- JSON Processing -->
