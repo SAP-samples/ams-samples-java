@@ -1,22 +1,27 @@
 package com.sap.cloud.security.ams.samples.auth;
 
-import java.io.*;
-import java.util.Collections;
-import java.util.Set;
-
 import com.sap.cloud.environment.servicebinding.api.DefaultServiceBindingAccessor;
 import com.sap.cloud.environment.servicebinding.api.ServiceBinding;
-import com.sap.cloud.security.ams.api.*;
-import com.sap.cloud.security.ams.core.*;
+import com.sap.cloud.security.ams.api.App2AppFlow;
+import com.sap.cloud.security.ams.api.AuthorizationManagementService;
+import com.sap.cloud.security.ams.api.Principal;
+import com.sap.cloud.security.ams.core.IasAuthorizationsProvider;
 import com.sap.cloud.security.ams.dcn.PolicyName;
-import com.sap.cloud.security.config.*;
-import com.sap.cloud.security.servlet.*;
+import com.sap.cloud.security.config.Environments;
+import com.sap.cloud.security.servlet.IasTokenAuthenticator;
+import com.sap.cloud.security.servlet.TokenAuthenticationResult;
+import com.sap.cloud.security.servlet.TokenAuthenticator;
 import com.sap.cloud.security.token.SecurityContext;
-
-import org.slf4j.*;
-
-import io.javalin.http.*;
+import io.javalin.http.Context;
+import io.javalin.http.ForbiddenResponse;
+import io.javalin.http.Handler;
+import io.javalin.http.UnauthorizedResponse;
 import io.javalin.security.RouteRole;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Collections;
+import java.util.Set;
 
 import static com.sap.cloud.security.ams.api.Principal.fromSecurityContext;
 
@@ -26,7 +31,7 @@ import static com.sap.cloud.security.ams.api.Principal.fromSecurityContext;
  */
 public class AuthHandler implements Handler {
     private static final Logger LOG = LoggerFactory.getLogger(AuthHandler.class);
-	private TokenAuthenticator authenticator;
+    private TokenAuthenticator authenticator;
     protected final AuthorizationManagementService ams;
     protected final IasAuthorizationsProvider<ShoppingAuthorizations> authProvider;
 
@@ -37,7 +42,7 @@ public class AuthHandler implements Handler {
     }
 
     protected void setupAuthentication() {
-		this.authenticator = new IasTokenAuthenticator().withServiceConfiguration(
+        this.authenticator = new IasTokenAuthenticator().withServiceConfiguration(
                 Environments.getCurrent().getIasConfiguration()
         );
     }
@@ -53,7 +58,7 @@ public class AuthHandler implements Handler {
                     "No SAP Identity Service credentials found in identityBinding. Refer to the documentation for a local test setup.");
         }
 
-        return AuthorizationManagementServiceFactory.fromIdentityServiceBinding(identityBinding);
+        return AuthorizationManagementService.fromIdentityServiceBinding(identityBinding);
     }
 
     private static final Set<String> TECHNICAL_USER_APIS = Set.of("GetProducts");

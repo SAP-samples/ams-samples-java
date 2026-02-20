@@ -2,7 +2,6 @@ package com.sap.cloud.security.ams.samples.auth;
 
 import com.sap.cloud.security.ams.api.AuthorizationManagementService;
 import com.sap.cloud.security.ams.config.LocalAuthorizationManagementServiceConfig;
-import com.sap.cloud.security.ams.core.AuthorizationManagementServiceFactory;
 import com.sap.cloud.security.token.SapIdToken;
 import com.sap.cloud.security.token.SecurityContext;
 import com.sap.cloud.security.xsuaa.jwt.Base64JwtDecoder;
@@ -51,7 +50,7 @@ public class TestAuthHandler extends AuthHandler {
         try {
             LocalAuthorizationManagementServiceConfig amsTestConfig = new LocalAuthorizationManagementServiceConfig()
                     .withPolicyAssignmentsPath(Path.of("src/test/resources/mockPolicyAssignments.json"));
-            AuthorizationManagementService ams = AuthorizationManagementServiceFactory
+            AuthorizationManagementService ams = AuthorizationManagementService
                     .fromLocalDcn(Path.of("target/generated-test-resources/ams/dcn"), amsTestConfig);
 
             ams.whenReady().get(3, TimeUnit.SECONDS);
