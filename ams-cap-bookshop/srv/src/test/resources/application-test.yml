@@ -1,1 +1,6 @@
 debug: true
+logging.level:
+  com.sap.cds.security.authorization: TRACE
+  com.sap.cloud.security.ams: TRACE
+  com.sap.cloud.security.ams.samples: TRACE
+  com.sap.cloud.security.ams.cap: TRACE
