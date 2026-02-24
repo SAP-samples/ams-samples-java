@@ -1,4 +1,3 @@
-
 ---
 spring:
   config:
@@ -14,7 +13,7 @@ cds:
         admin:
           password: admin
           roles:
-          - admin
+            - admin
         user:
           password: user
         content-manager:
@@ -65,7 +64,7 @@ logging:
         cds:
           security:
             authorization: TRACE
-    com.sap.cloud.security.ams: DEBUG
+    com.sap.cloud.security.ams: TRACE
     com.sap.cloud.security.ams.samples: DEBUG
     com.sap.cloud.security.ams.cap: DEBUG
 ---
