@@ -3,18 +3,17 @@ spring:
     name: ams-spring-boot-shopping
 
 sap:
-  spring:
-    ams:
-      test:
-        default-tenant: provider
-        policy-assignments:
-          tenant1:
-            alice:
-              - shopping.CreateOrders
-              - shopping.DeleteOrders
-          tenant2:
-            bob:
-              - local.OrderAccessory
+  ams:
+    test:
+      default-tenant: provider
+      policy-assignments:
+        tenant1:
+          alice:
+            - shopping.CreateOrders
+            - shopping.DeleteOrders
+        tenant2:
+          bob:
+            - local.OrderAccessory
 
 logging:
   level:
