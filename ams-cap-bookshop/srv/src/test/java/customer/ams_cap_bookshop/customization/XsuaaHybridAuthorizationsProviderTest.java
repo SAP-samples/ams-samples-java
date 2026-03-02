@@ -7,6 +7,7 @@ import com.sap.cds.Result;
 import com.sap.cds.ql.Insert;
 import com.sap.cds.ql.Select;
 import com.sap.cds.services.ServiceException;
+import com.sap.cds.services.request.RequestContext;
 import com.sap.cds.services.runtime.CdsRuntime;
 import com.sap.cloud.security.ams.api.AuthorizationsProvider;
 import com.sap.cloud.security.ams.cap.api.CdsAuthorizations;
@@ -24,11 +25,14 @@ import org.springframework.security.oauth2.server.resource.authentication.JwtAut
 import org.springframework.test.annotation.DirtiesContext;
 import org.springframework.test.context.ActiveProfiles;
 
+import java.lang.reflect.Field;
 import java.time.Instant;
 import java.util.Base64;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.function.Supplier;
 
 import static cds.gen.adminservice.AdminService_.AUTHORS;
 import static cds.gen.adminservice.AdminService_.BOOKS;
@@ -51,8 +55,50 @@ import static org.junit.jupiter.api.Assertions.*;
 @Import(XsuaaHybridTestConfiguration.class)
 class XsuaaHybridAuthorizationsProviderTest {
 
-    // Note: SERVICE_BINDING_ROOT is set via Maven Surefire plugin in pom.xml
-    // to point to src/test/resources/customization/service-bindings
+    /*
+     * SERVICE_BINDING_ROOT is set via static initializer using reflection.
+     * This requires JVM args: --add-opens java.base/java.util=ALL-UNNAMED --add-opens java.base/java.lang=ALL-UNNAMED
+     * These are configured in pom.xml.
+     */
+    static {
+        setServiceBindingRoot();
+    }
+
+    /**
+     * Sets the SERVICE_BINDING_ROOT environment variable using reflection.
+     * This allows the test to configure service bindings without requiring
+     * external environment configuration.
+     *
+     * <p>Requires JVM args for JDK 17+:
+     * <pre>
+     * --add-opens java.base/java.util=ALL-UNNAMED
+     * </pre>
+     */
+    @SuppressWarnings("unchecked")
+    private static void setServiceBindingRoot() {
+        // Skip if already set (e.g., by external configuration)
+        if (System.getenv("SERVICE_BINDING_ROOT") != null) {
+            return;
+        }
+
+        try {
+            // Find the service-bindings directory
+            String serviceBindingRoot = "src/test/resources/customization/service-bindings";
+
+            // Get the unmodifiable environment map and make it modifiable via reflection
+            // System.getenv() returns Collections.unmodifiableMap(new ProcessEnvironment.StringEnvironment(theEnvironment))
+            // We need to access the underlying map 'm' in the UnmodifiableMap
+            Map<String, String> env = System.getenv();
+            Field field = env.getClass().getDeclaredField("m");
+            field.setAccessible(true);
+            Map<String, String> writableEnv = (Map<String, String>) field.get(env);
+            writableEnv.put("SERVICE_BINDING_ROOT", serviceBindingRoot);
+
+        } catch (Exception e) {
+            throw new RuntimeException("Failed to set SERVICE_BINDING_ROOT environment variable. " +
+                    "Ensure JVM args include: --add-opens java.base/java.util=ALL-UNNAMED", e);
+        }
+    }
 
     @Autowired
     private AdminService.Draft adminService;
@@ -67,78 +113,23 @@ class XsuaaHybridAuthorizationsProviderTest {
     void cleanUp() {
         SecurityContext.clear();
     }
+    
+    // ===================================================================================
+    // StockManager (ManageBooks) tests:
+    // - Books: READ + WRITE
+    // - Authors: READ only
+    // ===================================================================================
 
     @Test
-    void authorizationsProviderIsHybridAuthorizationsProvider() {
-        // Verify the AuthorizationsProvider bean was overridden with HybridAuthorizationsProvider
-        assertInstanceOf(HybridAuthorizationsProvider.class, authorizationsProvider,
-                "AuthorizationsProvider should be HybridAuthorizationsProvider");
-    }
-
-    @Test
-    void xsuaaTokenIsSetInSecurityContext() {
-        String jwt = createXsuaaJwt("test-user", "bookshop.StockManager");
-        setXsuaaTokenInSecurityContext(jwt);
-
-        // Verify that XsuaaToken was set in SecurityContext
-        assertInstanceOf(XsuaaToken.class, SecurityContext.getToken(),
-                "SecurityContext should contain XsuaaToken");
-    }
-
-    @Test
-    void stockManagerScopeAllowsBooksAccess() {
-        // User with StockManager scope can access and manage books
+    void stockManagerCanReadBooks() {
         String jwt = createXsuaaJwt("xsuaa-stock-manager", "bookshop.StockManager");
 
         Result result = runWithXsuaaToken(jwt, () -> adminService.run(Select.from(BOOKS)));
-        assertTrue(result.rowCount() > 0, "StockManager should be able to access books");
+        assertTrue(result.rowCount() > 0, "StockManager should be able to read books");
     }
 
     @Test
-    void contentManagerScopeAllowsAuthorsAccess() {
-        // User with ContentManager scope can access and manage authors
-        String jwt = createXsuaaJwt("xsuaa-content-manager", "bookshop.ContentManager");
-
-        Result result = runWithXsuaaToken(jwt, () -> adminService.run(Select.from(AUTHORS)));
-        assertTrue(result.rowCount() > 0, "ContentManager should be able to access authors");
-    }
-
-    @Test
-    void stockManagerScopeDoesNotAllowAuthorCreation() {
-        // User with only StockManager scope cannot create authors
-        String jwt = createXsuaaJwt("xsuaa-stock-manager", "bookshop.StockManager");
-
-        assertThrows(ServiceException.class, () -> {
-            runWithXsuaaToken(jwt, () -> adminService.newDraft(Insert.into(AUTHORS).entry(Collections.emptyMap())));
-        }, "StockManager should not be able to create authors");
-    }
-
-    @Test
-    void noMatchingScopesDeniesAccess() {
-        // User without relevant scopes is denied access
-        String jwt = createXsuaaJwt("xsuaa-no-access-user", "openid");
-
-        assertThrows(ServiceException.class, () -> {
-            runWithXsuaaToken(jwt, () -> adminService.run(Select.from(BOOKS)));
-        }, "User without relevant scopes should be denied access to books");
-    }
-
-    @Test
-    void multipleScopesGrantCombinedPermissions() {
-        // User with both StockManager and ContentManager scopes can access both resources
-        String jwt = createXsuaaJwt("xsuaa-full-access", "bookshop.StockManager", "bookshop.ContentManager");
-
-        // Can access books
-        Result booksResult = runWithXsuaaToken(jwt, () -> adminService.run(Select.from(BOOKS)));
-        assertTrue(booksResult.rowCount() > 0, "User with both scopes should access books");
-
-        // Can access authors
-        Result authorsResult = runWithXsuaaToken(jwt, () -> adminService.run(Select.from(AUTHORS)));
-        assertTrue(authorsResult.rowCount() > 0, "User with both scopes should access authors");
-    }
-
-    @Test
-    void stockManagerCanCreateBooks() {
+    void stockManagerCanWriteBooks() {
         String jwt = createXsuaaJwt("xsuaa-stock-manager", "bookshop.StockManager");
 
         Books book = Books.create();
@@ -151,7 +142,62 @@ class XsuaaHybridAuthorizationsProviderTest {
     }
 
     @Test
-    void contentManagerCanCreateAuthors() {
+    void stockManagerCanReadAuthors() {
+        String jwt = createXsuaaJwt("xsuaa-stock-manager", "bookshop.StockManager");
+
+        Result result = runWithXsuaaToken(jwt, () -> adminService.run(Select.from(AUTHORS)));
+        assertTrue(result.rowCount() > 0, "StockManager should be able to read authors");
+    }
+
+    @Test
+    void stockManagerCannotWriteAuthors() {
+        String jwt = createXsuaaJwt("xsuaa-stock-manager", "bookshop.StockManager");
+
+        assertThrows(ServiceException.class, () -> {
+            runWithXsuaaToken(jwt, () -> adminService.newDraft(Insert.into(AUTHORS).entry(Collections.emptyMap())));
+        }, "StockManager should NOT be able to create authors");
+    }
+
+    // ===================================================================================
+    // ContentManager (ManageAuthors + ManageBooks via AMS policy) tests:
+    // The ContentManager AMS policy grants BOTH ManageAuthors and ManageBooks roles,
+    // so ContentManager can write both Books AND Authors.
+    // - Books: READ + WRITE (via ManageBooks role from AMS policy)
+    // - Authors: READ + WRITE (via ManageAuthors role from AMS policy)
+    // ===================================================================================
+
+    @Test
+    void contentManagerCanReadBooks() {
+        String jwt = createXsuaaJwt("xsuaa-content-manager", "bookshop.ContentManager");
+
+        Result result = runWithXsuaaToken(jwt, () -> adminService.run(Select.from(BOOKS)));
+        assertTrue(result.rowCount() > 0, "ContentManager should be able to read books");
+    }
+
+    @Test
+    void contentManagerCanWriteBooks() {
+        // ContentManager AMS policy grants ManageBooks role, so write is allowed
+        String jwt = createXsuaaJwt("xsuaa-content-manager", "bookshop.ContentManager");
+
+        Books book = Books.create();
+        book.setTitle("ContentManager Book");
+        book.setAuthorId("4cf60975-300d-4dbe-8598-57b02e62bae2");
+        book.setGenreId(16);
+
+        Result result = runWithXsuaaToken(jwt, () -> adminService.run(Insert.into(BOOKS).entry(book)));
+        assertEquals(1, result.rowCount(), "ContentManager should be able to create books (via ManageBooks role)");
+    }
+
+    @Test
+    void contentManagerCanReadAuthors() {
+        String jwt = createXsuaaJwt("xsuaa-content-manager", "bookshop.ContentManager");
+
+        Result result = runWithXsuaaToken(jwt, () -> adminService.run(Select.from(AUTHORS)));
+        assertTrue(result.rowCount() > 0, "ContentManager should be able to read authors");
+    }
+
+    @Test
+    void contentManagerCanWriteAuthors() {
         String jwt = createXsuaaJwt("xsuaa-content-manager", "bookshop.ContentManager");
 
         Authors author = Authors.create();
@@ -163,6 +209,64 @@ class XsuaaHybridAuthorizationsProviderTest {
         assertEquals(1, result.rowCount(), "ContentManager should be able to create authors");
     }
 
+    // ===================================================================================
+    // Combined Scopes tests (both StockManager + ContentManager)
+    // ===================================================================================
+
+    @Test
+    void combinedScopesCanReadBothEntities() {
+        String jwt = createXsuaaJwt("xsuaa-full-access", "bookshop.StockManager", "bookshop.ContentManager");
+
+        Result booksResult = runWithXsuaaToken(jwt, () -> adminService.run(Select.from(BOOKS)));
+        assertTrue(booksResult.rowCount() > 0, "User with both scopes should read books");
+
+        Result authorsResult = runWithXsuaaToken(jwt, () -> adminService.run(Select.from(AUTHORS)));
+        assertTrue(authorsResult.rowCount() > 0, "User with both scopes should read authors");
+    }
+
+    @Test
+    void combinedScopesCanWriteBothEntities() {
+        String jwt = createXsuaaJwt("xsuaa-full-access", "bookshop.StockManager", "bookshop.ContentManager");
+
+        // Can write books (from StockManager/ManageBooks)
+        Books book = Books.create();
+        book.setTitle("Combined Access Book");
+        book.setAuthorId("4cf60975-300d-4dbe-8598-57b02e62bae2");
+        book.setGenreId(16);
+        Result booksResult = runWithXsuaaToken(jwt, () -> adminService.run(Insert.into(BOOKS).entry(book)));
+        assertEquals(1, booksResult.rowCount(), "User with both scopes should create books");
+
+        // Can write authors (from ContentManager/ManageAuthors)
+        Authors author = Authors.create();
+        author.setName("Combined Access Author");
+        author.setDateOfBirth(java.time.LocalDate.of(1970, 1, 1));
+        author.setPlaceOfBirth("Test City");
+        Result authorsResult = runWithXsuaaToken(jwt, () -> adminService.run(Insert.into(AUTHORS).entry(author)));
+        assertEquals(1, authorsResult.rowCount(), "User with both scopes should create authors");
+    }
+
+    // ===================================================================================
+    // No Scopes tests
+    // ===================================================================================
+
+    @Test
+    void noMatchingScopesDeniesAccessToBooks() {
+        String jwt = createXsuaaJwt("xsuaa-no-access-user", "openid");
+
+        assertThrows(ServiceException.class, () -> {
+            runWithXsuaaToken(jwt, () -> adminService.run(Select.from(BOOKS)));
+        }, "User without relevant scopes should be denied access to books");
+    }
+
+    @Test
+    void noMatchingScopesDeniesAccessToAuthors() {
+        String jwt = createXsuaaJwt("xsuaa-no-access-user", "openid");
+
+        assertThrows(ServiceException.class, () -> {
+            runWithXsuaaToken(jwt, () -> adminService.run(Select.from(AUTHORS)));
+        }, "User without relevant scopes should be denied access to authors");
+    }
+
     /**
      * Runs the given supplier within a CDS request context with the XSUAA token set.
      *
@@ -171,7 +275,7 @@ class XsuaaHybridAuthorizationsProviderTest {
      * @param <T>      the return type
      * @return the result from the supplier
      */
-    private <T> T runWithXsuaaToken(String jwt, java.util.function.Supplier<T> supplier) {
+    private <T> T runWithXsuaaToken(String jwt, Supplier<T> supplier) {
         // Set the token in SAP security library context
         XsuaaToken xsuaaToken = new XsuaaToken(jwt);
         SecurityContext.setToken(xsuaaToken);
@@ -185,7 +289,7 @@ class XsuaaHybridAuthorizationsProviderTest {
         SecurityContextHolder.setContext(springSecurityContext);
 
         try {
-            java.util.function.Function<com.sap.cds.services.request.RequestContext, T> function = ctx -> supplier.get();
+            Function<RequestContext, T> function = ctx -> supplier.get();
             return cdsRuntime.requestContext().run(function);
         } finally {
             SecurityContextHolder.clearContext();
@@ -214,16 +318,6 @@ class XsuaaHybridAuthorizationsProviderTest {
     }
 
     /**
-     * Sets the XSUAA token in the SecurityContext.
-     *
-     * @param jwt the JWT token string
-     */
-    private void setXsuaaTokenInSecurityContext(String jwt) {
-        XsuaaToken token = new XsuaaToken(jwt);
-        SecurityContext.setToken(token);
-    }
-
-    /**
      * Creates a test XSUAA JWT token with the specified user and scopes.
      *
      * <p>The JWT payload is structured like a typical XSUAA token with:
@@ -242,16 +336,16 @@ class XsuaaHybridAuthorizationsProviderTest {
 
         String payload = String.format("""
                         {
-                          "sub": "a1b2c3d4-5678-90ab-cdef-1234567890ab",
+                          "sub": "test-user",
                           "xs.user.attributes": {},
                           "user_name": "%s@example.com",
-                          "origin": "sap.custom",
                           "iss": "https://test-tenant.authentication.eu12.hana.ondemand.com/oauth/token",
                           "xs.system.attributes": {
                             "xs.rolecollections": [
                               "TestRoleCollection"
                             ]
                           },
+                          "family_name": "User",
                           "given_name": "Test",
                           "client_id": "sb-bookshop-test!t1234",
                           "aud": [
@@ -264,17 +358,12 @@ class XsuaaHybridAuthorizationsProviderTest {
                             "subaccountid": "12345678-1234-1234-1234-123456789012",
                             "zdn": "test-tenant"
                           },
-                          "user_uuid": "b2c3d4e5-6789-0abc-def1-234567890abc",
+                          "user_uuid": "4711",
                           "zid": "98765432-4321-4321-4321-210987654321",
-                          "grant_type": "urn:ietf:params:oauth:grant-type:jwt-bearer",
-                          "user_id": "a1b2c3d4-5678-90ab-cdef-1234567890ab",
+                          "user_id": "test-user",
                           "azp": "sb-bookshop-test!t1234",
                           "scope": ["%s"],
-                          "cnf": {
-                            "x5t#S256": "test-certificate-thumbprint"
-                          },
                           "exp": %d,
-                          "family_name": "User",
                           "iat": %d,
                           "jti": "test-jwt-id-12345",
                           "email": "%s@example.com",

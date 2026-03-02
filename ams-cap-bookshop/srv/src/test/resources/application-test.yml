@@ -1,4 +1,8 @@
 debug: true
+spring:
+  sql:
+    init:
+      platform: h2
 logging.level:
   com.sap.cds.security.authorization: TRACE
   com.sap.cloud.security.ams: TRACE
