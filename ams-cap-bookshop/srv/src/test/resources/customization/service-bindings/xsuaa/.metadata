@@ -1,0 +1,15 @@
+{
+  "metaDataProperties": [
+    {"name": "type", "sourceName": "type", "format": "json"},
+    {"name": "label", "sourceName": "label", "format": "json"},
+    {"name": "plan", "sourceName": "plan", "format": "json"},
+    {"name": "tags", "sourceName": "tags", "format": "json"}
+  ],
+  "credentialProperties": [
+    {"name": "clientid", "sourceName": "clientid", "format": "json"},
+    {"name": "clientsecret", "sourceName": "clientsecret", "format": "json"},
+    {"name": "url", "sourceName": "url", "format": "json"},
+    {"name": "uaadomain", "sourceName": "uaadomain", "format": "json"},
+    {"name": "xsappname", "sourceName": "xsappname", "format": "json"}
+  ]
+}

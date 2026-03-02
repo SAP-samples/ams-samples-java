@@ -1,0 +1,14 @@
+{
+  "metaDataProperties": [
+    {"name": "type", "sourceName": "type", "format": "text"},
+    {"name": "label", "sourceName": "label", "format": "text"},
+    {"name": "plan", "sourceName": "plan", "format": "text"},
+    {"name": "tags", "sourceName": "tags", "format": "json"}
+  ],
+  "credentialProperties": [
+    {"name": "clientid", "sourceName": "clientid", "format": "text"},
+    {"name": "clientsecret", "sourceName": "clientsecret", "format": "text"},
+    {"name": "url", "sourceName": "url", "format": "text"},
+    {"name": "domains", "sourceName": "domains", "format": "json"}
+  ]
+}
