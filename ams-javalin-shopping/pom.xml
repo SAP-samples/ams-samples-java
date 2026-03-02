@@ -16,6 +16,7 @@
         <jdk.version>17</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sap.cloud.security.ams.version>4.0.0-SNAPSHOT</sap.cloud.security.ams.version>
+        <sap.cloud.environment.servicebinding.version>0.21.0</sap.cloud.environment.servicebinding.version>
         <javalin.version>6.7.0</javalin.version>
         <jackson.version>2.15.2</jackson.version>
         <opencsv.version>5.8</opencsv.version>
@@ -27,11 +28,20 @@
 
     <dependencyManagement>
         <dependencies>
-            <!-- AMS BOM - manages all com.sap.cloud.security.ams artifacts -->
+            <!-- AMS -->
             <dependency>
                 <groupId>com.sap.cloud.security.ams</groupId>
                 <artifactId>ams-bom</artifactId>
                 <version>${sap.cloud.security.ams.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- SAP BTP Service Binding Accessor -->
+            <dependency>
+                <groupId>com.sap.cloud.environment.servicebinding</groupId>
+                <artifactId>java-bom</artifactId>
+                <version>${sap.cloud.environment.servicebinding.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
             </dependency>
@@ -103,6 +113,18 @@
         <dependency>
             <groupId>com.sap.cloud.security.ams</groupId>
             <artifactId>ams-core</artifactId>
+        </dependency>
+
+        <!-- Include following dependency if your application uses the VCAP_SERVICES environment variable as a source for service bindings -->
+        <dependency>
+            <groupId>com.sap.cloud.environment.servicebinding</groupId>
+            <artifactId>java-sap-vcap-services</artifactId>
+        </dependency>
+
+        <!-- Include following dependency if your application uses mounted service bindings created by the SAP BTP Service Operator -->
+        <dependency>
+            <groupId>com.sap.cloud.environment.servicebinding</groupId>
+            <artifactId>java-sap-service-operator</artifactId>
         </dependency>
 
         <!-- JSON Processing -->

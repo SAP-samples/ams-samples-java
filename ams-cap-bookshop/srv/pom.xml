@@ -30,6 +30,16 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-test</artifactId>
 			<scope>test</scope>
+			<exclusions>
+				<!-- Exclude android-json to avoid conflict with org.json:json
+				     The android-json library is a stripped version that doesn't have
+				     methods like JSONArray.toList() which are needed by
+				     SapServiceOperatorServiceBindingIoAccessor -->
+				<exclusion>
+					<groupId>com.vaadin.external.google</groupId>
+					<artifactId>android-json</artifactId>
+				</exclusion>
+			</exclusions>
 		</dependency>
 
         <dependency>
