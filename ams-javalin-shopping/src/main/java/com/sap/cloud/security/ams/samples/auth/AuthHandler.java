@@ -4,9 +4,9 @@ import com.sap.cloud.environment.servicebinding.api.DefaultServiceBindingAccesso
 import com.sap.cloud.environment.servicebinding.api.ServiceBinding;
 import com.sap.cloud.security.ams.api.App2AppFlow;
 import com.sap.cloud.security.ams.api.AuthorizationManagementService;
+import com.sap.cloud.security.ams.api.PolicyName;
 import com.sap.cloud.security.ams.api.Principal;
 import com.sap.cloud.security.ams.core.SciAuthorizationsProvider;
-import com.sap.cloud.security.ams.dcn.PolicyName;
 import com.sap.cloud.security.config.Environments;
 import com.sap.cloud.security.servlet.IasTokenAuthenticator;
 import com.sap.cloud.security.servlet.TokenAuthenticationResult;

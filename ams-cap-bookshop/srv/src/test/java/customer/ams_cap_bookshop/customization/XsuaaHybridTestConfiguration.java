@@ -2,10 +2,10 @@ package customer.ams_cap_bookshop.customization;
 
 import com.sap.cloud.security.ams.api.AuthorizationManagementService;
 import com.sap.cloud.security.ams.api.AuthorizationsProvider;
+import com.sap.cloud.security.ams.api.PolicyName;
 import com.sap.cloud.security.ams.api.ScopeMapper;
 import com.sap.cloud.security.ams.cap.api.CdsAuthorizations;
 import com.sap.cloud.security.ams.core.HybridAuthorizationsProvider;
-import com.sap.cloud.security.ams.dcn.PolicyName;
 import com.sap.cloud.security.token.SecurityContext;
 import com.sap.cloud.security.token.XsuaaToken;
 import com.sap.cloud.security.xsuaa.jwt.Base64JwtDecoder;

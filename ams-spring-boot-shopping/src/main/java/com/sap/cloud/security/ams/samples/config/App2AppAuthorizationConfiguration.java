@@ -1,9 +1,9 @@
 package com.sap.cloud.security.ams.samples.config;
 
 import com.sap.cloud.security.ams.api.ApiMapper;
+import com.sap.cloud.security.ams.api.PolicyName;
 import com.sap.cloud.security.ams.api.Principal;
 import com.sap.cloud.security.ams.core.SciAuthorizationsProvider;
-import com.sap.cloud.security.ams.dcn.PolicyName;
 import org.springframework.beans.BeansException;
 import org.springframework.beans.factory.config.BeanPostProcessor;
 import org.springframework.context.annotation.Configuration;
