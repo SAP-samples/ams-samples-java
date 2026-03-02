@@ -5,7 +5,7 @@ import com.sap.cloud.environment.servicebinding.api.ServiceBinding;
 import com.sap.cloud.security.ams.api.App2AppFlow;
 import com.sap.cloud.security.ams.api.AuthorizationManagementService;
 import com.sap.cloud.security.ams.api.Principal;
-import com.sap.cloud.security.ams.core.IasAuthorizationsProvider;
+import com.sap.cloud.security.ams.core.SciAuthorizationsProvider;
 import com.sap.cloud.security.ams.dcn.PolicyName;
 import com.sap.cloud.security.config.Environments;
 import com.sap.cloud.security.servlet.IasTokenAuthenticator;
@@ -33,7 +33,7 @@ public class AuthHandler implements Handler {
     private static final Logger LOG = LoggerFactory.getLogger(AuthHandler.class);
     private TokenAuthenticator authenticator;
     protected final AuthorizationManagementService ams;
-    protected final IasAuthorizationsProvider<ShoppingAuthorizations> authProvider;
+    protected final SciAuthorizationsProvider<ShoppingAuthorizations> authProvider;
 
     public AuthHandler() {
         this.setupAuthentication();
@@ -64,8 +64,8 @@ public class AuthHandler implements Handler {
     private static final Set<String> TECHNICAL_USER_APIS = Set.of("GetProducts");
     private static final Set<String> PRINCIPAL_PROPAGATION_APIS = Set.of("GetProducts", "ExternalOrder");
 
-    private IasAuthorizationsProvider<ShoppingAuthorizations> createAuthProvider() {
-        return IasAuthorizationsProvider.create(ams, ShoppingAuthorizations::of)
+    private SciAuthorizationsProvider<ShoppingAuthorizations> createAuthProvider() {
+        return SciAuthorizationsProvider.create(ams, ShoppingAuthorizations::of)
                 .withApiMapper((String api, Principal principal) -> {
                     if (TECHNICAL_USER_APIS.contains(api)) {
                         return Set.of(PolicyName.ofSegments("internal", api));
