@@ -99,7 +99,7 @@
     <build>
         <finalName>${project.artifactId}</finalName>
         <plugins>
-            <!-- SUREFIRE PLUGIN - Run XsuaaHybrid test in isolated forked JVM -->
+            <!-- SUREFIRE PLUGIN - Run customization tests in isolated forked JVM -->
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
@@ -109,24 +109,24 @@
                     </argLine>
                 </configuration>
                 <executions>
-                    <!-- Default execution: run all tests EXCEPT XsuaaHybridAuthorizationsProviderTest -->
+                    <!-- Default execution: run all tests EXCEPT customization tests -->
                     <execution>
                         <id>default-test</id>
                         <configuration>
                             <excludes>
-                                <exclude>**/XsuaaHybridAuthorizationsProviderTest.java</exclude>
+                                <exclude>**/customization/**</exclude>
                             </excludes>
                         </configuration>
                     </execution>
-                    <!-- Separate execution for XsuaaHybridAuthorizationsProviderTest in a forked JVM -->
+                    <!-- Separate execution for customization tests in a forked JVM -->
                     <execution>
-                        <id>xsuaa-hybrid-tests</id>
+                        <id>customization-tests</id>
                         <goals>
                             <goal>test</goal>
                         </goals>
                         <configuration>
                             <includes>
-                                <include>**/XsuaaHybridAuthorizationsProviderTest.java</include>
+                                <include>**/customization/**Test.java</include>
                             </includes>
                             <!-- Fork a new JVM to isolate the environment variable modification -->
                             <forkCount>1</forkCount>
