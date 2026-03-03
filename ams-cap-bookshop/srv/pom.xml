@@ -1,46 +1,48 @@
-<?xml version="1.0" encoding="UTF-8" standalone="no"?><project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-	<modelVersion>4.0.0</modelVersion>
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
 
-	<parent>
-		<artifactId>ams-cap-bookshop-parent</artifactId>
-		<groupId>customer</groupId>
-		<version>${revision}</version>
-	</parent>
+    <parent>
+        <artifactId>ams-cap-bookshop-parent</artifactId>
+        <groupId>customer</groupId>
+        <version>${revision}</version>
+    </parent>
 
-	<artifactId>ams-cap-bookshop</artifactId>
-	<packaging>jar</packaging>
+    <artifactId>ams-cap-bookshop</artifactId>
+    <packaging>jar</packaging>
 
-	<name>ams-cap-bookshop</name>
+    <name>ams-cap-bookshop</name>
 
-	<!-- ACTUAL DEPENDENCIES -->
-	<dependencies>
-		<!-- CDS SPRING BOOT STARTER -->
-		<dependency>
-			<groupId>com.sap.cds</groupId>
-			<artifactId>cds-starter-spring-boot</artifactId>
-		</dependency>
+    <!-- ACTUAL DEPENDENCIES -->
+    <dependencies>
+        <!-- CDS SPRING BOOT STARTER -->
+        <dependency>
+            <groupId>com.sap.cds</groupId>
+            <artifactId>cds-starter-spring-boot</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-devtools</artifactId>
-			<optional>true</optional>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-devtools</artifactId>
+            <optional>true</optional>
+        </dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-test</artifactId>
-			<scope>test</scope>
-			<exclusions>
-				<!-- Exclude android-json to avoid conflict with org.json:json
-				     The android-json library is a stripped version that doesn't have
-				     methods like JSONArray.toList() which are needed by
-				     SapServiceOperatorServiceBindingIoAccessor -->
-				<exclusion>
-					<groupId>com.vaadin.external.google</groupId>
-					<artifactId>android-json</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <!-- Exclude android-json to avoid conflict with org.json:json
+                     The android-json library is a stripped version that doesn't have
+                     methods like JSONArray.toList() which are needed by
+                     SapServiceOperatorServiceBindingIoAccessor -->
+                <exclusion>
+                    <groupId>com.vaadin.external.google</groupId>
+                    <artifactId>android-json</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.security</groupId>
@@ -54,17 +56,17 @@
             <scope>test</scope>
         </dependency>
 
-		<dependency>
-			<groupId>com.sap.cds</groupId>
-			<artifactId>cds-adapter-odata-v4</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+        <dependency>
+            <groupId>com.sap.cds</groupId>
+            <artifactId>cds-adapter-odata-v4</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>com.h2database</groupId>
-			<artifactId>h2</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
         <dependency>
             <groupId>com.sap.cloud.security.ams</groupId>
@@ -77,146 +79,148 @@
             <scope>test</scope>
         </dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-security</artifactId>
-		</dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
 
-		<dependency>
-			<groupId>com.sap.cds</groupId>
-			<artifactId>cds-starter-cloudfoundry</artifactId>
-			<scope>runtime</scope>
-		</dependency>
+        <dependency>
+            <groupId>com.sap.cds</groupId>
+            <artifactId>cds-starter-cloudfoundry</artifactId>
+            <scope>runtime</scope>
+        </dependency>
 
-		<dependency>
-			<groupId>org.springframework.boot</groupId>
-			<artifactId>spring-boot-starter-actuator</artifactId>
-		</dependency>
-	</dependencies>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+    </dependencies>
 
-	<build>
-		<finalName>${project.artifactId}</finalName>
-		<plugins>
-			<!-- SUREFIRE PLUGIN - Run XsuaaHybrid test in isolated forked JVM -->
-			<plugin>
-				<groupId>org.apache.maven.plugins</groupId>
-				<artifactId>maven-surefire-plugin</artifactId>
-				<configuration>
-					<argLine>
-						--add-opens java.base/java.util=ALL-UNNAMED
-					</argLine>
-				</configuration>
-				<executions>
-					<!-- Default execution: run all tests EXCEPT XsuaaHybridAuthorizationsProviderTest -->
-					<execution>
-						<id>default-test</id>
-						<configuration>
-							<excludes>
-								<exclude>**/XsuaaHybridAuthorizationsProviderTest.java</exclude>
-							</excludes>
-						</configuration>
-					</execution>
-					<!-- Separate execution for XsuaaHybridAuthorizationsProviderTest in a forked JVM -->
-					<execution>
-						<id>xsuaa-hybrid-tests</id>
-						<goals>
-							<goal>test</goal>
-						</goals>
-						<configuration>
-							<includes>
-								<include>**/XsuaaHybridAuthorizationsProviderTest.java</include>
-							</includes>
-							<!-- Fork a new JVM to isolate the environment variable modification -->
-							<forkCount>1</forkCount>
-							<reuseForks>false</reuseForks>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <!-- SUREFIRE PLUGIN - Run XsuaaHybrid test in isolated forked JVM -->
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <configuration>
+                    <argLine>
+                        --add-opens java.base/java.util=ALL-UNNAMED
+                    </argLine>
+                </configuration>
+                <executions>
+                    <!-- Default execution: run all tests EXCEPT XsuaaHybridAuthorizationsProviderTest -->
+                    <execution>
+                        <id>default-test</id>
+                        <configuration>
+                            <excludes>
+                                <exclude>**/XsuaaHybridAuthorizationsProviderTest.java</exclude>
+                            </excludes>
+                        </configuration>
+                    </execution>
+                    <!-- Separate execution for XsuaaHybridAuthorizationsProviderTest in a forked JVM -->
+                    <execution>
+                        <id>xsuaa-hybrid-tests</id>
+                        <goals>
+                            <goal>test</goal>
+                        </goals>
+                        <configuration>
+                            <includes>
+                                <include>**/XsuaaHybridAuthorizationsProviderTest.java</include>
+                            </includes>
+                            <!-- Fork a new JVM to isolate the environment variable modification -->
+                            <forkCount>1</forkCount>
+                            <reuseForks>false</reuseForks>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<!-- SPRING BOOT PLUGIN -->
-			<plugin>
-				<groupId>org.springframework.boot</groupId>
-				<artifactId>spring-boot-maven-plugin</artifactId>
-				<version>${spring.boot.version}</version>
-				<configuration>
-					<skip>false</skip>
-				</configuration>
-				<executions>
-					<execution>
-						<id>repackage</id>
-						<goals>
-							<goal>repackage</goal>
-						</goals>
-						<configuration>
-							<classifier>exec</classifier>
-						</configuration>
-					</execution>
-				</executions>
-			</plugin>
+            <!-- SPRING BOOT PLUGIN -->
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+                <version>${spring.boot.version}</version>
+                <configuration>
+                    <skip>false</skip>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>repackage</id>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                        <configuration>
+                            <classifier>exec</classifier>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
 
-			<!-- STEPS TO BUILD CDS MODEL AND GENERATE POJOs -->
-			<plugin>
-				<groupId>com.sap.cds</groupId>
-				<artifactId>cds-maven-plugin</artifactId>
-				<executions>
-					<execution>
-						<id>cds.clean</id>
-						<goals>
-							<goal>clean</goal>
-						</goals>
-					</execution>
+            <!-- STEPS TO BUILD CDS MODEL AND GENERATE POJOs -->
+            <plugin>
+                <groupId>com.sap.cds</groupId>
+                <artifactId>cds-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>cds.clean</id>
+                        <goals>
+                            <goal>clean</goal>
+                        </goals>
+                    </execution>
 
-					<execution>
-						<id>cds.install-node</id>
-						<goals>
-							<goal>install-node</goal>
-						</goals>
-					</execution>
+                    <execution>
+                        <id>cds.install-node</id>
+                        <goals>
+                            <goal>install-node</goal>
+                        </goals>
+                    </execution>
 
-					<execution>
-						<id>cds.npm-ci</id>
-						<goals>
-							<goal>npm</goal>
-						</goals>
-						<configuration>
-							<arguments>ci</arguments>
-						</configuration>
-					</execution>
+                    <execution>
+                        <id>cds.npm-ci</id>
+                        <goals>
+                            <goal>npm</goal>
+                        </goals>
+                        <configuration>
+                            <arguments>ci</arguments>
+                        </configuration>
+                    </execution>
 
-					<execution>
-						<id>cds.resolve</id>
-						<goals>
-							<goal>resolve</goal>
-						</goals>
-					</execution>
+                    <execution>
+                        <id>cds.resolve</id>
+                        <goals>
+                            <goal>resolve</goal>
+                        </goals>
+                    </execution>
 
-					<execution>
-						<id>cds.build</id>
-						<goals>
-							<goal>cds</goal>
-						</goals>
-						<configuration>
-							<commands>
-								<command>build --for java</command>
-								<command>deploy --to h2 --with-mocks --dry --out "${project.basedir}/src/main/resources/schema-h2.sql"</command>
-								<command>build --for ams</command>
-							</commands>
-						</configuration>
-					</execution>
+                    <execution>
+                        <id>cds.build</id>
+                        <goals>
+                            <goal>cds</goal>
+                        </goals>
+                        <configuration>
+                            <commands>
+                                <command>build --for java</command>
+                                <command>deploy --to h2 --with-mocks --dry --out
+                                    "${project.basedir}/src/main/resources/schema-h2.sql"
+                                </command>
+                                <command>build --for ams</command>
+                            </commands>
+                        </configuration>
+                    </execution>
 
-					<execution>
-						<id>cds.generate</id>
-						<goals>
-							<goal>generate</goal>
-						</goals>
-						<configuration>
-							<basePackage>cds.gen</basePackage>
-						</configuration>
-					</execution>
+                    <execution>
+                        <id>cds.generate</id>
+                        <goals>
+                            <goal>generate</goal>
+                        </goals>
+                        <configuration>
+                            <basePackage>cds.gen</basePackage>
+                        </configuration>
+                    </execution>
 
-					<!-- DCL -> DCN compilation before tests -->
-					<execution>
+                    <!-- DCL -> DCN compilation before tests -->
+                    <execution>
                         <id>compile-dcl</id>
                         <goals>
                             <goal>npx</goal>
@@ -225,14 +229,14 @@
                         <configuration>
                             <arguments>--package=@sap/ams-dev compile-dcl
                                 -d ${project.basedir}/src/main/resources/ams -o
-                                ${project.build.directory}/classes/ams/dcn
+                                ${project.build.directory}/generated-test-resources/ams/dcn
                             </arguments>
                         </configuration>
                     </execution>
-				</executions>
-			</plugin>
+                </executions>
+            </plugin>
 
-		</plugins>
-	</build>
+        </plugins>
+    </build>
 
 </project>
