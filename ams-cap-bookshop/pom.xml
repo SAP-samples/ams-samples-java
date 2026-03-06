@@ -21,7 +21,7 @@
 
         <cds.install-node.downloadUrl>https://nodejs.org/dist/</cds.install-node.downloadUrl>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <sap.cloud.security.ams.version>4.0.0-SNAPSHOT</sap.cloud.security.ams.version>
+        <sap.cloud.security.ams.version>4.0.3-SNAPSHOT</sap.cloud.security.ams.version>
     </properties>
 
     <modules>
