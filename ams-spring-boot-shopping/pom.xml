@@ -24,7 +24,7 @@
         <jdk.version>17</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <spring.boot.version>3.5.10</spring.boot.version>
-        <sap.cloud.security.ams.version>4.0.3-SNAPSHOT</sap.cloud.security.ams.version>
+        <sap.cloud.security.ams.version>4.0.5-SNAPSHOT</sap.cloud.security.ams.version>
         <sap.cloud.security.version>3.5.7</sap.cloud.security.version>
         <sap.cloud.sdk.version>5.24.0</sap.cloud.sdk.version>
         <sap.cloud.environment.servicebinding.version>0.21.0</sap.cloud.environment.servicebinding.version>
