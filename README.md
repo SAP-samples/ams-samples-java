@@ -1,92 +1,89 @@
+[![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/ams-samples-java)](https://api.reuse.software/info/github.com/SAP-samples/ams-samples-java)
+
 # Overview: Authorization Management Service (AMS) Java Samples
 
 This repository brings together several sample applications that demonstrate how to integrate the **SAP Authorization Management Service (AMS)** into various Java frameworks. Each sample showcases different architectures and scenarios for authentication and authorization using AMS and the SAP Identity Authentication Service (IAS).
 
+## ⚠️ Important Version Notice
+
+**These samples use major version 4.** The older version 3 samples have been moved to the `legacy-v3-samples` directory. We **strongly recommend**:
+- ✅ Use v4 for all new projects
+- ✅ Upgrade existing v3 projects to v4
+- ❌ Do not start new projects with v3
+
+---
+
 ## Repository Structure and Sample Overview
 
-| Sample Name                          | Description                                                                                                                         | Typical Use Case                 | Directory                  |
-|-------------------------------------- |-------------------------------------------------------------------------------------------------------------------------------------|----------------------------------|----------------------------|
-| **Spring Boot Sample**                | A Spring Boot application using AMS and IAS for authentication & authorization with JWT. Includes deployment examples for Kubernetes (Kyma) and Cloud Foundry. | Microservices, Cloud-native apps | `spring-security-ams`      |
-| **Jakarta EE Sample**                 | Example Jakarta EE application that integrates AMS for resource access authorization and uses IAS for authentication.                | Java EE/enterprise projects      | `jakarta-ams-sample`       |
-| **CAP Java Sample**                   | Demonstrates the integration of AMS into a **SAP CAP Java** application, including policy generation for CAP roles.                 | SAP CAP projects                 | `ams_cap_sample`           |
-| **Jakarta EE Zero Trust Sample**      | Jakarta EE sample showing how to secure resource access with AMS and **Zero Trust Identity Services (ZTIS)**. Demonstrates mTLS with automatically rotated SPIFFE certificates and programmatic download of bundles using ZTIS certificates. | Enterprise Zero Trust/mTLS apps  | `jakarta-ams-sample`       |
+| Sample Name                          | Description                                                                                                                         | Directory                  |
+|-------------------------------------- |-------------------------------------------------------------------------------------------------------------------------------------|----------------------------|
+| **Javalin Shopping Sample**           | A lightweight application using **Javalin** (minimal web framework) to showcase the AMS v4 Core API        | `ams-javalin-shopping`     |
+| **Spring Boot Shopping Sample**       | A Spring Boot application to showcase AMS **Spring Security** integration                               | `ams-spring-boot-shopping` |
+| **CAP Spring Boot Bookshop Sample**   | Demonstrates the integration of AMS into a **SAP CAP Java** Spring Boot application    | `ams-cap-bookshop`         |
 
 ---
 
 ## Sample Details
 
-### 1. Spring Boot Sample (`spring-security-ams`)
+### 1. Javalin Shopping Sample (`ams-javalin-shopping`)
+
+- **Framework:** Javalin (lightweight Java web framework)
+- **Highlights:**
+  - Minimal web framework approach with AMS Core API v4
+  - AMS and IAS integration for securing REST APIs via JWT tokens
+  - Clean, straightforward implementation ideal for learning AMS basics
+  - Simple shopping application example
+- **More info:** [Javalin Shopping Sample](ams-javalin-shopping/README.md)
+
+### 2. Spring Boot Shopping Sample (`ams-spring-boot-shopping`)
 
 - **Framework:** Spring Boot
 - **Highlights:**
-  - AMS and IAS integration for securing REST APIs via JWT tokens.
-  - Example of using the SAP Application Router as a reverse proxy.
-  - Provides DCL files to define authorization models.
-  - Deployment instructions for both Kyma/Kubernetes and Cloud Foundry.
-- **Typical Use:** Microservice-based Java applications needing SAP IAM integration.
-- **More info:** [Spring Security AMS](spring-security-ams/README.md)
+  - AMS Core API v4 integration with Spring Boot
+  - AMS and IAS integration for securing REST APIs via JWT tokens
+  - Shopping application with Spring Security integration
+- **More info:** [Spring Boot Shopping Sample](ams-spring-boot-shopping/README.md)
 
-### 2. Jakarta EE Sample (`jakarta-ams-sample`)
-
-- **Framework:** Jakarta EE
-- **Highlights:**
-  - Shows how to secure Java EE applications using AMS and IAS.
-  - Uses the SAP Application Router as an OAuth 2.0 client.
-  - Contains deployment guides for Kubernetes (Helm chart) and Cloud Foundry.
-- **Typical Use:** Java EE or enterprise applications on SAP BTP.
-- **More info:** [Jakarta AMS Sample](jakarta-ams-sample/README.md)
-
-### 3. CAP Java Sample (`ams_cap_sample`)
+### 3. CAP Spring Boot Bookshop Sample (`ams-cap-bookshop`)
 
 - **Framework:** SAP Cloud Application Programming Model (CAP) for Java
 - **Highlights:**
-  - Demonstrates AMS integration in a CAP Java project (example: bookshop).
-  - Shows policy generation for CAP security roles.
-  - Contains instructions for both local development and Cloud Foundry deployment.
-- **Typical Use:** Extending CAP Java projects with AMS-based authorization.
-- **More info:** [AMS CAP Sample](ams_cap_sample/README.md)
+  - Demonstrates AMS Core API v4 integration in a CAP Java project (bookshop sample)
+  - Contains instructions for both local development and cloud deployment
+- **More info:** [CAP Bookshop Sample](ams-cap-bookshop/README.md)
 
-### 4. Jakarta EE Zero Trust Sample (`jakarta-ams-sample`)
+---
 
-- **Framework:** Jakarta EE (Zero Trust, SPIFFE/SPIRE, ZTIS)
-- **Highlights:**
-  - Demonstrates how to use **Zero Trust Identity Services (ZTIS)** for fully automated, short-lived mTLS certificates via SPIFFE/SPIRE.
-  - The backend is protected by AMS (Authorization Management Service) and IAS authentication.
-  - Shows how to **download SPIFFE bundles** (i.e., retrieve trust bundles/certificate chains) using ZTIS-issued certificates.
-  - Exposes endpoints for inspecting the current SPIFFE SVID and X.509 certificate (helpful for verifying live certificate rotation).
-  - Contains sample endpoints that use mTLS for backend requests, leveraging automatic certificate renewal (rotation).
-  - Includes deployment and configuration guides for Cloud Foundry.
-- **Typical Use:** Java EE or cloud enterprise applications requiring modern mTLS (zero trust) and AMS authorization. Useful for scenarios where backend services must regularly prove identity using frequently rotated certs, e.g., inter-service communication in regulated/critical environments.
-- **More info:** [Jakarta AMS Sample with Zero Trust](jakarta-ams-sample/README.md)
+## Legacy Samples (v3)
+
+The `legacy-v3-samples` directory contains samples for **AMS Core API v3**. These are maintained for reference but are **not recommended for new projects**:
+
+- `spring-security-ams` - Spring Boot sample with v3 API
+- `jakarta-ams-sample` - Jakarta EE sample with v3 API
+- `ams-cap-sample` - CAP Java sample with v3 API
+- `ams-ztis-sample` - Jakarta EE Zero Trust sample with v3 API
+
+**Please migrate to v4 for new development and consider upgrading existing v3 projects.**
 
 ---
 
 ## What Can You Learn From These Samples?
 
-- **Central policy and access management** using AMS and DCL files.
-- **Integrating SAP IAM** in different Java frameworks (Spring Boot, Jakarta EE, CAP).
-- **Cloud-native deployment** patterns for SAP BTP (Kyma/Kubernetes & Cloud Foundry).
-- **Mapping CAP roles to AMS policies** for unified authorization logic.
-- **Zero Trust/mTLS**: How to secure backend apps with rotating SPIFFE/SPIRE certificates and ZTIS, including programmatic bundle download.
+- **AMS API integration** across different Java frameworks
+- **Policy and access management** using AMS and DCL files
+- **JWT-based authentication** with IAS (Identity Authentication Service)
 
 ---
 
 ## Further References
 
-- [AMS Documentation (internal)](https://github.wdf.sap.corp/pages/CPSecurity/ams-docu/)
-- [SAP Cloud Security Services (public)](https://github.com/SAP/cloud-security-services-integration-library)
+- [AMS Documentation](https://sap.github.io/cloud-identity-developer-guide/)
+- [SAP Cloud Security Services Library](https://github.com/SAP/cloud-security-services-integration-library)
 - [SAP CAP Documentation](https://cap.cloud.sap/docs/)
-- [ZTIS / Zero Trust Identity Services (internal)](https://github.tools.sap/pse/ztis/)
-- [SPIFFE/SPIRE Java SDK (public)](https://github.com/spiffe/java-spiffe)
+- [Javalin Documentation](https://javalin.io/)
 
 ---
 
 ## Licenses
 
 This repository is licensed under the Apache License, Version 2.0. See the [LICENSE](LICENSES/Apache-2.0.txt) file for details.
-
-[![REUSE status](https://api.reuse.software/badge/github.com/SAP-samples/ams-samples-java)](https://api.reuse.software/info/github.com/SAP-samples/ams-samples-java)
-
-**Note:**  
-Each sample includes its own README with detailed setup, configuration, and deployment instructions.
-~~~~

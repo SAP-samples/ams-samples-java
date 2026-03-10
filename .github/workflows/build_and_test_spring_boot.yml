@@ -1,0 +1,79 @@
+# This workflow builds and tests the Spring Boot Shopping sample
+# For more information see: https://docs.github.com/en/actions/automating-builds-and-tests/building-and-testing-java-with-maven
+
+name: Spring Boot Shopping sample
+
+on:
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "**" ]
+  workflow_dispatch:  # Allow manual triggering
+
+jobs:
+  detect-changes:
+    name: Detect Changes
+    runs-on: ubuntu-latest
+    outputs:
+      should_run: ${{ steps.changed.outputs.any_modified }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Detect changed files
+        id: changed
+        uses: tj-actions/changed-files@v46
+        with:
+          files: |
+            ams-spring-boot-shopping/pom.xml
+            ams-spring-boot-shopping/src/**
+            .github/workflows/build_and_test_spring_boot.yml
+
+  maven:
+    name: Build and Test${{ matrix.spring_boot_version && format(' (Spring Boot {0})', matrix.spring_boot_version) || '' }}
+    needs: detect-changes
+    if: ${{ github.event_name == 'workflow_dispatch' || needs.detect-changes.outputs.should_run == 'true' }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - spring_boot_version: ''
+          - spring_boot_version: '4.0.2'
+      fail-fast: false
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up JDK 17
+        uses: actions/setup-java@v4
+        with:
+          java-version: '17'
+          distribution: 'temurin'
+          cache: 'maven'
+          cache-dependency-path: ams-spring-boot-shopping/pom.xml
+
+      - name: Patch Spring Boot version in pom.xml
+        if: matrix.spring_boot_version
+        run: |
+          # Replace the parent version in pom.xml
+          sed -i.bak 's|<version>3\.5\.10</version><!-- spring-boot-starter-parent -->|<version>${{ matrix.spring_boot_version }}</version><!-- spring-boot-starter-parent -->|' pom.xml
+          # Also replace the spring.boot.version property
+          sed -i.bak 's|<spring.boot.version>3\.5\.10</spring.boot.version>|<spring.boot.version>${{ matrix.spring_boot_version }}</spring.boot.version>|' pom.xml
+          echo "Patched pom.xml for Spring Boot ${{ matrix.spring_boot_version }}"
+          cat pom.xml | head -30
+        working-directory: ams-spring-boot-shopping
+
+      - name: Build and Test
+        run: mvn clean test
+        working-directory: ams-spring-boot-shopping
+
+  # This job ensures the workflow passes when no relevant changes are detected
+  # Required for PR status checks to pass when the sample hasn't changed
+  no-changes:
+    name: No Changes Detected
+    needs: detect-changes
+    if: ${{ needs.detect-changes.outputs.should_run != 'true' }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: No relevant changes detected
+        run: echo "No relevant changes detected for ams-spring-boot-shopping. Skipping build and test."

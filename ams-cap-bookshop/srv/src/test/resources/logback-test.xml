@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration>
+    <!-- Console appender for test output -->
+    <appender name="CONSOLE" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%d{HH:mm:ss.SSS} [%thread] %-5level %logger{36} -- %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <!-- Root logger level -->
+    <root level="INFO">
+        <appender-ref ref="CONSOLE" />
+    </root>
+
+    <!-- Spring Boot auto-configuration report - this is what you need for debug output -->
+    <logger name="org.springframework.boot.autoconfigure" level="DEBUG" />
+
+    <!-- Spring context and beans - useful for troubleshooting -->
+    <logger name="org.springframework.context" level="DEBUG" />
+    <logger name="org.springframework.boot" level="DEBUG" />
+
+    <!-- CAP framework messages -->
+    <logger name="com.sap.cds" level="INFO" />
+
+    <!-- SAP AMS messages including auto-configuration conditions -->
+    <logger name="com.sap.cloud.security.ams" level="DEBUG" />
+    <logger name="com.sap.cloud.security.ams.cap.autoconfigure" level="DEBUG" />
+
+    <!-- Your application messages -->
+    <logger name="com.sap.capire.bookshop" level="DEBUG" />
+
+</configuration>
+

@@ -1,0 +1,270 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <groupId>com.sap.cloud.security.ams.samples</groupId>
+    <artifactId>ams-javalin-shopping</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>AMS Javalin Shopping Sample</name>
+    <description>A Java shopping application sample using Javalin and SAP Authorization Management Service</description>
+
+    <properties>
+        <jdk.version>17</jdk.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <sap.cloud.security.ams.version>4.0.5</sap.cloud.security.ams.version>
+        <sap.cloud.environment.servicebinding.version>0.21.0</sap.cloud.environment.servicebinding.version>
+        <javalin.version>6.7.0</javalin.version>
+        <jackson.version>2.15.2</jackson.version>
+        <opencsv.version>5.8</opencsv.version>
+        <slf4j.version>2.0.7</slf4j.version>
+        <logback.version>1.4.14</logback.version>
+        <junit.version>5.10.0</junit.version>
+        <httpclient.version>4.5.14</httpclient.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- AMS -->
+            <dependency>
+                <groupId>com.sap.cloud.security.ams</groupId>
+                <artifactId>ams-bom</artifactId>
+                <version>${sap.cloud.security.ams.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- SAP BTP Service Binding Accessor -->
+            <dependency>
+                <groupId>com.sap.cloud.environment.servicebinding</groupId>
+                <artifactId>java-bom</artifactId>
+                <version>${sap.cloud.environment.servicebinding.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- Javalin -->
+            <dependency>
+                <groupId>io.javalin</groupId>
+                <artifactId>javalin</artifactId>
+                <version>${javalin.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>io.javalin</groupId>
+                <artifactId>javalin-testtools</artifactId>
+                <version>${javalin.version}</version>
+            </dependency>
+
+            <!-- JSON -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <!-- CSV -->
+            <dependency>
+                <groupId>com.opencsv</groupId>
+                <artifactId>opencsv</artifactId>
+                <version>${opencsv.version}</version>
+            </dependency>
+
+            <!-- HTTP -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${httpclient.version}</version>
+            </dependency>
+
+            <!-- Logging - manage both to keep them in sync -->
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-classic</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+            <dependency>
+                <groupId>ch.qos.logback</groupId>
+                <artifactId>logback-core</artifactId>
+                <version>${logback.version}</version>
+            </dependency>
+
+            <!-- Testing -->
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!-- Javalin Framework -->
+        <dependency>
+            <groupId>io.javalin</groupId>
+            <artifactId>javalin</artifactId>
+        </dependency>
+
+        <!-- SAP AMS Client -->
+        <dependency>
+            <groupId>com.sap.cloud.security.ams</groupId>
+            <artifactId>ams-core</artifactId>
+        </dependency>
+
+        <!-- Include following dependency if your application uses the VCAP_SERVICES environment variable as a source for service bindings -->
+        <dependency>
+            <groupId>com.sap.cloud.environment.servicebinding</groupId>
+            <artifactId>java-sap-vcap-services</artifactId>
+        </dependency>
+
+        <!-- Include following dependency if your application uses mounted service bindings created by the SAP BTP Service Operator -->
+        <dependency>
+            <groupId>com.sap.cloud.environment.servicebinding</groupId>
+            <artifactId>java-sap-service-operator</artifactId>
+        </dependency>
+
+        <!-- JSON Processing -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- CSV Processing -->
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+        </dependency>
+
+        <!-- Apache HTTP Client 4 required for Authentication Library -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+
+        <!-- Logging -->
+        <dependency>
+            <groupId>ch.qos.logback</groupId>
+            <artifactId>logback-classic</artifactId>
+        </dependency>
+
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>io.javalin</groupId>
+            <artifactId>javalin-testtools</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sap.cloud.security.ams</groupId>
+            <artifactId>ams-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.0</version>
+                <configuration>
+                    <release>${jdk.version}</release>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.2</version>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>3.4.1</version>
+                <configuration>
+                    <createDependencyReducedPom>false</createDependencyReducedPom>
+                    <transformers>
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                        <transformer
+                                implementation="org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                            <mainClass>com.sap.cloud.security.ams.samples.JavalinShoppingApplication
+                            </mainClass> <!-- Here you should put the main class of your application -->
+                        </transformer>
+                    </transformers>
+                    <filters>
+                        <filter> <!-- This filter is needed to avoid a bug in the shade plugin -->
+                            <artifact>*:*</artifact>
+                            <excludes>
+                                <exclude>META-INF/*.SF</exclude>
+                                <exclude>META-INF/*.DSA</exclude>
+                                <exclude>META-INF/*.RSA</exclude>
+                            </excludes>
+                        </filter>
+                    </filters>
+                </configuration>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <!-- Main class execution plugin -->
+            <plugin>
+                <groupId>org.codehaus.mojo</groupId>
+                <artifactId>exec-maven-plugin</artifactId>
+                <version>3.1.0</version>
+                <configuration>
+                    <mainClass>com.sap.cloud.security.ams.samples.JavalinShoppingApplication</mainClass>
+                </configuration>
+            </plugin>
+
+            <!-- Plugin for DCL -> DCN compilation before tests -->
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>1.14.1</version>
+                <executions>
+                    <execution>
+                        <id>install node and npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <nodeVersion>v24.11.0</nodeVersion>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>compile-dcl</id>
+                        <goals>
+                            <goal>npx</goal>
+                        </goals>
+                        <phase>generate-resources</phase>
+                        <configuration>
+                            <arguments>--package=@sap/ams-dev@2.2.0 compile-dcl
+                                -d src/main/resources/ams/dcl -o
+                                ${project.build.directory}/generated-test-resources/ams/dcn
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>

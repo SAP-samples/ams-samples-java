@@ -1,0 +1,6 @@
+id,name,price,category
+1,"MacBook Pro M3",3000.0,pc
+2,"Dell 34 inch Widescreen Monitor",400.0,monitor
+3,"Apple Mouse",70.0,accessory
+4,"Cherry Keyboard",40.0,accessory
+5,"Yubikey",30.0,securityAccessory

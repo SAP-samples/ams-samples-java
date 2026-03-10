@@ -1,0 +1,273 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.5.10</version><!-- spring-boot-starter-parent -->
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+
+    <groupId>com.sap.cloud.security.ams.samples</groupId>
+    <artifactId>ams-spring-boot-shopping</artifactId>
+    <version>1.0.0</version>
+    <packaging>jar</packaging>
+
+    <name>AMS Spring Boot Shopping Sample</name>
+    <description>A Java shopping application sample using Spring Boot and SAP Authorization Management Service
+    </description>
+
+    <properties>
+        <jdk.version>17</jdk.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <spring.boot.version>3.5.10</spring.boot.version>
+        <sap.cloud.security.ams.version>4.0.5</sap.cloud.security.ams.version>
+        <sap.cloud.security.version>3.5.7</sap.cloud.security.version>
+        <sap.cloud.sdk.version>5.24.0</sap.cloud.sdk.version>
+        <sap.cloud.environment.servicebinding.version>0.21.0</sap.cloud.environment.servicebinding.version>
+        <jackson.version>2.15.2</jackson.version>
+        <opencsv.version>5.8</opencsv.version>
+        <apache.httpclient.version>4.5.14</apache.httpclient.version>
+        <junit.version>5.10.0</junit.version>
+    </properties>
+
+    <dependencyManagement>
+        <dependencies>
+            <!-- BOMs -->
+            <dependency>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-dependencies</artifactId>
+                <version>${spring.boot.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.sap.cloud.security</groupId>
+                <artifactId>java-bom</artifactId>
+                <version>${sap.cloud.security.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.sap.cloud.security.ams</groupId>
+                <artifactId>ams-bom</artifactId>
+                <version>${sap.cloud.security.ams.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.sap.cloud.sdk</groupId>
+                <artifactId>sdk-bom</artifactId>
+                <version>${sap.cloud.sdk.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+            <dependency>
+                <groupId>com.sap.cloud.environment.servicebinding</groupId>
+                <artifactId>java-bom</artifactId>
+                <version>${sap.cloud.environment.servicebinding.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
+            <!-- JSON -->
+            <dependency>
+                <groupId>com.fasterxml.jackson.core</groupId>
+                <artifactId>jackson-databind</artifactId>
+                <version>${jackson.version}</version>
+            </dependency>
+
+            <!-- CSV -->
+            <dependency>
+                <groupId>com.opencsv</groupId>
+                <artifactId>opencsv</artifactId>
+                <version>${opencsv.version}</version>
+            </dependency>
+
+            <!-- HTTP -->
+            <dependency>
+                <groupId>org.apache.httpcomponents</groupId>
+                <artifactId>httpclient</artifactId>
+                <version>${apache.httpclient.version}</version>
+            </dependency>
+
+            <!-- Testing -->
+            <dependency>
+                <groupId>org.junit.jupiter</groupId>
+                <artifactId>junit-jupiter</artifactId>
+                <version>${junit.version}</version>
+            </dependency>
+        </dependencies>
+    </dependencyManagement>
+
+    <dependencies>
+        <!-- Spring Boot Starters -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-actuator</artifactId>
+        </dependency>
+
+        <!-- SAP Cloud Security -->
+        <dependency>
+            <groupId>com.sap.cloud.security</groupId>
+            <artifactId>resourceserver-security-spring-boot-starter</artifactId>
+        </dependency>
+
+        <!-- SAP AMS -->
+        <dependency>
+            <groupId>com.sap.cloud.security.ams</groupId>
+            <artifactId>spring-boot-starter-ams</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.sap.cloud.security.ams</groupId>
+            <artifactId>spring-boot-3-starter-ams-health</artifactId>
+        </dependency>
+
+        <!-- SAP Cloud SDK ZTIS Connectivity -->
+        <dependency>
+            <groupId>com.sap.cloud.sdk.cloudplatform</groupId>
+            <artifactId>connectivity-ztis</artifactId>
+        </dependency>
+
+        <!-- Include following dependency if your application uses the VCAP_SERVICES environment variable as a source for service bindings -->
+        <dependency>
+            <groupId>com.sap.cloud.environment.servicebinding</groupId>
+            <artifactId>java-sap-vcap-services</artifactId>
+        </dependency>
+
+        <!-- Include following dependency if your application uses mounted service bindings created by the SAP BTP Service Operator -->
+        <dependency>
+            <groupId>com.sap.cloud.environment.servicebinding</groupId>
+            <artifactId>java-sap-service-operator</artifactId>
+        </dependency>
+
+        <!-- JSON Processing -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
+
+        <!-- CSV Processing -->
+        <dependency>
+            <groupId>com.opencsv</groupId>
+            <artifactId>opencsv</artifactId>
+        </dependency>
+
+        <!-- Apache HTTP Client 4 required for Authentication Library -->
+        <dependency>
+            <groupId>org.apache.httpcomponents</groupId>
+            <artifactId>httpclient</artifactId>
+        </dependency>
+
+        <!-- Test Dependencies -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.vaadin.external.google</groupId>
+                    <artifactId>android-json</artifactId>
+                </exclusion>
+            </exclusions>
+        </dependency>
+
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.sap.cloud.security.ams</groupId>
+            <artifactId>spring-boot-starter-ams-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.junit.jupiter</groupId>
+            <artifactId>junit-jupiter</artifactId>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-test-autoconfigure</artifactId>
+            <scope>test</scope>
+        </dependency>
+    </dependencies>
+
+    <build>
+        <finalName>${project.artifactId}</finalName>
+        <plugins>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <version>3.14.0</version>
+                <configuration>
+                    <release>${jdk.version}</release>
+                </configuration>
+            </plugin>
+
+            <plugin>
+                <groupId>org.springframework.boot</groupId>
+                <artifactId>spring-boot-maven-plugin</artifactId>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-surefire-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <classpathDependencyExcludes>
+                        <classpathDependencyExclude>
+                            com.sap.cloud.security:resourceserver-security-spring-boot-starter
+                        </classpathDependencyExclude>
+                    </classpathDependencyExcludes>
+                </configuration>
+            </plugin>
+
+            <!-- Plugin for DCL -> DCN compilation before tests -->
+            <plugin>
+                <groupId>com.github.eirslett</groupId>
+                <artifactId>frontend-maven-plugin</artifactId>
+                <version>1.14.1</version>
+                <executions>
+                    <execution>
+                        <id>install node and npm</id>
+                        <goals>
+                            <goal>install-node-and-npm</goal>
+                        </goals>
+                        <phase>generate-test-resources</phase>
+                        <configuration>
+                            <nodeVersion>v24.11.0</nodeVersion>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>compile-dcl</id>
+                        <goals>
+                            <goal>npx</goal>
+                        </goals>
+                        <phase>generate-test-resources</phase>
+                        <configuration>
+                            <arguments>--package=@sap/ams-dev compile-dcl
+                                -d ${project.basedir}/src/main/resources/dcl
+                                -o ${project.build.directory}/generated-test-resources/ams/dcn
+                            </arguments>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+</project>
