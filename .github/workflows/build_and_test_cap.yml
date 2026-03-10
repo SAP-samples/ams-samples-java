@@ -15,7 +15,7 @@ jobs:
     name: Detect Changes
     runs-on: ubuntu-latest
     outputs:
-      should_run: ${{ steps.changed.outputs.any_changed }}
+      should_run: ${{ steps.changed.outputs.any_modified }}
     steps:
       - uses: actions/checkout@v4
         with:
