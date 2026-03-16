@@ -15,13 +15,13 @@
     <properties>
         <jdk.version>17</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <sap.cloud.security.ams.version>4.0.5</sap.cloud.security.ams.version>
+        <sap.cloud.security.ams.version>4.0.6</sap.cloud.security.ams.version>
         <sap.cloud.environment.servicebinding.version>0.21.0</sap.cloud.environment.servicebinding.version>
         <javalin.version>6.7.0</javalin.version>
-        <jackson.version>2.15.2</jackson.version>
-        <opencsv.version>5.8</opencsv.version>
+        <jackson.version>2.21.1</jackson.version>
+        <opencsv.version>5.12.0</opencsv.version>
         <slf4j.version>2.0.7</slf4j.version>
-        <logback.version>1.4.14</logback.version>
+        <logback.version>1.5.32</logback.version>
         <junit.version>5.10.0</junit.version>
         <httpclient.version>4.5.14</httpclient.version>
     </properties>
@@ -176,7 +176,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.14.0</version>
+                <version>3.15.0</version>
                 <configuration>
                     <release>${jdk.version}</release>
                 </configuration>
@@ -185,13 +185,13 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.5.5</version>
             </plugin>
 
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>3.4.1</version>
+                <version>3.6.2</version>
                 <configuration>
                     <createDependencyReducedPom>false</createDependencyReducedPom>
                     <transformers>
@@ -228,7 +228,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>exec-maven-plugin</artifactId>
-                <version>3.1.0</version>
+                <version>3.6.3</version>
                 <configuration>
                     <mainClass>com.sap.cloud.security.ams.samples.JavalinShoppingApplication</mainClass>
                 </configuration>
