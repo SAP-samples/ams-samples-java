@@ -70,10 +70,15 @@ jobs:
   # This job ensures the workflow passes when no relevant changes are detected
   # Required for PR status checks to pass when the sample hasn't changed
   no-changes:
-    name: No Changes Detected
+    name: Build and Test${{ matrix.spring_boot_version && format(' (Spring Boot {0})', matrix.spring_boot_version) || '' }}
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.should_run != 'true' }}
+    if: ${{ github.event_name != 'workflow_dispatch' && needs.detect-changes.outputs.should_run != 'true' }}
     runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        include:
+          - spring_boot_version: ''
+          - spring_boot_version: '4.0.2'
     steps:
       - name: No relevant changes detected
         run: echo "No relevant changes detected for ams-spring-boot-shopping. Skipping build and test."

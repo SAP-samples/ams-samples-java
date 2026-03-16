@@ -53,9 +53,9 @@ jobs:
   # This job ensures the workflow passes when no relevant changes are detected
   # Required for PR status checks to pass when the sample hasn't changed
   no-changes:
-    name: No Changes Detected
+    name: Build and Test
     needs: detect-changes
-    if: ${{ needs.detect-changes.outputs.should_run != 'true' }}
+    if: ${{ github.event_name != 'workflow_dispatch' && needs.detect-changes.outputs.should_run != 'true' }}
     runs-on: ubuntu-latest
     steps:
       - name: No relevant changes detected
