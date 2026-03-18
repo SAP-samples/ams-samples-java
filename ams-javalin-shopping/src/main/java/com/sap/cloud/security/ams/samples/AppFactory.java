@@ -1,16 +1,20 @@
 package com.sap.cloud.security.ams.samples;
 
+import com.sap.cloud.security.ams.samples.auth.AuthHandler;
+import com.sap.cloud.security.ams.samples.auth.Role;
+import com.sap.cloud.security.ams.samples.db.SimpleDatabase;
+import com.sap.cloud.security.ams.samples.model.HealthStatus;
+import com.sap.cloud.security.ams.samples.service.OrdersService;
+import com.sap.cloud.security.ams.samples.service.PrivilegesService;
+import com.sap.cloud.security.ams.samples.service.ProductsService;
+import io.javalin.Javalin;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
 
-import com.sap.cloud.security.ams.samples.auth.*;
-import com.sap.cloud.security.ams.samples.db.SimpleDatabase;
-import com.sap.cloud.security.ams.samples.model.HealthStatus;
-import com.sap.cloud.security.ams.samples.service.*;
-
-import org.slf4j.*;
-
-import io.javalin.Javalin;
+import static io.javalin.apibuilder.ApiBuilder.*;
 
 /**
  * Factory class for creating and configuring the Javalin application.
@@ -23,7 +27,7 @@ public class AppFactory {
 
     /**
      * Create and configure the Javalin application
-     * 
+     *
      * @param authHandler The authentication handler to use
      * @return Configured Javalin application
      */
@@ -36,30 +40,35 @@ public class AppFactory {
         OrdersService ordersService = new OrdersService(database, authHandler);
         PrivilegesService privilegesService = new PrivilegesService(authHandler);
 
-        Javalin app = Javalin.create();
+        Javalin app = Javalin.create(config -> {
+            // Request lifecycle handlers
+            config.routes.beforeMatched(authHandler);
+            config.routes.after(authHandler::clear);
 
-        app.beforeMatched(authHandler::handle);
-        app.after(authHandler::clear);
+            // Routes using apiBuilder syntax
+            config.routes.apiBuilder(() -> {
+                // Health endpoint
+                get("/health", ctx -> {
+                    if (isReady.get()) {
+                        ctx.json(HealthStatus.up());
+                    } else {
+                        ctx.status(503).json(HealthStatus.down("Service is not ready"));
+                    }
+                });
 
-        app.get("/health", ctx -> {
-            if (isReady.get()) {
-                ctx.json(HealthStatus.up());
-            } else {
-                ctx.status(503).json(HealthStatus.down("Service is not ready"));
-            }
-        });
+                // API endpoints  
+                get("/privileges", privilegesService.getPrivileges(), Role.AUTHENTICATED);
+                get("/products", productsService.getProducts(), Role.READ_PRODUCTS);
+                get("/orders", ordersService.getOrders(), Role.READ_ORDERS);
+                post("/orders", ordersService.createOrder(), Role.CREATE_ORDERS);
+                delete("/orders/{id}", ordersService.deleteOrder(), Role.DELETE_ORDERS);
+            });
 
-        // API endpoints
-        app.get("/privileges", privilegesService.getPrivileges(), Role.AUTHENTICATED);
-        app.get("/products", productsService.getProducts(), Role.READ_PRODUCTS);
-        app.get("/orders", ordersService.getOrders(), Role.READ_ORDERS);
-        app.post("/orders", ordersService.createOrder(), Role.CREATE_ORDERS);
-        app.delete("/orders/{id}", ordersService.deleteOrder(), Role.DELETE_ORDERS);
-
-        // Global error handler
-        app.exception(Exception.class, (e, ctx) -> {
-            LOG.error("Unhandled exception", e);
-            ctx.status(500).result("Internal server error");
+            // Global error handler
+            config.routes.exception(Exception.class, (e, ctx) -> {
+                LOG.error("Unhandled exception", e);
+                ctx.status(500).result("Internal server error");
+            });
         });
 
         // Wait up to 30s for AMS to become ready
