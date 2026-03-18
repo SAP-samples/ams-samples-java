@@ -38,6 +38,14 @@
                 <scope>import</scope>
             </dependency>
 
+            <dependency>
+                <groupId>org.junit</groupId>
+                <artifactId>junit-bom</artifactId>
+                <version>${junit.version}</version>
+                <type>pom</type>
+                <scope>import</scope>
+            </dependency>
+
             <!-- SAP BTP Service Binding Accessor -->
             <dependency>
                 <groupId>com.sap.cloud.environment.servicebinding</groupId>
@@ -92,14 +100,6 @@
                 <version>${logback.version}</version>
             </dependency>
 
-            <!-- Testing -->
-            <dependency>
-                <groupId>org.junit</groupId>
-                <artifactId>junit-bom</artifactId>
-                <version>${junit.version}</version>
-                <type>pom</type>
-                <scope>import</scope>
-            </dependency>
         </dependencies>
     </dependencyManagement>
 
