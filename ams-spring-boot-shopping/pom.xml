@@ -65,7 +65,7 @@
             </dependency>
             <dependency>
                 <groupId>com.sap.cloud.environment.servicebinding</groupId>
-                <artifactId>java-bom</artifactId>
+                <artifactId>java-modules-bom</artifactId>
                 <version>${sap.cloud.environment.servicebinding.version}</version>
                 <type>pom</type>
                 <scope>import</scope>
