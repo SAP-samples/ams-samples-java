@@ -218,24 +218,25 @@
                             <basePackage>cds.gen</basePackage>
                         </configuration>
                     </execution>
+                </executions>
+            </plugin>
 
-                    <!-- DCL -> DCN compilation before tests -->
+            <!-- Plugin for DCL -> DCN compilation before tests -->
+            <plugin>
+                <groupId>com.sap.cloud.security.ams.dcl</groupId>
+                <artifactId>dcl-compiler-plugin</artifactId>
+                <version>${sap.cloud.security.ams.dcl-compiler.version}</version>
+                <executions>
                     <execution>
-                        <id>compile-dcl</id>
                         <goals>
-                            <goal>npx</goal>
+                            <goal>compile</goal>
                         </goals>
-                        <phase>generate-test-resources</phase>
                         <configuration>
-                            <arguments>--package=@sap/ams-dev compile-dcl
-                                -d ${project.basedir}/src/main/resources/ams -o
-                                ${project.build.directory}/generated-test-resources/ams/dcn
-                            </arguments>
+                            <sourceDirectory>${project.basedir}/src/main/resources/ams</sourceDirectory>
                         </configuration>
                     </execution>
                 </executions>
             </plugin>
-
         </plugins>
     </build>
 

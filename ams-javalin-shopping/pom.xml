@@ -16,6 +16,7 @@
         <jdk.version>17</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <sap.cloud.security.ams.version>4.0.7</sap.cloud.security.ams.version>
+        <sap.cloud.security.ams.dcl-compiler.version>1.1.1</sap.cloud.security.ams.dcl-compiler.version>
         <sap.cloud.environment.servicebinding.version>0.21.0</sap.cloud.environment.servicebinding.version>
         <javalin.version>6.7.0</javalin.version>
         <jackson.version>2.21.1</jackson.version>
@@ -236,32 +237,14 @@
 
             <!-- Plugin for DCL -> DCN compilation before tests -->
             <plugin>
-                <groupId>com.github.eirslett</groupId>
-                <artifactId>frontend-maven-plugin</artifactId>
-                <version>1.14.1</version>
+                <groupId>com.sap.cloud.security.ams.dcl</groupId>
+                <artifactId>dcl-compiler-plugin</artifactId>
+                <version>${sap.cloud.security.ams.dcl-compiler.version}</version>
                 <executions>
                     <execution>
-                        <id>install node and npm</id>
                         <goals>
-                            <goal>install-node-and-npm</goal>
+                            <goal>compile</goal>
                         </goals>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <nodeVersion>v24.11.0</nodeVersion>
-                        </configuration>
-                    </execution>
-                    <execution>
-                        <id>compile-dcl</id>
-                        <goals>
-                            <goal>npx</goal>
-                        </goals>
-                        <phase>generate-resources</phase>
-                        <configuration>
-                            <arguments>--package=@sap/ams-dev@2.2.0 compile-dcl
-                                -d src/main/resources/ams/dcl -o
-                                ${project.build.directory}/generated-test-resources/ams/dcn
-                            </arguments>
-                        </configuration>
                     </execution>
                 </executions>
             </plugin>
