@@ -26,13 +26,10 @@
         <spring.boot.version>3.5.10</spring.boot.version>
         <sap.cloud.security.ams.version>4.0.7</sap.cloud.security.ams.version>
         <sap.cloud.security.ams.dcl-compiler.version>1.1.1</sap.cloud.security.ams.dcl-compiler.version>
-        <sap.cloud.security.version>3.5.7</sap.cloud.security.version>
-        <sap.cloud.sdk.version>5.24.0</sap.cloud.sdk.version>
+        <sap.cloud.security.version>3.6.8</sap.cloud.security.version>
+        <sap.cloud.sdk.version>5.27.0</sap.cloud.sdk.version>
         <sap.cloud.environment.servicebinding.version>0.21.0</sap.cloud.environment.servicebinding.version>
-        <jackson.version>2.15.2</jackson.version>
-        <opencsv.version>5.8</opencsv.version>
-        <apache.httpclient.version>4.5.14</apache.httpclient.version>
-        <junit.version>6.0.3</junit.version>
+        <opencsv.version>5.12.0</opencsv.version>
     </properties>
 
     <dependencyManagement>
@@ -74,32 +71,11 @@
                 <scope>import</scope>
             </dependency>
 
-            <!-- JSON -->
-            <dependency>
-                <groupId>com.fasterxml.jackson.core</groupId>
-                <artifactId>jackson-databind</artifactId>
-                <version>${jackson.version}</version>
-            </dependency>
-
             <!-- CSV -->
             <dependency>
                 <groupId>com.opencsv</groupId>
                 <artifactId>opencsv</artifactId>
                 <version>${opencsv.version}</version>
-            </dependency>
-
-            <!-- HTTP -->
-            <dependency>
-                <groupId>org.apache.httpcomponents</groupId>
-                <artifactId>httpclient</artifactId>
-                <version>${apache.httpclient.version}</version>
-            </dependency>
-
-            <!-- Testing -->
-            <dependency>
-                <groupId>org.junit.jupiter</groupId>
-                <artifactId>junit-jupiter</artifactId>
-                <version>${junit.version}</version>
             </dependency>
         </dependencies>
     </dependencyManagement>
@@ -153,22 +129,10 @@
             <artifactId>java-sap-service-operator</artifactId>
         </dependency>
 
-        <!-- JSON Processing -->
-        <dependency>
-            <groupId>com.fasterxml.jackson.core</groupId>
-            <artifactId>jackson-databind</artifactId>
-        </dependency>
-
         <!-- CSV Processing -->
         <dependency>
             <groupId>com.opencsv</groupId>
             <artifactId>opencsv</artifactId>
-        </dependency>
-
-        <!-- Apache HTTP Client 4 required for Authentication Library -->
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
         </dependency>
 
         <!-- Test Dependencies -->
@@ -195,12 +159,6 @@
             <artifactId>spring-boot-starter-ams-test</artifactId>
             <scope>test</scope>
         </dependency>
-
-        <dependency>
-            <groupId>org.junit.jupiter</groupId>
-            <artifactId>junit-jupiter</artifactId>
-            <scope>test</scope>
-        </dependency>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-test-autoconfigure</artifactId>
@@ -214,7 +172,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.14.0</version>
+                <version>3.15.0</version>
                 <configuration>
                     <release>${jdk.version}</release>
                 </configuration>
@@ -228,7 +186,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.5.5</version>
                 <configuration>
                     <classpathDependencyExcludes>
                         <classpathDependencyExclude>
