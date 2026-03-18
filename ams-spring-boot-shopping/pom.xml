@@ -26,11 +26,11 @@
         <spring.boot.version>3.5.10</spring.boot.version>
         <sap.cloud.security.ams.version>4.0.7</sap.cloud.security.ams.version>
         <sap.cloud.security.ams.dcl-compiler.version>1.1.1</sap.cloud.security.ams.dcl-compiler.version>
-        <sap.cloud.security.version>3.5.7</sap.cloud.security.version>
-        <sap.cloud.sdk.version>5.24.0</sap.cloud.sdk.version>
+        <sap.cloud.security.version>3.6.8</sap.cloud.security.version>
+        <sap.cloud.sdk.version>5.27.0</sap.cloud.sdk.version>
         <sap.cloud.environment.servicebinding.version>0.21.0</sap.cloud.environment.servicebinding.version>
-        <jackson.version>2.15.2</jackson.version>
-        <opencsv.version>5.8</opencsv.version>
+        <jackson.version>2.21.1</jackson.version>
+        <opencsv.version>5.12.0</opencsv.version>
         <apache.httpclient.version>4.5.14</apache.httpclient.version>
         <junit.version>6.0.3</junit.version>
     </properties>
@@ -214,7 +214,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.14.0</version>
+                <version>3.15.0</version>
                 <configuration>
                     <release>${jdk.version}</release>
                 </configuration>
@@ -228,7 +228,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>3.1.2</version>
+                <version>3.5.5</version>
                 <configuration>
                     <classpathDependencyExcludes>
                         <classpathDependencyExclude>
