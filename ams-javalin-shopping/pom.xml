@@ -18,7 +18,7 @@
         <sap.cloud.security.ams.version>4.1.0</sap.cloud.security.ams.version>
         <sap.cloud.security.ams.dcl-compiler.version>1.1.1</sap.cloud.security.ams.dcl-compiler.version>
         <sap.cloud.environment.servicebinding.version>0.30.0</sap.cloud.environment.servicebinding.version>
-        <javalin.version>7.1.0</javalin.version>
+        <javalin.version>7.2.0</javalin.version>
         <jackson.version>2.21.2</jackson.version>
         <opencsv.version>5.12.0</opencsv.version>
         <slf4j.version>2.0.7</slf4j.version>
