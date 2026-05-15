@@ -10,6 +10,9 @@ on:
     branches: [ "**" ]
   workflow_dispatch:  # Allow manual triggering
 
+permissions:
+  contents: read
+
 jobs:
   detect-changes:
     name: Detect Changes
