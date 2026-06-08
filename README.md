@@ -20,6 +20,7 @@ This repository brings together several sample applications that demonstrate how
 | **Javalin Shopping Sample**           | A lightweight application using **Javalin** (minimal web framework) to showcase the AMS v4 Core API        | `ams-javalin-shopping`     |
 | **Spring Boot Shopping Sample**       | A Spring Boot application to showcase AMS **Spring Security** integration                               | `ams-spring-boot-shopping` |
 | **CAP Spring Boot Bookshop Sample**   | Demonstrates the integration of AMS into a **SAP CAP Java** Spring Boot application    | `ams-cap-bookshop`         |
+| **CAP Value Help Sample**             | Demonstrates how to configure **AMS value help** in a CAP Java application | `ams-value-help-sample`    |
 
 ---
 
@@ -51,6 +52,15 @@ This repository brings together several sample applications that demonstrate how
   - Demonstrates AMS Core API v4 integration in a CAP Java project (bookshop sample)
   - Contains instructions for both local development and cloud deployment
 - **More info:** [CAP Bookshop Sample](ams-cap-bookshop/README.md)
+
+### 4. CAP Value Help Sample (`ams-value-help-sample`)
+
+- **Framework:** SAP Cloud Application Programming Model (CAP) for Java
+- **Highlights:**
+  - Demonstrates how to enable **AMS value help** so administrators can select valid attribute values from a dropdown when creating policies in the AMS admin console
+  - Uses the `@valueHelp` CDS annotation to expose an OData endpoint that the AMS server calls back
+  - Shows how to secure the value help endpoint using an `INTERNAL POLICY` and a dedicated `AmsValueHelpService`
+- **More info:** [CAP Value Help Sample](ams-value-help-sample/README.md)
 
 ---
 
