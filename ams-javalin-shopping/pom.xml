@@ -15,7 +15,7 @@
     <properties>
         <jdk.version>17</jdk.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <sap.cloud.security.ams.version>4.1.2</sap.cloud.security.ams.version>
+        <sap.cloud.security.ams.version>4.2.0</sap.cloud.security.ams.version>
         <sap.cloud.security.ams.dcl-compiler.version>1.4.0</sap.cloud.security.ams.dcl-compiler.version>
         <sap.cloud.environment.servicebinding.version>0.31.0</sap.cloud.environment.servicebinding.version>
         <javalin.version>7.2.2</javalin.version>
