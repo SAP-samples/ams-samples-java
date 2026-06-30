@@ -44,6 +44,21 @@ public class TestSecurityContextHelper {
      */
     public static final String SERVICE_BINDING_ROOT = "src/test/resources/customization/service-bindings";
 
+    /**
+     * Token TTL used for mocked JWTs in tests.
+     *
+     * <p>Set to 24 hours rather than the typical 1 hour because of a latent timezone bug in
+     * {@code com.sap.cloud.security:java-api}'s {@code Token.isExpired()} implementation, which
+     * compares the parsed {@code exp} claim against {@code LocalDateTime.now().toInstant(ZoneOffset.UTC)}.
+     * On a JVM whose default zone is UTC+N (e.g. CEST = UTC+2), that expression is N hours ahead
+     * of the real {@code Instant.now()}, so a token minted with a TTL shorter than N is reported
+     * as already expired the moment it's created.
+     *
+     * <p>Using 24h is safely larger than the maximum civil offset on Earth (+14h, Kiribati) and
+     * therefore makes these tests robust against the bug regardless of the JVM's default zone.
+     */
+    private static final long TOKEN_TTL_SECONDS = 24L * 60 * 60;
+
     private final CdsRuntime cdsRuntime;
 
     public TestSecurityContextHelper(CdsRuntime cdsRuntime) {
@@ -263,8 +278,8 @@ public class TestSecurityContextHelper {
                         """,
                 userName,
                 scopesJson,
-                System.currentTimeMillis() / 1000 + 3600,  // expires in 1 hour
-                System.currentTimeMillis() / 1000,         // issued now
+                System.currentTimeMillis() / 1000 + TOKEN_TTL_SECONDS,  // exp
+                System.currentTimeMillis() / 1000,                     // iat
                 userName);
 
         return encodeJwt(payload);
@@ -306,13 +321,13 @@ public class TestSecurityContextHelper {
                           "email": "%s@example.com"
                         }
                         """,
-                scimId,                                     // sub (same as scim_id for user tokens)
-                TEST_TENANT_ID,                             // app_tid (tenant ID)
-                scimId,                                     // scim_id (user identifier for policy lookup)
-                scimId,                                     // user_uuid
-                System.currentTimeMillis() / 1000 + 3600,   // exp (expires in 1 hour)
-                System.currentTimeMillis() / 1000,          // iat (issued now)
-                userName);                                  // email
+                scimId,                                            // sub (same as scim_id for user tokens)
+                TEST_TENANT_ID,                                    // app_tid (tenant ID)
+                scimId,                                            // scim_id (user identifier for policy lookup)
+                scimId,                                            // user_uuid
+                System.currentTimeMillis() / 1000 + TOKEN_TTL_SECONDS,  // exp
+                System.currentTimeMillis() / 1000,                 // iat
+                userName);                                         // email
 
         return encodeJwt(payload);
     }

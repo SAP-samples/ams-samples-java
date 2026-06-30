@@ -3,6 +3,9 @@ package customer.ams_cap_bookshop.customization.config;
 import com.sap.cloud.security.ams.api.*;
 import com.sap.cloud.security.ams.cap.api.CdsAuthorizations;
 import com.sap.cloud.security.ams.core.HybridAuthorizationsProvider;
+import com.sap.cloud.security.token.SecurityContext;
+import com.sap.cloud.security.token.XsuaaTokenExtension;
+import jakarta.annotation.PostConstruct;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
@@ -42,13 +45,25 @@ public class HybridAuthorizationsTestConfiguration {
     private static final Logger LOG = LoggerFactory.getLogger(HybridAuthorizationsTestConfiguration.class);
     private static final String XSAPPNAME = "bookshop";
 
+    /**
+     * Replaces the auto-configured {@code DefaultXsuaaTokenExtension} with a pass-through that
+     * returns the {@link com.sap.cloud.security.token.Token} previously placed by
+     * {@code SecurityContext.setXsuaaToken(...)} as-is without cache invalidation logic.
+     */
+    @PostConstruct
+    void installPassThroughXsuaaTokenExtension() {
+        XsuaaTokenExtension passThrough = token -> token;
+        SecurityContext.registerXsuaaTokenExtension(passThrough);
+        LOG.info("Registered pass-through XsuaaTokenExtension; production DefaultXsuaaTokenExtension will not be used.");
+    }
+
     @Bean
     @Primary
     public AuthorizationsProvider<CdsAuthorizations> hybridCdsAuthorizationsProvider(
             AuthorizationManagementService ams,
             @Value("${ams.combined-authorizations-enabled:false}") boolean combinedAuthorizationsEnabled) {
 
-        LOG.info("Creating HybridAuthorizationsProvider with combinedAuthorizationsEnabled={}", 
+        LOG.info("Creating HybridAuthorizationsProvider with combinedAuthorizationsEnabled={}",
                 combinedAuthorizationsEnabled);
 
         ScopeMapper scopeMapper = ScopeMapper.ofFunctionMultiple(scope -> switch (scope) {
@@ -61,10 +76,10 @@ public class HybridAuthorizationsTestConfiguration {
                 .withXsAppName(XSAPPNAME)
                 .withCombinedAuthorizationsEnabled(combinedAuthorizationsEnabled);
     }
-    
+
     /**
      * Provides mock policy assignments for IAS users.
-     * 
+     *
      * <p>This bean is used when combined authorizations is enabled to simulate
      * policy assignments that would normally come from the AMS service.
      */
