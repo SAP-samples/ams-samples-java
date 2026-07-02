@@ -34,7 +34,7 @@ import static org.springframework.http.HttpMethod.*;
 public class SecurityConfiguration {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, AmsRouteSecurity via) {
+    public SecurityFilterChain filterChain(HttpSecurity http, AmsRouteSecurity via) throws Exception {
         http.authorizeHttpRequests(authz -> {
                     // Public endpoints - Spring Boot Actuator health check
                     authz.requestMatchers(GET, "/actuator/health").permitAll();
