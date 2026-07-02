@@ -11,6 +11,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.web.SecurityFilterChain;
 
+import static com.sap.cloud.security.ams.samples.config.Privileges.*;
 import static org.springframework.http.HttpMethod.*;
 
 /**
@@ -29,11 +30,11 @@ import static org.springframework.http.HttpMethod.*;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@PropertySource(factory = IdentityServicesPropertySourceFactory.class, ignoreResourceNotFound = true, value = { "" })
+@PropertySource(factory = IdentityServicesPropertySourceFactory.class, ignoreResourceNotFound = true, value = {""})
 public class SecurityConfiguration {
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http, AmsRouteSecurity via) throws Exception {
+    public SecurityFilterChain filterChain(HttpSecurity http, AmsRouteSecurity via) {
         http.authorizeHttpRequests(authz -> {
                     // Public endpoints - Spring Boot Actuator health check
                     authz.requestMatchers(GET, "/actuator/health").permitAll();
@@ -41,17 +42,19 @@ public class SecurityConfiguration {
                     // Authenticated endpoints without authorization checks
                     authz.requestMatchers(GET, "/privileges").authenticated();
 
-                    // Endpoints protected with AMS  method-level security
+                    // CHOOSE ONE idiom below (route-level authorization + service-level filtering vs. full service-level authorization
+
+                    // Idiom 1 (Full service-level authorization): these endpoints are protected with AMS method-level security
                     authz.requestMatchers(GET, "/products").authenticated();
                     authz.requestMatchers(GET, "/orders").authenticated();
                     authz.requestMatchers(POST, "/orders").authenticated();
                     authz.requestMatchers(DELETE, "/orders/**").authenticated();
 
-                    // Showcases alternative endpoint protection via AMS route-level security
-                    // authz.requestMatchers(GET, "/products").access(via.checkPrivilege(READ_PRODUCTS));
-                    // authz.requestMatchers(GET, "/orders").access(via.precheckPrivilege(READ_ORDERS));
-                    // authz.requestMatchers(POST, "/orders").access(via.precheckPrivilege(CREATE_ORDERS));
-                    // authz.requestMatchers(DELETE, "/orders/**").access(via.checkPrivilege(DELETE_ORDERS));
+                    // Idiom 2 (route-level authorization + service-level filtering) Showcases alternative endpoint protection via AMS route-level security (+ service-level filtering)
+                    authz.requestMatchers(GET, "/products").access(via.checkPrivilege(READ_PRODUCTS));
+                    authz.requestMatchers(GET, "/orders").access(via.precheckPrivilege(READ_ORDERS));
+                    authz.requestMatchers(POST, "/orders").access(via.precheckPrivilege(CREATE_ORDERS));
+                    authz.requestMatchers(DELETE, "/orders/**").access(via.checkPrivilege(DELETE_ORDERS));
 
                     // Deny all other requests
                     authz.anyRequest().denyAll();
