@@ -3,6 +3,7 @@ spring:
   sql:
     init:
       platform: h2
+sap.ams.test.enabled: true
 logging.level:
   com.sap.cds.security.authorization: TRACE
   com.sap.cloud.security.ams: TRACE
