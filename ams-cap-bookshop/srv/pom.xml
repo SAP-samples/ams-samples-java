@@ -76,7 +76,6 @@
         <dependency>
             <groupId>com.sap.cloud.security.ams</groupId>
             <artifactId>spring-boot-starter-cap-ams-test</artifactId>
-            <scope>test</scope>
         </dependency>
 
         <dependency>
