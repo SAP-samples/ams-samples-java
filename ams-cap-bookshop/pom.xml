@@ -21,7 +21,7 @@
 
         <cds.install-node.downloadUrl>https://nodejs.org/dist/</cds.install-node.downloadUrl>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <sap.cloud.security.ams.version>4.4.0</sap.cloud.security.ams.version>
+        <sap.cloud.security.ams.version>4.4.1</sap.cloud.security.ams.version>
         <sap.cloud.security.ams.dcl-compiler.version>1.4.0</sap.cloud.security.ams.dcl-compiler.version>
         <sap.cloud.security.version>4.0.8</sap.cloud.security.version>
     </properties>
@@ -113,7 +113,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>flatten-maven-plugin</artifactId>
-                <version>1.7.3</version>
+                <version>1.8.0</version>
                 <configuration>
                     <updatePomFile>true</updatePomFile>
                     <flattenMode>resolveCiFriendliesOnly</flattenMode>
