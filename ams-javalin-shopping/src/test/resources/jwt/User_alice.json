@@ -1,5 +1,6 @@
 {
     "sub": "alice",
+    "sap_id_type": "user",
     "app_tid": "tenant1",
     "iss": "https://footenant.accounts400.ondemand.com",
     "given_name": "alice",

@@ -4,6 +4,7 @@
         "ReadInvoices"
     ],
     "sub": "b8eeb174-afdb-4055-a29b-05458deaf7fe",
+    "sap_id_type": "app",
     "app_tid": "tenant1",
     "iss": "https://footenant.accounts400.ondemand.com",
     "azpacr": "2",
