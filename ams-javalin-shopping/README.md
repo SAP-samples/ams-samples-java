@@ -1,170 +1,83 @@
 # AMS Javalin Shopping Sample
 
-A Java shopping application sample using Javalin framework and SAP Authorization Management Service (AMS). This project demonstrates how to build a RESTful API with authentication and authorization using Javalin as an alternative to Spring Boot.
-
 ## Overview
 
-This sample is a Java equivalent of the Node.js Express shopping sample, showcasing:
+This is a sample for the plain Java (i.e. non-Spring) API of the AMS Java library. It is a simplified shopping REST API built with the lightweight [Javalin](https://javalin.io/) framework which was chosen due to its simplicity and brevity in order to put the focus on the AMS specific parts of the implementation. The sample integrates both SAP Authorization Management Service (AMS) and the SAP Identity Authentication Service (IAS). Route-level authorization pre-checks are implemented in [`AuthHandler`](src/main/java/com/sap/cloud/security/ams/samples/auth/AuthHandler.java) while fine-grained contextual checks are implemented in the service handlers.
 
-- **Javalin Framework**: Lightweight Java web framework for REST APIs
-- **SAP AMS Integration**: Authorization Management Service for role-based access control
-- **In-memory Database**: Simple CSV-based data initialization
-- **Authentication & Authorization**: Configurable auth handlers for production and testing
-- **Clean Architecture**: Modular design with separation of concerns
+## Domain Entities
 
-## Project Structure
+| Entity | Description | Source |
+|--------|-------------|--------|
+| **Product** | `id`, `name`, `price`, `category` | [`Product.java`](src/main/java/com/sap/cloud/security/ams/samples/model/Product.java), seeded from [`src/main/resources/csv/products.csv`](src/main/resources/csv/products.csv) |
+| **Order** | `id`, `productId`, `quantity`, `totalAmount`, `createdBy` (SCIM id) | [`Order.java`](src/main/java/com/sap/cloud/security/ams/samples/model/Order.java), seeded from [`src/main/resources/csv/orders.csv`](src/main/resources/csv/orders.csv) |
+| **HealthStatus** | Health response payload | [`HealthStatus.java`](src/main/java/com/sap/cloud/security/ams/samples/model/HealthStatus.java) |
 
-```
-ams-javalin-shopping/
-├── src/main/java/com/sap/ams/cloud/security/samples/
-│   ├── JavalinShoppingApplication.java    # Main application entry point
-│   ├── AppFactory.java                     # Configurable app builder
-│   ├── auth/
-│   │   └── AuthHandler.java               # Production auth handler (AMS integration)
-│   ├── service/
-│   │   ├── ProductsService.java           # Products REST service
-│   │   ├── OrdersService.java             # Orders REST service
-│   │   └── PrivilegesService.java         # User privileges service
-│   ├── db/
-│   │   ├── SimpleDatabase.java            # In-memory database
-│   │   └── DataLoader.java                # CSV data loader
-│   └── model/
-│       ├── Product.java                   # Product entity
-│       ├── Order.java                     # Order entity
-│       └── HealthStatus.java              # Health check model
-├── src/main/resources/
-│   └── csv/
-│       ├── products.csv                   # Initial product data
-│       └── orders.csv                     # Initial order data
-└── src/test/java/com/sap/ams/cloud/security/samples/
-    ├── JavalinShoppingApplicationTest.java # Integration tests
-    └── auth/
-        └── MockAuthHandler.java           # Mock auth for testing
-```
+Persistence is in-memory via [`SimpleDatabase`](src/main/java/com/sap/cloud/security/ams/samples/db/SimpleDatabase.java) and [`DataLoader`](src/main/java/com/sap/cloud/security/ams/samples/db/DataLoader.java).
 
-## Features
+## Services
 
-### API Endpoints
+| Component | Responsibility                                                                                                                                             |
+|-----------|------------------------------------------------------------------------------------------------------------------------------------------------------------|
+| [`ProductsService`](src/main/java/com/sap/cloud/security/ams/samples/service/ProductsService.java) | `GET /products`                                                                                                                                            |
+| [`OrdersService`](src/main/java/com/sap/cloud/security/ams/samples/service/OrdersService.java) | `GET` / `POST` / `DELETE` on `/orders`; contextual AMS checks for list, create, and optional in-handler delete check                                       |
+| [`PrivilegesService`](src/main/java/com/sap/cloud/security/ams/samples/service/PrivilegesService.java) | `GET /privileges` — returns potential privileges for the current user                                                                                      |
+| [`AuthHandler`](src/main/java/com/sap/cloud/security/ams/samples/auth/AuthHandler.java) | IAS JWT authentication and route-level authorization via [`ShoppingAuthorizations`](src/main/java/com/sap/cloud/security/ams/samples/auth/ShoppingAuthorizations.java) |
+| [`AppFactory`](src/main/java/com/sap/cloud/security/ams/samples/AppFactory.java) | Wires together the different application components on start-up                                                                                            |
 
-- `GET /health` - Health check endpoint (accessible to ANYONE)
-- `GET /products` - Get all products (requires authentication)
-- `GET /orders` - Get user orders with contextual filtering
-- `POST /orders` - Create new order with business validation
-- `DELETE /orders/{id}` - Delete specific order
-- `GET /privileges` - Get user's potential privileges for UI
+Production entry point: [`JavalinShoppingApplication`](src/main/java/com/sap/cloud/security/ams/samples/JavalinShoppingApplication.java).
 
-### Key Components
+## API
 
-1. **Configurable Authentication**: Factory pattern allows different auth handlers for production vs testing
-2. **Role-based Authorization**: Health endpoint accessible to "ANYONE", others require proper authentication
-3. **CSV-based Initialization**: Data loaded from CSV files similar to the Node.js version
-4. **Error Handling**: Comprehensive error handling with proper HTTP status codes
-5. **Logging**: Structured logging throughout the application
+| Method | Path | Auth                                              |
+|--------|------|---------------------------------------------------|
+| `GET` | `/health` | Public (503 until AMS library is ready, then 200) |
+| `GET` | `/privileges` | Authenticated                                     |
+| `GET` | `/products` | `read:products`                                   |
+| `GET` | `/orders` | `read:orders` (with optional row filtering)       |
+| `POST` | `/orders` | `create:orders` (with per-order attribute checks) |
+| `DELETE` | `/orders/{id}` | `delete:orders`                                   |
 
-## Getting Started
+Request body for `POST /orders`: JSON `{ "productId": number, "quantity": number }`.
 
-### Prerequisites
+## Authorization model
 
-- Java 17 or higher
-- Maven 3.6 or higher
+Privileges are defined in [`Role`](src/main/java/com/sap/cloud/security/ams/samples/auth/Role.java) and granted by AMS policies. Enforcement is split between the route layer (`AuthHandler` + Javalin route roles in [`AppFactory`](src/main/java/com/sap/cloud/security/ams/samples/AppFactory.java)) and the service layer where instance-based authorization is implemented.
 
-### Building the Application
+| Operation | AMS privilege | Typical policy | Route-level check | Contextual / service check |
+|-----------|-----------------|----------------|-------------------|----------------------------|
+| `GET /health` | — | — | No AMS role on route | [`AppFactory`](src/main/java/com/sap/cloud/security/ams/samples/AppFactory.java) waits for AMS before reporting UP |
+| `GET /privileges` | — | — | [`Role.AUTHENTICATED`](src/main/java/com/sap/cloud/security/ams/samples/auth/Role.java) in [`AuthHandler.authorize`](src/main/java/com/sap/cloud/security/ams/samples/auth/AuthHandler.java) | [`PrivilegesService`](src/main/java/com/sap/cloud/security/ams/samples/service/PrivilegesService.java) |
+| `GET /products` | `read:products` | `ReadProducts` | `Role.READ_PRODUCTS` in [`AppFactory`](src/main/java/com/sap/cloud/security/ams/samples/AppFactory.java) | Route only |
+| `GET /orders` | `read:orders` | `ReadOrders`, `ReadOwnOrders` | `Role.READ_ORDERS` in [`AppFactory`](src/main/java/com/sap/cloud/security/ams/samples/AppFactory.java) | [`OrdersService.getOrders`](src/main/java/com/sap/cloud/security/ams/samples/service/OrdersService.java) — deny, full list, or filter via [`ShoppingAuthorizations.checkRole`](src/main/java/com/sap/cloud/security/ams/samples/auth/ShoppingAuthorizations.java) |
+| `POST /orders` | `create:orders` | `CreateOrders` | `Role.CREATE_ORDERS` in [`AppFactory`](src/main/java/com/sap/cloud/security/ams/samples/AppFactory.java) | [`OrdersService.createOrder`](src/main/java/com/sap/cloud/security/ams/samples/service/OrdersService.java) — [`checkCreateOrder`](src/main/java/com/sap/cloud/security/ams/samples/auth/ShoppingAuthorizations.java) with product category and order total |
+| `DELETE /orders/{id}` | `delete:orders` | `DeleteOrders` | `Role.DELETE_ORDERS` in [`AppFactory`](src/main/java/com/sap/cloud/security/ams/samples/AppFactory.java) | Route only (see commented equivalent check in [`OrdersService.deleteOrder`](src/main/java/com/sap/cloud/security/ams/samples/service/OrdersService.java)) |
 
-```bash
-cd ams-javalin-shopping
-mvn clean compile
-```
+**App2App communication**: External principal propagation and technical user requests from other applications may act only with controlled privileges as defined by the policy mappers in [`AuthHandler.createAuthProvider`](src/main/java/com/sap/cloud/security/ams/samples/auth/AuthHandler.java), see [`PolicyTest`](src/test/java/com/sap/cloud/security/ams/samples/auth/PolicyTest.java).
 
-### Running the Application
+## Policy definitions (DCL)
 
-```bash
-mvn exec:java
-```
+| Package | File | Purpose                                                                                    |
+|---------|------|--------------------------------------------------------------------------------------------|
+| `shopping` | [`src/main/resources/ams/dcl/shopping/basePolicies.dcl`](src/main/resources/ams/dcl/shopping/basePolicies.dcl) | `ReadProducts`, `ReadOrders`, `ReadOwnOrders`, `CreateOrders`, `DeleteOrders`              |
+| `local` | [`src/main/resources/ams/dcl/local/adminPolicies.dcl`](src/main/resources/ams/dcl/local/adminPolicies.dcl) | Mocked derived policies for testing, e.g. `OrderAccessory` (restricted create)             |
+| `internal` | [`src/main/resources/ams/dcl/internal/internalPolicies.dcl`](src/main/resources/ams/dcl/internal/internalPolicies.dcl) | Internal App2App policies (inaccessible by administrators)                                 |
+| Schema | [`src/main/resources/ams/dcl/schema.dcl`](src/main/resources/ams/dcl/schema.dcl) | Attributes for instance-based authorization `order.*`, `product.category`, `$user.scim_id` |
 
-Or with custom port:
+## Running tests
 
-```bash
-mvn exec:java -Dserver.port=8080
-```
-
-The application will start on port 7000 by default and be available at:
-- Health check: http://localhost:7000/health
-- API endpoints: http://localhost:7000/products, etc.
-
-### Running Tests
+From this directory:
 
 ```bash
 mvn test
 ```
 
-## Configuration
+| Test class | Focus |
+|------------|--------|
+| [`JavalinShoppingApplicationTest`](src/test/java/com/sap/cloud/security/ams/samples/JavalinShoppingApplicationTest.java) | HTTP integration tests with [`TestAuthHandler`](src/test/java/com/sap/cloud/security/ams/samples/auth/TestAuthHandler.java) and JWT fixtures under `src/test/resources/jwt/` |
+| [`PolicyTest`](src/test/java/com/sap/cloud/security/ams/samples/auth/PolicyTest.java) | DCL policy evaluation via local DCN (`AmsTestExtension`) |
 
-### Environment Variables
-
-- `PORT` - Server port (default: 7000)
-
-### System Properties
-
-- `server.port` - Alternative way to set server port
-
-## Authentication & Authorization
-
-### Production Mode
-
-The `AuthHandler` class provides production authentication using SAP AMS. Currently implemented as stubs that can be extended with actual AMS integration:
-
-```java
-// TODO: Implement actual AMS authentication and authorization
-// This would include:
-// 1. Extract JWT token from Authorization header
-// 2. Validate token with Identity Service
-// 3. Create security context
-// 4. Perform authorization checks with AMS
-```
-
-### Testing Mode
-
-The `MockAuthHandler` allows testing with simple Basic Authentication:
-
-```bash
-curl -H "Authorization: Basic $(echo -n 'testuser:password' | base64)" \
-     http://localhost:7000/products
-```
-
-## Sample Data
-
-### Products
-- MacBook Pro M3 (pc category)
-- Dell Monitor (monitor category)  
-- Apple Mouse (accessory category)
-- Cherry Keyboard (accessory category)
-- Yubikey (securityAccessory category)
-
-### Orders
-- Pre-loaded orders for users: carol, alice, bob
-
-## Dependencies
-
-### Main Dependencies
-- **Javalin 5.6.3** - Web framework
-- **Jackson** - JSON processing
-- **OpenCSV** - CSV file processing
-- **SAP Jakarta AMS 3.9.0-SNAPSHOT** - Authorization Management Service
-- **SLF4J** - Logging
-
-### Test Dependencies
-- **JUnit 5** - Testing framework
-- **Javalin Test Tools** - Integration testing support
-
-## Future Enhancements
-
-1. **Complete AMS Integration**: Implement actual authentication and authorization with SAP AMS
-2. **Database Integration**: Replace in-memory database with persistent storage
-3. **Advanced Authorization**: Implement contextual authorization checks
-4. **API Documentation**: Add OpenAPI/Swagger documentation
-5. **Monitoring**: Add metrics and health indicators
-6. **Security**: Implement HTTPS, CORS configuration, and security headers
+Tests use a local AMS DCN compiled to `target/generated-test-resources/ams/dcn` and policy assignments in [`src/test/resources/mockPolicyAssignments.json`](src/test/resources/mockPolicyAssignments.json). Run tests with Maven so the DCN is generated before execution.
 
 ## License
 
-This project is licensed under the Apache License 2.0 - see the LICENSE file for details.
+Licensed under the Apache License 2.0 — see the [LICENSE](../LICENSE) file in the repository root.
