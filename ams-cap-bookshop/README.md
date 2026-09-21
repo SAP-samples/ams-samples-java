@@ -39,7 +39,7 @@ Notable Catalog operations: read `Books`, `ListOfBooks`; action `submitOrder(boo
 
 ## Authorization model
 
-While anyone can use the catalog service to browse through the shop, there are two roles (`ManageBooks`, `ManageAuthors`) defined in the CAP model (see [`srv/admin-service.cds`](srv/admin-service.cds)) for management purposes. The policy intended for the business role `StockManager` grants only the former - optionally restricted to a specific book genre -, while the policy for the business role `ContentManager` grants both roles.
+While anyone can use the catalog service to browse through the shop, there are two roles (`ManageBooks`, `ManageAuthors`) defined in the CAP model (see [`srv/admin-service.cds`](srv/admin-service.cds)) for management purposes. The policy intended for the business role `StockManager` grants only the former (optionally restricted to a specific book genre), while the policy for the business role `ContentManager` grants both roles.
 
 | CAP role | AMS policy | Typical effect | Enforcement |
 |----------|------------|----------------|-------------|
