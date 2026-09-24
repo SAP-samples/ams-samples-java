@@ -56,9 +56,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 /**
  * End-to-end tests for the production IAS token flow, covering the full API surface
- * of the shopping sample: privilege lookup, product and order reads with
- * instance-based filtering, order creation with per-order attribute checks
- * (including the App2App principal propagation flow), and order deletion.
+ * of the shopping sample: health endpoints, privilege lookup, product and order
+ * reads with instance-based filtering, order creation with per-order attribute
+ * checks (including the App2App principal propagation flow), and order deletion.
  *
  * <p>
  * The production {@code JwtDecoder} validates the token but does NOT populate the
@@ -114,6 +114,19 @@ class IasJwtFlowTest {
     void setUp() {
         // Reset database to initial state before each test to ensure test independence
         database.reset();
+    }
+
+    // Health endpoint tests
+    @Test
+    void healthEndpointIsPublicWithoutAuthentication() throws Exception {
+        mockMvc.perform(get("/health"))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void actuatorHealthEndpointIsPublicWithoutAuthentication() throws Exception {
+        mockMvc.perform(get("/actuator/health"))
+                .andExpect(status().isOk());
     }
 
     // GET /privileges tests

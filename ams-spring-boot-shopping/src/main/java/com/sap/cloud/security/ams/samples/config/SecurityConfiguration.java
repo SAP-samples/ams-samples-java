@@ -36,8 +36,9 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AmsRouteSecurity via) throws Exception {
         http.authorizeHttpRequests(authz -> {
-                    // Public endpoints - Spring Boot Actuator health check
+                    // Public endpoints - health checks
                     authz.requestMatchers(GET, "/actuator/health").permitAll();
+                    authz.requestMatchers(GET, "/health").permitAll();
 
                     // Authenticated endpoints without authorization checks
                     authz.requestMatchers(GET, "/privileges").authenticated();
