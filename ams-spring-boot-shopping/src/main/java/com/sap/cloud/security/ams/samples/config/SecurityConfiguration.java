@@ -5,7 +5,6 @@ import com.sap.cloud.security.spring.config.IdentityServicesPropertySourceFactor
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.PropertySource;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -20,9 +19,10 @@ import static org.springframework.http.HttpMethod.*;
  * <p>
  * This configuration:
  * <ul>
- * <li>Configures route-level security using Spring Security's hasAuthority
- * checks</li>
- * <li>Integrates with AMS through the amsAuthenticationConverter</li>
+ * <li>Configures route-level security using AMS route-level checks
+ * ({@code AmsRouteSecurity}) in addition to standard Spring Security rules</li>
+ * <li>Integrates with AMS through the {@link IasJwtAuthenticationConverter}, which
+ * establishes the caller's token as an AMS principal for authorization checks</li>
  * <li>Uses Privilege constants with toAuthority() to check for
  * "action:resource" authorities</li>
  * </ul>
@@ -59,7 +59,8 @@ public class SecurityConfiguration {
                     // Deny all other requests
                     authz.anyRequest().denyAll();
                 })
-                .oauth2ResourceServer(oauth2 -> oauth2.jwt(Customizer.withDefaults()));
+                .oauth2ResourceServer(oauth2 -> oauth2
+                        .jwt(jwt -> jwt.jwtAuthenticationConverter(new IasJwtAuthenticationConverter())));
 
         return http.build();
     }
