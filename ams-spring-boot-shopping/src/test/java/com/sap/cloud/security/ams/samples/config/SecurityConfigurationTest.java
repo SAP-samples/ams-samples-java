@@ -22,9 +22,8 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContextImpl;
 import org.springframework.security.oauth2.jwt.Jwt;
 
-class IasJwtAuthenticationConverterTest {
+class SecurityConfigurationTest {
 
-    private final IasJwtAuthenticationConverter converter = new IasJwtAuthenticationConverter();
     private final ObjectMapper objectMapper = new ObjectMapper();
 
     @AfterEach
@@ -33,10 +32,10 @@ class IasJwtAuthenticationConverterTest {
     }
 
     @Test
-    void convertsJwtIntoSapAuthenticationToken() {
+    void jwtIsWrappedIntoSapAuthenticationToken() {
         Jwt jwt = testJwt(Map.of("sub", "alice", "app_tid", "tenant1"));
 
-        var authentication = converter.convert(jwt);
+        var authentication = new AuthenticationToken(jwt, SecurityConfiguration.groupAuthorities(jwt));
 
         assertInstanceOf(AuthenticationToken.class, authentication);
         assertInstanceOf(SapIdToken.class, authentication.getPrincipal());
@@ -46,20 +45,25 @@ class IasJwtAuthenticationConverterTest {
     void derivesAuthoritiesFromGroupsClaim() {
         Jwt jwt = testJwt(Map.of("sub", "alice", "groups", List.of("admin", "users")));
 
-        var authentication = converter.convert(jwt);
-
-        List<String> authorities = authentication.getAuthorities().stream()
+        List<String> authorities = SecurityConfiguration.groupAuthorities(jwt).stream()
                 .map(GrantedAuthority::getAuthority)
                 .toList();
         assertEquals(List.of("admin", "users"), authorities);
     }
 
     @Test
-    void convertedAuthenticationEstablishesAmsPrincipal() {
+    void noAuthoritiesWithoutGroupsClaim() {
+        Jwt jwt = testJwt(Map.of("sub", "alice", "app_tid", "tenant1"));
+
+        assertEquals(List.of(), SecurityConfiguration.groupAuthorities(jwt));
+    }
+
+    @Test
+    void authenticationEstablishesAmsPrincipal() {
         Jwt jwt = testJwt(Map.of("sub", "alice", "app_tid", "tenant1", "scim_id", "alice"));
 
         new JavaSecurityContextHolderStrategy()
-                .setContext(new SecurityContextImpl(converter.convert(jwt)));
+                .setContext(new SecurityContextImpl(new AuthenticationToken(jwt, SecurityConfiguration.groupAuthorities(jwt))));
 
         assertInstanceOf(SapIdToken.class, SecurityContext.getToken());
         assertNotNull(Principal.fromSecurityContext());
