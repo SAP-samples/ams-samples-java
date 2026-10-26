@@ -120,6 +120,25 @@ class ApplicationTest {
                 .andExpect(status().isForbidden());
     }
 
+    // GET /products tests for the App2App technical user flow
+    @Test
+    void testProductsAllowedForTechnicalUserWithMappedApi() throws Exception {
+        // ias_apis=GetProducts is mapped to the internal policy GetProducts, which USEs ReadProducts
+        String technicalUserJwt = loadJwtFromFile("TechnicalUser_GetProducts.json");
+        mockMvc.perform(get("/products")
+                .header("Authorization", "Bearer " + technicalUserJwt))
+                .andExpect(status().isOk());
+    }
+
+    @Test
+    void testProductsDeniedForTechnicalUserWithUnmappedApi() throws Exception {
+        // ias_apis=ReadProducts,ReadInvoices are not mapped to any internal policy
+        String technicalUserJwt = loadJwtFromFile("TechnicalUser.json");
+        mockMvc.perform(get("/products")
+                .header("Authorization", "Bearer " + technicalUserJwt))
+                .andExpect(status().isForbidden());
+    }
+
     // DELETE /orders/:id tests
     @Test
     void testDeleteOrdersAllowedWithDeleteOrdersPolicy() throws Exception {
