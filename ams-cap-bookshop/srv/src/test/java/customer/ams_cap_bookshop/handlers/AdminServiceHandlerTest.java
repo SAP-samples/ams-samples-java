@@ -93,4 +93,12 @@ public class AdminServiceHandlerTest {
         // role restricted to Fantasy genre (genre_ID = 13) and Mystery genre (genre_ID = 16)
         assertTrue(result.stream().allMatch(row -> (int) row.get("genre_ID") == 13 || (int) row.get("genre_ID") == 16));
     }
+
+    @Test
+    void adminServiceDeniedWithoutAuthentication() {
+        // AdminService requires the ManageAuthors or ManageBooks role
+        assertThrows(ServiceException.class, () -> {
+            adminService.run(Select.from(BOOKS));
+        });
+    }
 }

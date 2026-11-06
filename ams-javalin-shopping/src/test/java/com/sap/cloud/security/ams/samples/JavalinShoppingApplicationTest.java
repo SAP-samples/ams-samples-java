@@ -28,6 +28,8 @@ public class JavalinShoppingApplicationTest {
     private static String BOB_JWT;
     private static String CAROL_JWT;
     private static String BOB_EXTERNAL_ORDER_JWT;
+    private static String TECHNICAL_USER_JWT;
+    private static String TECHNICAL_USER_UNKNOWN_API_JWT;
 
     private Javalin app;
 
@@ -41,6 +43,8 @@ public class JavalinShoppingApplicationTest {
         BOB_JWT = loadJwtFromFile("User_bob.json");
         CAROL_JWT = loadJwtFromFile("User_carol.json");
         BOB_EXTERNAL_ORDER_JWT = loadJwtFromFile("RestrictedPrincipalPropagation_bob.json");
+        TECHNICAL_USER_JWT = loadJwtFromFile("TechnicalUser_GetProducts.json");
+        TECHNICAL_USER_UNKNOWN_API_JWT = loadJwtFromFile("TechnicalUser.json");
     }
 
     @BeforeEach
@@ -73,6 +77,29 @@ public class JavalinShoppingApplicationTest {
         JavalinTest.test(app, (server, client) -> {
             var response = client.get("/products", req -> {
                 req.header("Authorization", "Bearer " + CAROL_JWT);
+            });
+            assertEquals(403, response.code());
+        });
+    }
+
+    // GET /products tests for the App2App technical user flow
+    @Test
+    public void testProductsAllowedForTechnicalUserWithMappedApi() {
+        // ias_apis=GetProducts is mapped to the internal policy GetProducts, which USEs ReadProducts
+        JavalinTest.test(app, (server, client) -> {
+            var response = client.get("/products", req -> {
+                req.header("Authorization", "Bearer " + TECHNICAL_USER_JWT);
+            });
+            assertEquals(200, response.code());
+        });
+    }
+
+    @Test
+    public void testProductsDeniedForTechnicalUserWithUnmappedApi() {
+        // ias_apis=ReadProducts,ReadInvoices are not mapped to any internal policy
+        JavalinTest.test(app, (server, client) -> {
+            var response = client.get("/products", req -> {
+                req.header("Authorization", "Bearer " + TECHNICAL_USER_UNKNOWN_API_JWT);
             });
             assertEquals(403, response.code());
         });
